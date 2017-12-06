@@ -38,6 +38,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
      */
     warning: string;
 
+    secondaryFilesCount = 0;
+    metadataKeysCount   = 0;
+
     @ViewChildren("arrayItem", {read: JobStepInspectorEntryComponent})
     private arrayElements: QueryList<JobStepInspectorEntryComponent>;
 
@@ -102,9 +105,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 this.control.setValue({
                     class: this.inputType,
                     path: update.path || "",
-                    secondaryFiles: Array.isArray(update.secondaryFiles) || [],
-                    metadata: Object.prototype.isPrototypeOf(update.metadata) || {}
+                    secondaryFiles: Array.isArray(update.secondaryFiles) ? update.secondaryFiles : [],
+                    metadata: Object.prototype.isPrototypeOf(update.metadata) ? update.metadata : {}
                 }, updateOptions);
+                this.recalculateSecondaryFilesAndMetadataCounts();
                 break;
 
             default:
@@ -134,6 +138,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             if (plainInputTypes.indexOf(this.inputArrayItemsType) !== -1 && list.last) {
                 list.last.focus();
             }
+        });
+
+        this.control.valueChanges.subscribeTracked(this, value => {
+            this.recalculateSecondaryFilesAndMetadataCounts();
         });
 
         this.control.valueChanges
@@ -302,10 +310,27 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     promptFileMetadata() {
-        const comp          = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
-        comp.secondaryFiles = ["first", "second", "third"];
+        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
+
+        const {secondaryFiles, metadata} = this.control.value;
+
+        comp.secondaryFiles = secondaryFiles;
+        comp.metadata       = metadata;
+
         comp.submit.take(1).subscribeTracked(this, (data) => {
-            console.log("Received data", data);
-        })
+            this.modal.close();
+            this.control.patchValue(data);
+            this.cdr.markForCheck();
+        });
+    }
+
+    private recalculateSecondaryFilesAndMetadataCounts() {
+        const ctrlVal = Object.prototype.isPrototypeOf(this.control.value) ? this.control.value : {};
+
+        const {secondaryFiles, metadata} = ctrlVal;
+
+        this.secondaryFilesCount = Array.isArray(secondaryFiles) ? secondaryFiles.length : 0;
+        this.metadataKeysCount   = Object.prototype.isPrototypeOf(metadata) ? Object.keys(metadata).length : 0;
+
     }
 }

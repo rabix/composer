@@ -2,35 +2,40 @@ import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 
-/**
- * @TODO: files can also be directories and need to be specified \as CWL file objects ({class: "File" | "Directory"})
- * @TODO: for each entry, check whether it's a file or a dir on the system
- */
 @Component({
     selector: "ct-job-file-metadata-modal",
     template: `
         <form [formGroup]="form" (ngSubmit)="form.valid && applyChanges()">
-            
+
             <div class="form-container p-2">
                 <div class="form-group ">
                     <label>Secondary files</label>
 
-                    <div *ngFor="let control of form.get('secondaryFiles')['controls']; let idx = i" class="mb-1 secondary-file-row">
+                    <div *ngFor="let group of form.get('secondaryFiles')['controls']; let idx = i" class="mb-1 secondary-file-row">
+
                         <ct-native-file-browser-form-field class="input-group secondary-file-input"
-                                                           [formControl]="control"
+                                                           [formControl]="group.get('path')"
                                                            [useIcon]="true"
-                                                           selectionType="file">
+                                                           [browseIcon]="group.get('class').value === 'File' ? 'fa-file' : 'fa-folder'"
+                                                           [selectionType]="group.get('class').value === 'File' ? 'file' : 'directory'">
                         </ct-native-file-browser-form-field>
+                        
                         <span class="delete-btn-group">
-                        <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteSecondaryFile(idx)"
-                                [disabled]="readonly">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </span>
+                            <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteSecondaryFile(idx)"
+                                    [disabled]="readonly">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </span>
                     </div>
                     <p>
-                        <button type="button" class="btn pl-0 btn-link no-outline no-underline-hover" (click)="addSecondaryFile()">
-                            <i class="fa fa-plus"></i> Add secondary file
+                        <button type="button" class="btn pl-0 pr-0 btn-link no-outline no-underline-hover"
+                                (click)="addSecondaryFile('', 'File')">
+                            <i class="fa fa-plus"></i> Add a file
+                        </button>
+                        or
+                        <button type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
+                                (click)="addSecondaryFile('', 'Directory')">
+                            a directory
                         </button>
                     </p>
                 </div>
@@ -38,9 +43,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <div class="form-group">
                     <label>Metadata</label>
                     <ct-map-list class="form-group" formControlName="metadata"></ct-map-list>
-                </div>    
+                </div>
             </div>
-            
+
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" (click)="close()" data-test="modal-cancel-btn">Cancel</button>
                 <button class="btn btn-primary" type="submit" data-test="modal-submit-btn" [disabled]="!form.valid">Done</button>
@@ -53,7 +58,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 export class JobFileMetadataModalComponent implements OnInit {
 
     @Input()
-    secondaryFiles = <string[]>[];
+    secondaryFiles: { class: "File" | "Directory", path: string }[] = [];
 
     @Input()
     metadata: Object;
@@ -74,8 +79,16 @@ export class JobFileMetadataModalComponent implements OnInit {
             metadata: new FormControl(this.metadata)
         });
 
-        for (const filePath of this.secondaryFiles) {
-            (this.form.get("secondaryFiles") as FormArray).push(new FormControl(filePath));
+        try {
+            for (const entry of this.secondaryFiles) {
+                const formArray = (this.form.get("secondaryFiles") as FormArray);
+                formArray.push(new FormGroup({
+                    class: new FormControl(entry.class),
+                    path: new FormControl(entry.path)
+                }));
+            }
+        } catch (ex) {
+            console.warn("Invalid secondary files format", this.secondaryFiles);
         }
     }
 
@@ -84,13 +97,21 @@ export class JobFileMetadataModalComponent implements OnInit {
         ctrl.removeAt(index);
     }
 
-    addSecondaryFile(path = "") {
+    addSecondaryFile(path = "", type: "File" | "Directory") {
         const ctrl = this.form.get("secondaryFiles") as FormArray;
-        ctrl.push(new FormControl(path));
+
+        ctrl.push(new FormGroup({
+            class: new FormControl(type),
+            path: new FormControl(path)
+        }));
     }
 
     applyChanges() {
-        this.submit.next(this.form.value);
+        let fVal = this.form.value;
+
+        fVal.secondaryFiles = fVal.secondaryFiles.filter(entry => entry.path.trim() !== "");
+
+        this.submit.next(fVal);
     }
 
     close() {

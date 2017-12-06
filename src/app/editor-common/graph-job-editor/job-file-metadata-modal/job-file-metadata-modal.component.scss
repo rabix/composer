@@ -1,6 +1,7 @@
 :host {
     $modalWidth: 600px !default;
 
+
     display: block;
     width: 600px;
 
@@ -15,10 +16,12 @@
 
     .secondary-file-input {
         width: 540px;
+
     }
 
     .delete-btn-group {
         line-height: 1.8em;
         padding: 0 5px;
     }
+
 }

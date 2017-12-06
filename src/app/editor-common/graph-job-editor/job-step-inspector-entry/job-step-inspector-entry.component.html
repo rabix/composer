@@ -52,8 +52,16 @@
                                                selectionType="file">
             </ct-native-file-browser-form-field>
 
-            <button class="btn btn-link file-meta-edit-btn" type="button" (click)="promptFileMetadata()">
-                Add secondary files and metadata
+            <button *ngIf="control.get('path').enabled" class="btn btn-link file-meta-edit-btn" type="button"
+                    (click)="promptFileMetadata()">
+                <ng-container *ngIf="metadataKeysCount > 0 || secondaryFilesCount > 0; else defaultTitle">
+
+                    {{ secondaryFilesCount }} secondary {{ secondaryFilesCount === 1 ? 'file' : 'files'}},
+                    {{ metadataKeysCount }} metadata
+                </ng-container>
+
+                <ng-template #defaultTitle>Add secondary files and metadata</ng-template>
+
             </button>
 
         </ng-template>

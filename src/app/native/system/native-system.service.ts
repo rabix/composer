@@ -31,14 +31,10 @@ export class NativeSystemService {
         return this.os === os;
     }
 
-    openFolderChoiceDialog(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
-
+    private openDialog(options: Electron.OpenDialogOptions = {}): Promise<string[]> {
         const {app, dialog} = this.electron.getRemote();
-
-        const config = Object.assign({
-            title: "Choose a Directory",
+        const config        = Object.assign({
             defaultPath: app.getPath("home"),
-            properties: ["openDirectory", multi ? "multiSelections" : null].filter(v => v)
         }, options);
 
         return new Promise((resolve, reject) => {
@@ -48,20 +44,20 @@ export class NativeSystemService {
         });
     }
 
+    openFolderChoiceDialog(options: Electron.OpenDialogOptions = {}, multi = false): Promise<string[]> {
+
+        const title      = "Choose a Directory";
+        const properties = ["openDirectory", multi && "multiSelections"].filter(v => v);
+
+        return this.openDialog(Object.assign({title, properties}, options));
+    }
+
     openFileChoiceDialog(options: Electron.OpenDialogOptions = {}): Promise<string[]> {
 
-        const {app, dialog} = this.electron.getRemote();
+        const title      = "Choose a File";
+        const properties = ["openFile"];
 
-        const config = Object.assign({
-            title: "Choose a File",
-            defaultPath: app.getPath("home"),
-        }, options);
-
-        return new Promise((resolve, reject) => {
-            dialog.showOpenDialog(config, paths => {
-                paths ? resolve(paths) : reject();
-            });
-        })
+        return this.openDialog(Object.assign({title, properties}, options));
     }
 
     createFileChoiceDialog(options: Electron.SaveDialogOptions = {}): Promise<string> {

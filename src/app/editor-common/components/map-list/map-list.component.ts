@@ -105,7 +105,6 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
             .map(() => this.makeMap())
             .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
             .subscribeTracked(this, val => {
-                console.log("Propagating map change", val);
                 this.propagateChange(val);
             });
     }
