@@ -1,16 +1,16 @@
 import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, ViewChildren} from "@angular/core";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
+import {noop} from "../../lib/utils.lib";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../ui/menu/menu-item";
-import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
-import {WorkboxService} from "./workbox.service";
-import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ModalService} from "../../ui/modal/modal.service";
-import {noop} from "../../lib/utils.lib";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closing-dirty-apps-modal.component";
+import {WorkboxService} from "./workbox.service";
 
 
 @Component({
@@ -40,9 +40,9 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-home"></i>
                             </div>
 
-                            <div class="title" 
-                                 data-test="tab-title" 
-                                 [ct-tooltip]="ctt" 
+                            <div class="title"
+                                 data-test="tab-title"
+                                 [ct-tooltip]="ctt"
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
                             </div>
@@ -55,8 +55,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                             </div>
 
                             <div class="title"
-                                 [ct-tooltip]="ctt" 
-                                 [tooltipPlacement]="'bottom'" 
+                                 [ct-tooltip]="ctt"
+                                 [tooltipPlacement]="'bottom'"
                                  data-test="tab-title">
                                 {{tab.label}}
                             </div>
@@ -68,8 +68,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-share-alt"></i>
                             </div>
 
-                            <div class="title" 
-                                 [ct-tooltip]="ctt" 
+                            <div class="title"
+                                 [ct-tooltip]="ctt"
                                  [tooltipPlacement]="'bottom'"
                                  data-test="tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
@@ -82,8 +82,8 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-terminal"></i>
                             </div>
 
-                            <div class="title" 
-                                 [ct-tooltip]="ctt" 
+                            <div class="title"
+                                 [ct-tooltip]="ctt"
                                  [tooltipPlacement]="'bottom'"
                                  data-test="tab-title">
                                 {{tabComponents[i]?.dataModel?.label || tab.label}}
@@ -96,9 +96,9 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-file-o"></i>
                             </div>
 
-                            <div class="title" 
-                                 data-test="tab-title" 
-                                 [ct-tooltip]="ctt" 
+                            <div class="title"
+                                 data-test="tab-title"
+                                 [ct-tooltip]="ctt"
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
                             </div>
@@ -110,9 +110,9 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                                 <i class="fa fa-cog"></i>
                             </div>
 
-                            <div class="title" 
+                            <div class="title"
                                  data-test="tab-title"
-                                 [ct-tooltip]="ctt" 
+                                 [ct-tooltip]="ctt"
                                  [tooltipPlacement]="'bottom'">
                                 {{tab.label}}
                             </div>
@@ -121,7 +121,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
                     </ng-container>
 
                     <div class="close-icon">
-                        <i class="fa fa-times clickable" 
+                        <i class="fa fa-times clickable"
                            data-test="tab-close-button"
                            [attr.data-label]="tab.label"
                            (click)="workbox.closeTab(tab)"></i>
@@ -208,12 +208,29 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
                 this.workbox.activatePrevious();
             });
 
+        this.ipc.watch("accelerator", "CmdOrCtrl+S")
+            .filter(_ => this.activeTab !== undefined)
+            .map(() => {
+                const activeTabIndex = this.tabs.indexOf(this.activeTab);
+                return this.tabComponents[activeTabIndex];
+            })
+            .filter(c => c)
+            .subscribeTracked(this, (component) => {
+                if (typeof component.save === "function") {
+                    try {
+                        component.save();
+                    } catch (ex) {
+                        console.warn("Unable to save.", ex);
+                    }
+                }
+            });
+
         this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;
         });
 
         this.workbox.closeTabStream.subscribeTracked(this, tab => {
-           this.closeTab(tab);
+            this.closeTab(tab);
         });
 
         this.workbox.closeAllTabsStream.subscribeTracked(this, tabs => {
@@ -256,7 +273,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             });
 
         this.tabComponentContainers.changes.startWith(this.tabComponentContainers).delay(1)
-            .subscribeTracked(this , (components) => {
+            .subscribeTracked(this, (components) => {
                 this.tabComponents = components.toArray().map((c) => c.tabComponent);
             });
     }
@@ -298,7 +315,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             });
 
             modal.confirmationLabel = "Save";
-            modal.discardLabel = "Close without saving";
+            modal.discardLabel      = "Close without saving";
 
             modal.decision.take(1).subscribe((result) => {
                 this.modal.close();
