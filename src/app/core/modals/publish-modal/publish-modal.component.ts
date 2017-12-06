@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
@@ -67,6 +67,9 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
     @Input()
     appContent: string;
 
+    @Output()
+    published = new EventEmitter<string>();
+
     error: string;
 
     projectOptions = [];
@@ -128,7 +131,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             })));
     }
 
-    onSubmit(): Promise<string> {
+    onSubmit() {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
@@ -140,8 +143,9 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        return saveCall.then(() => {
+        saveCall.then(() => {
             this.isPublishing = false;
+            this.published.emit(appID);
             this.close();
             return appID;
         }, (err) => {

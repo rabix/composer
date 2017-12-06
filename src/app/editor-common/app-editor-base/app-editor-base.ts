@@ -371,25 +371,21 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.syncModelAndCode(true).then(() => {
             const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
             modal.appContent     = this.getModelText(true);
-            const originalSubmit = modal.onSubmit;
 
-            modal.onSubmit = (...args: any[]) => {
-                return originalSubmit.apply(modal, args).then(appID => {
+            modal.published.take(1).subscribeTracked(this, (appID) => {
+                // After new revision is load, app state is not Dirty any more
+                this.setAppDirtyState(false);
 
-                    // After new revision is load, app state is not Dirty any more
-                    this.setAppDirtyState(false);
+                const tab = this.workbox.getOrCreateAppTab({
+                    id: AppHelper.getRevisionlessID(appID),
+                    type: this.dataModel.class,
+                    label: modal.inputForm.get("name").value,
+                    isWritable: true,
+                    language: "json"
 
-                    const tab = this.workbox.getOrCreateAppTab({
-                        id: AppHelper.getRevisionlessID(appID),
-                        type: this.dataModel.class,
-                        label: modal.inputForm.get("name").value,
-                        isWritable: true,
-                        language: "json"
-
-                    });
-                    this.workbox.openTab(tab);
                 });
-            };
+                this.workbox.openTab(tab);
+            });
 
         }, err => console.warn);
     }
