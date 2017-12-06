@@ -917,22 +917,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     exportApp() {
-        const serializedModel = this.dataModel.serialize();
-        this.resolveContent(JSON.stringify(serializedModel)).then(content => {
-
-            const stripped = JSON.parse(JSON.stringify(content, (key, value) => {
-                if (key === "sbg:rdfId" || key === "sbg:rdfSource") {
-                    return undefined;
-                }
-
-                return value;
-            }));
-
-            const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
-            comp.appID      = this.tabData.id;
-            comp.appContent = stripped;
-
-        })
+        let serialized: Object;
+        if (this.dataModel instanceof WorkflowModel) {
+            serialized = this.dataModel.serializeEmbedded(false);
+        } else {
+            serialized = this.dataModel.serialize();
+        }
+        const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
+        comp.appID      = this.tabData.id;
+        comp.appContent = serialized;
 
     }
 }
