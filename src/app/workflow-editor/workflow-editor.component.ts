@@ -87,6 +87,63 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         );
 
         this.inspectorService = inspector;
+
+        this.updateService.update
+            .do((data: {id: string, app: any}) => {
+
+                if (this.tabData.dataSource === "local") {
+                    /**
+                     * Updating app may have been invalid before, in which case this workflow's dataModel
+                     * will have removed the app as a step. Therefore, we need to resolve to make sure
+                     * the updating app will show up as a step
+                     */
+                    if (data.app) {
+                        this.resolveAfterModelAndCodeSync().then(() => {}, err => console.warn);;
+                    } else if (this.viewMode === "code") {
+                        this.resolveToModel(this.codeEditorContent.value).then(() => {}, err => console.warn);
+                    } else {
+                        this.resolveContent(this.getModelText()).then(() => {}, err => console.warn);
+                    }
+                }
+            })
+            .filter((data: {id: string, app: any}) => {
+
+                /**
+                 *  Perform filter to see if updated app is a part of this workflow - all local workflows
+                 *  and platform workflows that have the 'sbg:id" property should be updated if necessary
+                 */
+                let filterFn = (step) => false;
+                if (this.tabData.dataSource === "local") {
+                    filterFn = (step) => step.customProps["sbg:rdfId"] === data.id || step.runPath === data.id;
+                } else if (data.id && !AppHelper.isLocal(data.id)) {
+                    filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
+                }
+                return this.dataModel && this.dataModel.steps.filter(filterFn).length > 0;
+            })
+            .subscribeTracked(this, (data: {id: string, app: any}) => {
+
+                if (this.tabData.dataSource === "local") {
+                    let steps;
+                    if (data.app) {
+                        steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
+                        steps.forEach(step => step.setRunProcess(data.app));
+
+                        // If an updated node was open in inspector, reopen inspector with updated node information
+                        if (this.graphEditor && this.showInspector && steps && this.graphEditor.inspectedNode) {
+                            const inspectedStep = steps.filter((step) => step.connectionId === this.graphEditor.inspectedNode.connectionId)[0];
+                            if (inspectedStep) {
+                                this.graphEditor.openNodeInInspectorById(this.graphEditor.inspectedNode.id, true);
+                            }
+                        }
+                    }
+                } else {
+                    if (this.graphEditor) {
+                        this.graphEditor.getStepUpdates();
+                    } else {
+                        this.graphDrawQueue.push(() => this.graphEditor.getStepUpdates());
+                    }
+                }
+            });
     }
 
     protected getPreferredTab(): string {
@@ -125,42 +182,14 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         }
     }
 
-    protected onFirstModelCreation(): void {
-        this.updateService.update
-            .filter((data: {id: string, app: any, isValidCWL?: boolean}) => {
-                let filterFn = (step) => false;
-                if (this.tabData.dataSource === "local") {
-                    filterFn = (step) => step.customProps["sbg:rdfId"] === data.id || step.runPath === data.id;
-                } else if (data.id && !AppHelper.isLocal(data.id)) {
-                    filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
-                }
-                return this.dataModel.steps.filter(filterFn).length > 0;
-            })
-            .subscribeTracked(this, (data: {id: string, app: any, isValidCWL?: boolean}) => {
-                if (this.tabData.dataSource === "local") {
-                    if (data.app) {
-                        const steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
-                        steps.forEach(step => step.setRunProcess(data.app));
-                    }
-                    this.syncModelAndCode(!data.app).then(() => {}, err => console.warn);
-                } else {
-                    if (this.graphEditor) {
-                        this.graphEditor.getStepUpdates();
-                    } else {
-                        this.graphDrawQueue.push(() => this.graphEditor.getStepUpdates());
-                    }
-                }
-            });
-    }
-
     /**
      * Serializes model to text. It also adds sbg:modified flag to indicate
      * the text has been formatted by the GUI editor
      */
-    protected getModelText(embed = false): string {
+    protected getModelText(forceJSON = false, embed = false): string {
         const wf = embed || this.tabData.dataSource === "app" ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
 
-        return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
+        return this.tabData.language === "json" || this.tabData.dataSource === "app" || forceJSON ?
             JSON.stringify(wf, null, 4) : Yaml.dump(wf);
     }
 

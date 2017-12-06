@@ -36,7 +36,7 @@
     <!--GUI Editor-->
     <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading && dataModel"
                            class="flex-col"
-                           (change)="syncModelAndCode(false)"
+                           (change)="dumpSwap()"
                            [readonly]="isReadonly"
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>
@@ -51,7 +51,7 @@
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  class="gui-editor-component p-2"
                  [readonly]="isReadonly"
-                 (change)="syncModelAndCode(false)"
+                 (change)="dumpSwap()"
                  [formGroup]="toolGroup"
                  [class.flex-col]="showInspector"
                  [model]="dataModel"></ct-app-info>

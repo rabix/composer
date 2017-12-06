@@ -29,8 +29,6 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
-import {JobHelper} from "cwlts/models/helpers/JobHelper";
-import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {

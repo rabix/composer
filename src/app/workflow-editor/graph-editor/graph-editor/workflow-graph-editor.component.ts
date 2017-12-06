@@ -403,6 +403,13 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     /**
+     * Open node in object inspector by passing in id
+     */
+    openNodeInInspectorById(id: string, forceRecreate = false) {
+        this.inspector.show(this.inspectorTemplate, id, forceRecreate);
+    }
+
+    /**
      * Set focus on Canvas
      */
     setFocusOnCanvas() {
