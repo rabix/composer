@@ -223,6 +223,10 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
     ngOnDestroy(): void {
         super.ngOnDestroy();
+
+        if (this.graph) {
+            this.graph.destroy();
+        }
         this.inspector.hide();
     }
 
