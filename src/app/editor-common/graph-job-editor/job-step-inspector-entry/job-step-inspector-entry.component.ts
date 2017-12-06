@@ -1,9 +1,11 @@
 import {
-    AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, QueryList,
+    AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, Injector, Input, OnChanges,
+    QueryList,
     SimpleChanges, ViewChild, ViewChildren
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
+import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
@@ -54,8 +56,12 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     private control: AbstractControl;
 
-    constructor(private cdr: ChangeDetectorRef, private modal: ModalService) {
+    constructor(private cdr: ChangeDetectorRef,
+                private modal: ModalService,
+                private injector: Injector,
+                @Inject(APP_MODEL) private appModel) {
         super();
+
     }
 
     writeValue(value: any): void {
@@ -130,6 +136,8 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     ngAfterViewInit() {
+
+        // console.log("Inhjected model", this.appModel);
 
         this.arrayElements.changes.subscribeTracked(this, list => {
 
@@ -314,8 +322,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
         const {secondaryFiles, metadata} = this.control.value;
 
-        comp.secondaryFiles = secondaryFiles;
-        comp.metadata       = metadata;
+        comp.secondaryFiles   = secondaryFiles;
+        comp.metadata         = metadata;
+        comp.allowDirectories = this.appModel.cwlVersion.indexOf("draft-2") === -1;
 
         comp.submit.take(1).subscribeTracked(this, (data) => {
             this.modal.close();

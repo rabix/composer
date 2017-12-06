@@ -19,7 +19,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                                            [browseIcon]="group.get('class').value === 'File' ? 'fa-file' : 'fa-folder'"
                                                            [selectionType]="group.get('class').value === 'File' ? 'file' : 'directory'">
                         </ct-native-file-browser-form-field>
-                        
+
                         <span class="delete-btn-group">
                             <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteSecondaryFile(idx)"
                                     [disabled]="readonly">
@@ -32,11 +32,14 @@ import {ModalService} from "../../../ui/modal/modal.service";
                                 (click)="addSecondaryFile('', 'File')">
                             <i class="fa fa-plus"></i> Add a file
                         </button>
-                        or
-                        <button type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
-                                (click)="addSecondaryFile('', 'Directory')">
-                            a directory
-                        </button>
+
+                        <ng-container *ngIf="allowDirectories">
+                            or
+                            <button type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
+                                    (click)="addSecondaryFile('', 'Directory')">
+                                a directory
+                            </button>
+                        </ng-container>
                     </p>
                 </div>
 
@@ -65,6 +68,9 @@ export class JobFileMetadataModalComponent implements OnInit {
 
     @Output()
     submit = new EventEmitter<Object>();
+
+    @Input()
+    allowDirectories = true;
 
     form: FormGroup;
 
