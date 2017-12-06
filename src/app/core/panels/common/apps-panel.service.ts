@@ -12,8 +12,12 @@ import {AppHelper} from "../../helpers/AppHelper";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
 import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
+import {environment} from './../../../../environments/environment';
 
-const {dialog} = window["require"]("electron").remote;
+declare var dialog:any;
+if ( ! environment.browser ) {
+    const {dialog} = window["require"]("electron").remote;
+}
 
 @Injectable()
 export class AppsPanelService {

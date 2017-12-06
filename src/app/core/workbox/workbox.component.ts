@@ -11,7 +11,8 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ModalService} from "../../ui/modal/modal.service";
 import {noop} from "../../lib/utils.lib";
 import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closing-dirty-apps-modal.component";
-
+import {LogoutComponent} from "../../logout/logout.component";
+import {environment} from '../../../environments/environment';
 
 @Component({
     selector: "ct-workbox",
@@ -139,6 +140,7 @@ import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closi
 
             </ul>
 
+            <logout *ngIf="isBrowser"></logout>
             <ct-settings-menu></ct-settings-menu>
         </div>
 
@@ -165,6 +167,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     activeTab: TabData<any>;
 
     private el: Element;
+    public isBrowser: Boolean = false;
 
     @ViewChildren("tabComponentContainer")
     private tabComponentContainers: QueryList<any>;
@@ -186,7 +189,9 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngOnInit() {
 
-
+        if (environment.browser) {
+            this.isBrowser = true;
+        }
 
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab

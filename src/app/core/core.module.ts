@@ -42,6 +42,7 @@ import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
 import {ClosingDirtyAppsModalComponent} from "./modals/closing-dirty-apps/closing-dirty-apps-modal.component";
+import {LogoutComponent} from "../logout/logout.component";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();
@@ -87,7 +88,8 @@ export function errorHandlerFactory(modal: ModalService) {
         HintsModalComponent,
         PlatformCredentialsModalComponent,
         UpdatePlatformModalComponent,
-        ClosingDirtyAppsModalComponent
+        ClosingDirtyAppsModalComponent,
+        LogoutComponent
     ],
     exports: [
         LogoComponent,

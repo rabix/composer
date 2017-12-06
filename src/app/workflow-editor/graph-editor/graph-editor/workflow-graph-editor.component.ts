@@ -44,8 +44,12 @@ import {WorkflowEditorComponent} from "../../workflow-editor.component";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
+import {environment} from './../../../../environments/environment';
 
-const {dialog} = window["require"]("electron").remote;
+declare var dialog:any;
+if ( ! environment.browser ) {
+    const {dialog} = window["require"]("electron").remote;
+}
 
 @Component({
     selector: "ct-workflow-graph-editor",

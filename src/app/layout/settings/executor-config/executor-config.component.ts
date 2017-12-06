@@ -5,6 +5,12 @@ import {ExecutorService} from "../../../executor/executor.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";
+import {environment} from './../../../../environments/environment';
+
+declare var dialog:any;
+if ( ! environment.browser ) {
+    const {dialog} = window["require"]("electron").remote;
+}
 
 @Component({
     selector: "ct-executor-config",
