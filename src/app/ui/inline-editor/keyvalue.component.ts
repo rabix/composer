@@ -1,4 +1,4 @@
-import {Component, EventEmitter, forwardRef, NgZone, Output, ViewEncapsulation} from "@angular/core";
+import {Component, EventEmitter, forwardRef, Input, NgZone, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../lib/utils.lib";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
@@ -24,10 +24,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
-                    <input class="form-control  col-xs-5" formControlName="key" placeholder="key"/>
+                    <input class="form-control  col-xs-5" formControlName="key" [placeholder]="keyLabel"/>
                     <span class="input-group-addon">:</span>
-                    <input class="form-control col-xs-5" formControlName="value"
-                           placeholder="value"/>
+                    <input class="form-control col-xs-5" formControlName="value" [placeholder]="valueLabel"/>
                     <span class="input-group-btn">
                         <button (click)="remove(i)" type="button"
                                 class="input-group-addon btn btn-secondary ">
@@ -47,6 +46,12 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
     `
 })
 export class KeyvalueComponent extends DirectiveBase implements ControlValueAccessor {
+
+    @Input()
+    keyLabel = "key";
+
+    @Input()
+    valueLabel = "value";
 
     public list: { key: string, value: string }[] = [];
 
