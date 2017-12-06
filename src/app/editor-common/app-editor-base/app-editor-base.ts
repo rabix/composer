@@ -29,6 +29,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
+import {AppExportModalComponent} from "../app-export-modal/app-export-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
@@ -896,7 +897,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         comp.import.take(1).subscribeTracked(this, (jobObject) => {
             metaManager.patchAppMeta("job", jobObject);
             this.modal.close();
-            if(this.jobEditor){
+            if (this.jobEditor) {
                 this.jobEditor.updateJob(jobObject);
             }
 
@@ -913,5 +914,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             comp.appID  = this.tabData.id;
             comp.job    = job;
         });
+    }
+
+    exportApp() {
+        const serializedModel = this.dataModel.serialize();
+        this.resolveContent(JSON.stringify(serializedModel)).then(content => {
+
+            const stripped = JSON.parse(JSON.stringify(content, (key, value) => {
+                if (key === "sbg:rdfId" || key === "sbg:rdfSource") {
+                    return undefined;
+                }
+
+                return value;
+            }));
+
+            const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
+            comp.appID      = this.tabData.id;
+            comp.appContent = stripped;
+
+        })
+
     }
 }
