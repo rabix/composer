@@ -11,6 +11,7 @@ import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
@@ -103,7 +104,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 new ZoomPlugin(),
                 new SVGNodeMovePlugin(),
                 new SVGJobFileDropPlugin(),
-                new SVGArrangePlugin()
+                new SVGArrangePlugin(),
+                new SVGRequiredInputMarkup()
             ]
         });
 
@@ -114,9 +116,20 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
             .map(v => this.normalizeJob(v))
             .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
             .subscribeTracked(this, changes => {
+
                 this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
                 this.metaManager.patchAppMeta("job", changes);
             });
+
+        this.metaManager.getAppMeta("job").subscribeTracked(this, job => {
+            const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
+
+            const missingInputConnectionIDs = this.model.inputs
+                .filter(input => !input.type.isNullable && job[input.id] === null)
+                .map(input => input.connectionId);
+
+            markupPlugin.markMissing(...missingInputConnectionIDs);
+        });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
             this.updateJob(storedJob)
