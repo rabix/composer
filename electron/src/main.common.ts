@@ -74,6 +74,14 @@ function start(config: { devTools: boolean, url: string }) {
             label: "Application",
             submenu: [
                 {
+                    label: "Save",
+                    accelerator: "CmdOrCtrl+S",
+                    selector: "save:",
+                    click: (menu, browser, event) => {
+                        acceleratorProxy.pass(menu, browser, event);
+                    }
+                },
+                {
                     label: "Check For Updates...",
                     accelerator: "checkForPlatformUpdates",
                     click: (menu, browser) => {
