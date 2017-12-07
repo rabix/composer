@@ -52,7 +52,7 @@
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.10.0",
         "core-js": "^2.5.0",
-        "cwl-svg": "1.1.0",
+        "cwl-svg": "1.1.3",
         "cwlts": "1.15.14",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",
