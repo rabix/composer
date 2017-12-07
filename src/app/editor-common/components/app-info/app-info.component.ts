@@ -27,7 +27,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                   [disabled]="readonly"
                                   type="textarea"
                                   (saveData)="updateDescription($event)">
-                    <div [ct-markdown]="model.description"></div>
+                    <ct-markdown [value]="model.description"></ct-markdown>
                 </ct-inline-editor>
             </div>
 

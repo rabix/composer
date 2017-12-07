@@ -8,7 +8,7 @@ import * as LazyHeaders from "markdown-it-lazy-headers";
 @Injectable()
 export class MarkdownService {
 
-    private markDownIt : MarkdownIt;
+    private markDownIt: MarkdownIt;
 
     constructor() {
         // using markdown-it-lazy-headers plugin so you don't have
@@ -17,6 +17,10 @@ export class MarkdownService {
     }
 
     parse(markdown: string) {
-        return this.markDownIt.render(markdown);
+        try {
+            return this.markDownIt.render(markdown);
+        } catch (err) {
+            return "";
+        }
     }
 }
