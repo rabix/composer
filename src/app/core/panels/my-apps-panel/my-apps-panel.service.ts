@@ -187,14 +187,16 @@ export class MyAppsPanelService extends AppsPanelService {
     private createPlatformAppListingTreeNodes(apps: App[], isWritable: boolean): TreeNode<App>[] {
         return apps.map(app => {
 
+            const revisionlessID = AppHelper.getRevisionlessID(app.id);
+
             return {
-                id: AppHelper.getRevisionlessID(app.id),
+                id: revisionlessID,
                 data: {...app, isWritable},
                 label: app.name,
                 type: "app",
                 icon: app.raw.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
                 dragEnabled: true,
-                dragTransferData: {name: app.id, type: "cwl"},
+                dragTransferData: {name: revisionlessID, type: "cwl"},
                 dragDropZones: ["graph-editor"],
                 dragLabel: app.name,
                 dragImageClass: app.raw.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
