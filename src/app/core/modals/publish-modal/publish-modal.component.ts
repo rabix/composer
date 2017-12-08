@@ -8,6 +8,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
+import * as unidecode from "unidecode";
 
 @Component({
     selector: "ct-publish-modal",
@@ -18,21 +20,33 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
             <div class="p-1">
 
                 <div class="form-group">
-                    <label class="">App Name:</label>
-                    <input class="form-control" formControlName="name"/>
-
-                    <p *ngIf="inputForm.controls.name" class="form-text text-muted">
-                        App ID: {{ inputForm.controls.name.value | slugify }}
-                    </p>
-                </div>
-
-                <div class="form-group">
                     <label>Destination Project:</label>
                     <ct-auto-complete formControlName="project" data-test="app-project"
                                       [mono]="true"
                                       [options]="projectOptions"
                                       placeholder="Choose a destination project...">
                     </ct-auto-complete>
+
+                    <p class="form-text text-muted">
+                        Only projects from the file tree are visible on this list
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label class="">App ID:</label>
+                    <ct-auto-complete formControlName="id" data-test="app-project"
+                                      [create]="true"
+                                      [mono]="true"
+                                      [options]="appOptions"
+                                      placeholder="Choose an app id...">
+                    </ct-auto-complete>
+
+                    <p class="form-text text-danger" [class.hidden]="!inputForm.controls['id'].value || inputForm.controls['id'].valid">
+                        App id can only contain numeric, lowercase alphabetic, and hyphen characters
+                    </p>
+                    <p class="form-text text-muted">
+                        Choose an existing app if you want to publish as a new revision
+                    </p>
                 </div>
 
                 <div class="form-group" *ngIf="revision > 0">
@@ -67,7 +81,12 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
     @Input()
     appContent: string;
 
+    @Input()
+    appID: string;
+
     error: string;
+
+    appOptions = [];
 
     projectOptions = [];
 
@@ -89,12 +108,12 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
     ngOnInit() {
         this.inputForm = new FormGroup({
-            name: new FormControl("", [Validators.required]),
+            id: new FormControl(this.formatAppID(this.appID), [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]),
             project: new FormControl("", [Validators.required]),
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
-            const {name, project} = group.getRawValue();
+            const {id, project} = group.getRawValue();
 
-            const appID = `${project}/${this.slugify.transform(name.toLowerCase())}/${this.revision}`;
+            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
@@ -113,9 +132,9 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         });
 
         this.inputForm.statusChanges.filter(() => this.inputForm.valid).subscribe(() => {
-            const {name, project} = this.inputForm.getRawValue();
+            const {id, project} = this.inputForm.getRawValue();
             this.outputForm.patchValue({
-                appID: project + "/" + this.slugify.transform(name.toLowerCase()) + "/" + this.revision
+                appID: project + "/" + this.slugify.transform(id.toLowerCase()) + "/" + this.revision
             });
         });
 
@@ -126,6 +145,14 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
                 value: project.id,
                 text: project.name
             })));
+
+        this.inputForm.controls["project"].valueChanges
+            .flatMap(val =>  {
+                return this.platformRepository.getAppsForProject(val)
+            })
+            .subscribeTracked(this, (apps: App[]) => {
+                this.appOptions = apps.map(app => ({value: app.id.split("/")[2], text: app.id.split("/")[2]}));
+            });
     }
 
     onSubmit(): Promise<string> {
@@ -150,9 +177,25 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         });
     }
 
+    private formatAppID(id: string) {
+        // unidecode represents UTF-8 characters in US-ASCII characters
+        const str        = unidecode(id.trim()).replace(/[^a-z1-9-]/gi, '-').toLowerCase();
+        let formattedStr = "";
+        let index        = -1;
+
+        for (let c in str) {
+            if (str[c] !== "-" || (index !== -1 && formattedStr[index] !== "-")) {
+                formattedStr += str[c];
+                index++;
+            }
+        }
+        if (formattedStr[index] === '-') {
+            formattedStr = formattedStr.slice(0, -1);
+        }
+        return formattedStr;
+    }
+
     close() {
         this.modal.close();
     }
-
-
 }
