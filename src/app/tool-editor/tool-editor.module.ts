@@ -36,6 +36,9 @@ import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolEditorComponent} from "./tool-editor.component";
 import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
+import { BaseCommandEditorComponent } from './sections/base-command-editor/base-command-editor.component';
+import { BaseCommandExpressionListComponent } from './sections/base-command-editor/base-command-expression-list/base-command-expression-list.component';
+import { BaseCommandStringNewComponent } from './sections/base-command-editor/base-command-string-new/base-command-string-new.component';
 
 @NgModule({
     declarations: [
@@ -69,7 +72,10 @@ import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor
         ToolStreamsComponent,
         BaseCommandStringComponent,
         ToolOtherComponent,
-        ToolCodesComponent
+        ToolCodesComponent,
+        BaseCommandEditorComponent,
+        BaseCommandExpressionListComponent,
+        BaseCommandStringNewComponent
     ],
     exports: [
         ToolEditorComponent,

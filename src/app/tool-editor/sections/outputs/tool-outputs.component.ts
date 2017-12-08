@@ -16,6 +16,7 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-state *ngIf="!readonly && !model?.outputs.length"
+                                [hasAction]="true"
                                 [buttonText]="'Add an Output'"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#output-ports'"
                                 [description]="blankStateDescription"

@@ -37,6 +37,7 @@ import {CustomValidators} from "../../../validators/custom.validator";
             </ol>
 
             <ct-blank-state *ngIf="!formList.length"
+                            [hasAction]="true"
                             [title]="emptyListText"
                             [buttonText]="addButtonText"
                             [readonly]="readonly"

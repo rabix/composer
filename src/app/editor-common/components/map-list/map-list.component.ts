@@ -18,6 +18,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div formArrayName="pairs">
 
                 <ct-blank-state *ngIf="!list.length && !readonly"
+                                [hasAction]="true"
                                 [buttonText]="'Add an Entry'"
                                 [description]="'No entries defined.'"
                                 (buttonClick)="add()">

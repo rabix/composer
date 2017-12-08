@@ -11,6 +11,7 @@ import {SBDraft2CommandLineToolModel, SBDraft2ExpressionModel} from "cwlts/model
     template: `
         <form [formGroup]="form">
             <ct-blank-state *ngIf="!readonly && !baseCommand.length"
+                            [hasAction]="true"
                             [buttonText]="'Add base command'"
                             [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#base-command'"
                             [description]="blankStateDescription"

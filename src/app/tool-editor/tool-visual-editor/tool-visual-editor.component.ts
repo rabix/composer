@@ -19,6 +19,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
+            <ct-form-panel>
+                <div class="tc-header">Base Command</div>
+                <div class="tc-body">
+                    <ct-base-command-editor></ct-base-command-editor>
+                </div>
+            </ct-form-panel>
+
             <ct-base-command [baseCommand]="model.baseCommand"
                              [model]="model"
                              [context]="context"
