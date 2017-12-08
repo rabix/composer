@@ -1,12 +1,5 @@
 import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    OnInit,
-    Output,
-    SimpleChanges,
+    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
     ViewEncapsulation
 } from "@angular/core";
 import {WorkflowStepInputModel} from "cwlts/models";
@@ -25,7 +18,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                     {{ warning }}
             </span>
         </div>
-        
+
         <div [ngSwitch]="inputType" class="form-group">
 
             <!--Each leaf field will be wrapped as an input group-->
@@ -106,8 +99,8 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 
                 <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
                 <span class="input-group-btn" *ngIf="index !== -1">
-                    <button type="button" 
-                            class="btn btn-secondary" 
+                    <button type="button"
+                            class="btn btn-secondary"
                             (click)="deleteFromArray()"
                             [disabled]="readonly">
                         <i class="fa fa-trash"></i>
@@ -118,7 +111,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 
             <!--Records-->
             <ng-template ngSwitchCase="record">
-                
+
                 <div *ngFor="let entry of input.type.fields" class="ml-1">
                     <label>{{entry?.label || entry.id}} <i class="fa fa-info-circle text-muted"
                                                            *ngIf="entry.description"
@@ -238,7 +231,7 @@ export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnIn
     }
 
     addArrayEntry(input) {
-        this.warning = undefined;
+        this.warning         = undefined;
         const generatedEntry = JobHelper.generateMockJobData(input);
         this.updateJob((this.value || []).concat(generatedEntry.slice(0, 1)));
     }
@@ -252,12 +245,15 @@ export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnIn
             && !Array.isArray(this.value)
             && this.value !== undefined) {
 
-            this.value = [];
+            this.value   = [];
             this.warning = `Type mismatch: the default step value for this input 
                             is of type “${typeof this.value}”, but the input is declared 
                             as “${this.inputType}”. 
                             You can generate a new set of test data for this input by clicking 
                             on the “New ${this.input.type.items}” button.`;
+
+        } else if (this.inputType === "string" && (this.value === null || this.value === undefined)) {
+            this.value = "";
         }
     }
 

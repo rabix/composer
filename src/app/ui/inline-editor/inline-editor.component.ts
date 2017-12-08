@@ -12,12 +12,11 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                 <!--Editing mode-->
                 <div *ngIf="editing">
-                    <input class="form-control" *ngIf="type === 'text'"
-                            [type]="type" [placeholder]="label" value="{{value}}"
-                           [(ngModel)]="value"/>
-                    <textarea class="form-control" *ngIf="type === 'textarea'"
-                              [name]="value" rows="20" [(ngModel)]="value">{{value}}</textarea>
-                    <ct-key-value *ngIf="type === 'keyvalue'" [(ngModel)]="value"></ct-key-value>
+                    <input class="form-control" *ngIf="type === 'text'" [type]="type" [placeholder]="label" [(ngModel)]="value"/>
+                    
+                    <textarea class="form-control" *ngIf="type === 'textarea'" [name]="value" rows="20" [(ngModel)]="value"></textarea>
+                    
+                    <ct-key-value *ngIf="type === 'keyvalue'" [(ngModel)]="value" [keyLabel]="keyLabel" [valueLabel]="valueLabel"></ct-key-value>
 
                     <ct-auto-complete *ngIf="type === 'tags'"  [name]="value" [options]="options"
                                       [(ngModel)]="value" [create]="true">
@@ -78,10 +77,17 @@ export class InlineEditorComponent extends DirectiveBase {
     @Output()
     saveData: EventEmitter<string> = new EventEmitter<string>();
 
+    @Input()
+    keyLabel = "key";
+
+    @Input()
+    valueLabel = "value";
+
     editing = false;
     isHover = false;
 
     originalValue: any;
+
 
     onCancel($event: Event) {
         $event.preventDefault();
