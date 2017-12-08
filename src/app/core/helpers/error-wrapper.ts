@@ -46,6 +46,14 @@ export class ErrorWrapper {
                 return msg + " timed out after " + time;
             }
 
+            if (typeof this.err.error === "string") {
+                try {
+                    this.err.error = JSON.parse(this.err.error);
+                } catch (ex) {
+                    console.warn(ex);
+                }
+            }
+
             if (this.err.error && this.err.error.message) {
                 return this.err.error.message;
             }
