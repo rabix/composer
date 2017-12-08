@@ -67,6 +67,11 @@ export class SVGJobFileDropPlugin extends PluginBase {
 
             const filePaths = [];
             for (const entry of [].concat(job[inputID])) {
+
+                if (entry === null) {
+                    continue;
+                }
+
                 if (entry.class === "File" && entry.path) {
                     filePaths.push(entry.path);
                 }
