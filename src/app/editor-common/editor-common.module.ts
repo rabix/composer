@@ -43,6 +43,7 @@ import {CommonDocumentControlsComponent} from "./template-common/common-document
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 import { JobImportExportComponent } from './job-import-export/job-import-export.component';
+import { AppExportModalComponent } from './app-export-modal/app-export-modal.component';
 
 @NgModule({
     declarations: [
@@ -83,7 +84,8 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
         ValidationReportComponent,
         ValidationTextPipe,
         JobStepInspectorComponent,
-        JobImportExportComponent
+        JobImportExportComponent,
+        AppExportModalComponent
 
     ],
     exports: [
@@ -124,6 +126,7 @@ import { JobImportExportComponent } from './job-import-export/job-import-export.
     ],
     entryComponents: [
         AppExecutionContextModalComponent,
+        AppExportModalComponent,
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
