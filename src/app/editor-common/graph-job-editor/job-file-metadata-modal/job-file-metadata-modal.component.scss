@@ -1,0 +1,27 @@
+:host {
+    $modalWidth: 600px !default;
+
+
+    display: block;
+    width: 600px;
+
+    .secondary-file-row {
+        display: flex;
+    }
+
+    .form-container {
+        max-height: 600px;
+        overflow: auto;
+    }
+
+    .secondary-file-input {
+        width: 540px;
+
+    }
+
+    .delete-btn-group {
+        line-height: 1.8em;
+        padding: 0 5px;
+    }
+
+}

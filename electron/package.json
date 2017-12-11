@@ -1,6 +1,6 @@
 {
     "name": "rabix-composer",
-    "version": "1.0.0-rc.2",
+    "version": "1.0.0-rc.3",
     "main": "dist/main.js",
     "scripts": {
         "test": "./node_modules/mocha/bin/_mocha -r ts-node/register ./src/**/*.spec.ts",

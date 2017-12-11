@@ -11,6 +11,7 @@ import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 
 @Component({
@@ -61,18 +62,31 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         if (inputEl) {
 
-            const inputID   = inputEl.getAttribute("data-id");
-            const jobValue  = this.jobControl.value;
-            const fileValue = jobValue[inputID];
-            const isArray   = Array.isArray(fileValue);
-            const newEntry  = {class: type, path: data.name};
+            const inputID    = inputEl.getAttribute("data-id");
+            const inputModel = this.model.inputs.find(input => input.id === inputID) as WorkflowInputParameterModel;
+
+            const inputTypeIsArray = inputModel.type.type === "array";
+
+            const job           = this.jobControl.value;
+            const inputJobValue = job[inputID];
+
+            const jobValueIsArray = Array.isArray(inputJobValue);
+
+            const newEntry = {class: type, path: data.name};
 
             const patch = {[inputID]: newEntry} as any;
-            if (isArray) {
-                patch[inputID] = fileValue.concat(newEntry);
+
+            if (jobValueIsArray) {
+                patch[inputID] = inputJobValue.concat(newEntry);
+            } else if (inputTypeIsArray) {
+                patch[inputID] = [newEntry];
+            } else {
+                patch[inputID] = newEntry;
             }
 
-            this.jobControl.patchValue({...jobValue, ...patch});
+            const newJob = {...job, ...patch};
+
+            this.jobControl.patchValue(newJob);
         }
     }
 
@@ -90,16 +104,31 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 new ZoomPlugin(),
                 new SVGNodeMovePlugin(),
                 new SVGJobFileDropPlugin(),
-                new SVGArrangePlugin()
+                new SVGArrangePlugin(),
+                new SVGRequiredInputMarkup()
             ]
         });
 
         this.graph.fitToViewport();
         this.draw.emit(this);
 
-        this.jobControl.valueChanges.subscribeTracked(this, changes => {
-            this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
-            this.metaManager.patchAppMeta("job", changes);
+        this.jobControl.valueChanges
+            .map(v => this.normalizeJob(v))
+            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+            .subscribeTracked(this, changes => {
+
+                this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
+                this.metaManager.patchAppMeta("job", changes);
+            });
+
+        this.metaManager.getAppMeta("job").subscribeTracked(this, job => {
+            const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
+
+            const missingInputConnectionIDs = this.model.inputs
+                .filter(input => !input.type.isNullable && job[input.id] === null)
+                .map(input => input.connectionId);
+
+            markupPlugin.markMissing(...missingInputConnectionIDs);
         });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
@@ -107,27 +136,33 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         });
     }
 
-
-    updateJob(jobObject = {}) {
+    private normalizeJob(jobObject: Object) {
         const nullJob = JobHelper.getNullJobInputs(this.model);
-        const job     = jobObject || {};
 
-        // Clean abundant keys from stored job
-        Object.keys(job).forEach(key => {
-            if (!(key in nullJob)) {
+        const job = jobObject || {};
+
+        for (const key in job) {
+            if (!nullJob.hasOwnProperty(key)) {
                 delete job[key];
             }
-        });
+        }
 
-        const controlValue = Object.assign(nullJob, job);
+        return {...nullJob, ...job};
+    }
+
+
+    updateJob(jobObject = {}) {
+
+        const normalizedJob = this.normalizeJob(jobObject);
+        const controlValue  = normalizedJob;
 
         this.jobControl.patchValue(controlValue, {emitEvent: false});
 
         this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(controlValue);
 
         // If we modified the job, push the update back
-        if (JSON.stringify(job) !== JSON.stringify(jobObject)) {
-            this.metaManager.patchAppMeta("job", job);
+        if (JSON.stringify(normalizedJob) !== JSON.stringify(jobObject)) {
+            this.metaManager.patchAppMeta("job", normalizedJob);
         }
     }
 

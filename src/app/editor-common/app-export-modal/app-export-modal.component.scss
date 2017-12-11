@@ -1,0 +1,58 @@
+@import "../../../assets/sass/variables";
+
+:host {
+    display: flex;
+    width: 700px;
+    flex-direction: column;
+
+    .code-preview {
+        display: flex;
+        flex: 1;
+    }
+
+    .parse-error {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 500px;
+        line-height: 2em;
+    }
+
+    .convert-btn {
+        line-height: inherit;
+    }
+
+    .header {
+        display: block;
+        border-bottom: 1px solid $input-border-color;
+        line-height: 1.9em; // if pushed to 2em, tabs will push the border downwards and won't overlay it
+    }
+
+    ct-tab-selector-entry {
+        line-height: 3em;
+    }
+
+    .body {
+        flex: 1 1 auto;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .dialog-content {
+        max-height: 500px;
+    }
+
+    .dialog-centered {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .footer {
+        text-align: right;
+    }
+}

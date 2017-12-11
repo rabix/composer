@@ -62,7 +62,7 @@ export class ToggleSliderComponent implements ControlValueAccessor, OnInit {
     }
 
     writeValue(isChecked: boolean): void {
-        this.value = !!isChecked;
+        this.value = Boolean(isChecked);
     }
 
     registerOnChange(fn: any): void {
