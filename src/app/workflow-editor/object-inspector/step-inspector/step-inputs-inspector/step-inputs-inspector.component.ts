@@ -182,6 +182,9 @@ export class StepInputsInspectorComponent extends DirectiveBase implements OnIni
     @Output()
     change = new EventEmitter();
 
+    /** This input exists in order to call ngOnChange (by changing its reference) to update inputs when step is updated */
+    @Input()
+    public stepIsUpdatedReference: any;
 
     dropDownPortOptions = [
         {
