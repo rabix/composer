@@ -121,15 +121,17 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 this.metaManager.patchAppMeta("job", changes);
             });
 
-        this.metaManager.getAppMeta("job").subscribeTracked(this, job => {
-            const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
+        this.metaManager.getAppMeta("job")
+            .filter(v => v) // job might be empty if we havent modified anything yet
+            .subscribeTracked(this, job => {
+                const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
 
-            const missingInputConnectionIDs = this.model.inputs
-                .filter(input => !input.type.isNullable && job[input.id] === null)
-                .map(input => input.connectionId);
+                const missingInputConnectionIDs = this.model.inputs
+                    .filter(input => !input.type.isNullable && (job[input.id] === null || job[input.id] === undefined))
+                    .map(input => input.connectionId);
 
-            markupPlugin.markMissing(...missingInputConnectionIDs);
-        });
+                markupPlugin.markMissing(...missingInputConnectionIDs);
+            });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
             this.updateJob(storedJob)

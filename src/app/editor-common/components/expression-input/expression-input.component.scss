@@ -1,39 +1,49 @@
 @import "../../../../assets/sass/variables";
 
-.expression-input-group {
-    position: relative;
-    border-radius: $input-border-radius;
-    border: 1px solid transparent;
+:host {
 
-
-    &:hover {
-        border: 1px solid $input-bg-hover;
-    }
-
-    .input-group-btn button {
-        height: 28.38px; //@fixme (this works but PLEASE fix me)
-        width: 46px;
-    }
-
-    .input-group-btn, input {
-        cursor: pointer;
-    }
-
-    &.expr .form-control, &.warning .form-control, &.error .form-control {
-        padding-left: 30px;
-    }
-
-    .validation-icon {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        z-index: 4;
-
-        &.result {
-            color: $text-muted;
-            top: 5px;
-            font-weight: bold;
+    .direct-editing-disabled {
+        .form-control {
+            padding-left: 30px;
         }
+    }
+
+    /deep/ {
+        .validation-icon {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 4;
+
+            &.result {
+                color: $text-muted;
+                top: 5px;
+                font-weight: bold;
+            }
+        }
+
+    }
+
+    .expression-input-group {
+        position: relative;
+        border-radius: $input-border-radius;
+        border: 1px solid transparent;
+
+        &:hover {
+            border: 1px solid $input-bg-hover;
+        }
+
+        .input-group-btn button {
+            height: 28.38px; //@fixme (this works but PLEASE fix me)
+            width: 46px;
+        }
+
+        .input-group-btn, input {
+            cursor: pointer;
+        }
+
+
+
     }
 
 }

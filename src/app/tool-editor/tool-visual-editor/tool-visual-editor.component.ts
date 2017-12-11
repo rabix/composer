@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from "@angular/core";
-import {FormGroup} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
@@ -19,20 +19,13 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
-            <ct-form-panel>
+            <ct-form-panel class="base-command-section">
                 <div class="tc-header">Base Command</div>
                 <div class="tc-body">
-                    <ct-base-command-editor></ct-base-command-editor>
+                    <ct-base-command-editor [allowExpressions]="model.cwlVersion === 'sbg:draft-2'"
+                                            [formControl]="form.get('baseCommand')"></ct-base-command-editor>
                 </div>
             </ct-form-panel>
-
-            <ct-base-command [baseCommand]="model.baseCommand"
-                             [model]="model"
-                             [context]="context"
-                             (updateCmd)="updateModel('baseCommand', $event)"
-                             (updateStream)="setStreams($event)"
-                             [readonly]="readonly">
-            </ct-base-command>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
@@ -93,7 +86,10 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     @Input()
     readonly: boolean;
 
-    /** ControlGroup that encapsulates the validation for all the nested forms */
+    /**
+     * ControlGroup that encapsulates the validation for all the nested forms
+     * @deprecated  remove this, use internal {@link form}
+     */
     @Input()
     formGroup: FormGroup;
 
@@ -101,6 +97,8 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     change = new EventEmitter<any>();
 
     context: any;
+
+    form: FormGroup;
 
     constructor(public inspector: EditorInspectorService) {
         super();
@@ -110,20 +108,39 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
         this.context = this.model.getContext();
     }
 
+    ngOnInit() {
+        this.form = new FormGroup({
+            baseCommand: new FormControl(this.model.baseCommand)
+        });
+
+        this.form.get("baseCommand").valueChanges.debounceTime(300).subscribeTracked(this, () => {
+            this.updateBaseCommand(this.form.getRawValue().baseCommand);
+        });
+    }
+
+    private updateBaseCommand(values: any[]): void {
+
+        this.model.baseCommand = [];
+
+        for (let command of values) {
+            if (command instanceof ExpressionModel) {
+                this.model.addBaseCommand(command.serialize());
+            } else {
+                this.model.addBaseCommand(command);
+            }
+        }
+
+        this.model.updateCommandLine();
+    }
+
+    /**
+     * @deprecated move conditional clauses into separate methods
+     * @param {string} category
+     * @param data
+     */
     updateModel(category: string, data: any) {
 
-        if (category === "baseCommand") {
-            this.model.baseCommand = [];
-
-            data.forEach(cmd => {
-                if (cmd instanceof ExpressionModel) {
-                    cmd = cmd.serialize();
-                }
-                this.model.addBaseCommand(cmd);
-            });
-            this.model.updateCommandLine();
-
-        } else if (category === "fileRequirement") {
+        if (category === "fileRequirement") {
             if (!this.model.fileRequirement) {
                 if (this.model.cwlVersion === "v1.0") {
                     this.model.setRequirement(<ProcessRequirement>{
