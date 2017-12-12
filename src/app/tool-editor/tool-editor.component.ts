@@ -27,6 +27,7 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {Subscription} from "rxjs/Subscription";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -80,6 +81,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     toolGroup: FormGroup;
 
+    jobSubscription: Subscription;
+
     constructor(statusBar: StatusBarService,
                 notificationBarService: NotificationBarService,
                 modal: ModalService,
@@ -123,6 +126,11 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     switchTab(tabName): void {
         super.switchTab(tabName);
 
+        if (this.jobSubscription) {
+            this.jobSubscription.unsubscribe();
+            this.jobSubscription = null;
+        }
+
         if (!this.dataModel) return;
 
         if (tabName === "test") {
@@ -148,7 +156,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             });
 
             // set job on the tool to be the actual job, so the command line is the real thing
-            (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
+            this.jobSubscription = (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
                 this.dataModel.setJobInputs(job);
             });
         } else {
