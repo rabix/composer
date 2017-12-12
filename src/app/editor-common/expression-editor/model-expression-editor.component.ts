@@ -1,13 +1,12 @@
-import {Component, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {ExpressionModel} from "cwlts/models";
-import {Subject} from "rxjs/Subject";
 
 @Component({
     selector: "ct-model-expression-editor",
     template: `
         <ct-expression-editor [evaluator]="evaluator"
                               [context]="context"
-                              (action)="action.next($event)"
+                              (submit)="submit.emit()"
                               [code]="code"
                               [readonly]="readonly">
         </ct-expression-editor>
@@ -25,9 +24,10 @@ export class ModelExpressionEditorComponent implements OnInit {
     readonly = false;
 
     @Output()
-    action = new Subject<"close" | "save">();
+    submit = new EventEmitter();
 
     code: string;
+
     evaluator: (code: string) => Promise<string | { message: string; type: any; }>;
 
     ngOnInit() {
