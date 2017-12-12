@@ -78,7 +78,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
 
     ngOnInit() {
         this.formList = new FormArray([]);
-        this.formList.valueChanges.debounceTime(300).subscribeTracked(this, () => {
+        this.formList.valueChanges.subscribeTracked(this, () => {
             this.propagateChange(this.formList.value);
         });
 

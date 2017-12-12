@@ -35,15 +35,6 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
                        [readonly]="readonly || disableLiteralTextInput || control.value.isExpression || control.disabled"
                        (click)="control.value.isExpression && editExpression()"/>
 
-
-                <!--<input #input class="form-control" data-test="expression-input"-->
-                <!--[type]="expr?.isExpression ? 'text' : type"-->
-                <!--[value]="expr?.toString() || ''"-->
-                <!--[readonly]="expr?.isExpression || disableLiteralTextInput || readonly"-->
-                <!--(blur)="propagateTouch()"-->
-                <!--(click)="editExpr(expr?.isExpression || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"-->
-                <!--(change)="editString(input.value)"/>-->
-
                 <span *ngIf="!readonly" class="input-group-btn">
                     <button type="button" class="btn btn-secondary btn-icon"
                             (click)="control.value.isExpression ? clearExpression() : editExpression()">
