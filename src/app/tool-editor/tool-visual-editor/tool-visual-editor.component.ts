@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
@@ -23,9 +23,10 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                 <div class="tc-header">Base Command</div>
                 <div class="tc-body">
                     <ct-base-command-editor [allowExpressions]="model.cwlVersion === 'sbg:draft-2'"
+                                            [readonly]="readonly"
                                             [formControl]="form.get('baseCommand')"></ct-base-command-editor>
                 </div>
-            </ct-form-panel>
+            </ct-form-panel> 
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
@@ -104,7 +105,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
         super();
     }
 
-    ngOnChanges() {
+    ngOnChanges(changes: SimpleChanges) {
         this.context = this.model.getContext();
     }
 
@@ -113,10 +114,12 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             baseCommand: new FormControl(this.model.baseCommand)
         });
 
-        this.form.valueChanges.skip(1).take(1).subscribeTracked(this, () => this.change.emit());
-
-        this.form.get("baseCommand").valueChanges.debounceTime(300).subscribeTracked(this, () => {
+        this.form.get("baseCommand").valueChanges.subscribeTracked(this, () => {
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
+        });
+
+        this.form.valueChanges.skip(1).subscribeTracked(this, () =>{
+            this.change.emit();
         });
     }
 

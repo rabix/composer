@@ -36,20 +36,21 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 
                 <ct-expression-input *ngIf="allowExpressions; else stringInput" [formControl]="control"
+                                     [readonly]="readonly"
                                      [context]="appModel.getContext()"></ct-expression-input>
 
                 <ng-template #stringInput>
-                    <input class="form-control" data-test="base-command-string" [formControl]="control"/>
+                    <input class="form-control" data-test="base-command-string" [formControl]="control" [readonly]="readonly"/>
                 </ng-template>
 
-                <div *ngIf="formList.enabled" class="remove-icon">
+                <div *ngIf="formList.enabled && !readonly" class="remove-icon">
                     <i ct-tooltip="Delete" class="fa fa-trash clickable" (click)="removeEntry(i)"></i>
                 </div>
 
             </li>
         </ol>
 
-        <button *ngIf="formList.enabled && formList.length > 0" type="button" class="btn btn-link add-btn-link no-underline-hover"
+        <button *ngIf="!readonly && formList.enabled && formList.length > 0" type="button" class="btn btn-link add-btn-link no-underline-hover"
                 (click)="addEntry()">
             <i class="fa fa-plus"></i> Add base command
         </button>
@@ -59,6 +60,9 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
 
     @Input()
     allowExpressions = false;
+
+    @Input()
+    readonly = false;
 
     formList: FormArray;
 
