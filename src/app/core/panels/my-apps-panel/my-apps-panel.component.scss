@@ -5,6 +5,10 @@
     display: flex;
     flex-direction: column;
 
+    ct-search-field {
+        margin: 0.5rem;
+    }
+
     ct-nav-search-result {
         opacity: 0;
         margin-left: -1em;
@@ -48,13 +52,32 @@
     .app-sources-btn {
         text-decoration: none;
         color: $brand-primary;
-        padding-top: 0;
 
         &:active, &:focus {
             color: $brand-primary;
             border-color: transparent;
             background: none;
             outline: none;
+        }
+    }
+
+    .sync-btn {
+        color: $layout-text-color;
+        float: right;
+        margin-right: 1rem;
+        padding: 7px 10px;
+
+        &:focus {
+            border-color: transparent;
+            background: none;
+            outline: none;
+        }
+
+        &:hover {
+            color: $layout-text-color;
+            background: #333;
+            border: $input-btn-border-width solid #6d6d6d;
+            padding: 6px 9px;
         }
     }
 }
