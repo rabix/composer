@@ -912,7 +912,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
             comp.action = "export";
             comp.appID  = this.tabData.id;
-            comp.job    = job;
+            comp.job    = Object.prototype.isPrototypeOf(job) ? job : {};
         });
     }
 

@@ -152,7 +152,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 
             <!--Unknown-->
             <ng-template ngSwitchDefault>
-                <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
+                Unknown input type: {{ inputType || "null" }}
             </ng-template>
         </div>
     `

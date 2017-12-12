@@ -29,8 +29,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                 <ng-container *ngIf="platformIsOutdated; else upToDateSection">
                     What's new:
-                    <div [ct-markdown]="description">
-                    </div>
+                    <ct-markdown [value]="description"></ct-markdown>
 
                     <div class="version-info">Current version: Rabix Composer ({{currentVersion}})</div>
                     <div class="version-info">New version: Rabix Composer ({{newVersion}})</div>

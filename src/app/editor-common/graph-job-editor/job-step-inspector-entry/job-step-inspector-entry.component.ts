@@ -1,20 +1,14 @@
 import {
-    AfterViewInit,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    forwardRef,
-    Input,
-    OnChanges,
+    AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, Injector, Input, OnChanges,
     QueryList,
-    SimpleChanges,
-    ViewChild,
-    ViewChildren
+    SimpleChanges, ViewChild, ViewChildren
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
+import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
+import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
 
 @Component({
     selector: "ct-job-step-inspector-entry",
@@ -46,6 +40,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
      */
     warning: string;
 
+    secondaryFilesCount = 0;
+    metadataKeysCount   = 0;
+
     @ViewChildren("arrayItem", {read: JobStepInspectorEntryComponent})
     private arrayElements: QueryList<JobStepInspectorEntryComponent>;
 
@@ -59,8 +56,12 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     private control: AbstractControl;
 
-    constructor(private cdr: ChangeDetectorRef) {
+    constructor(private cdr: ChangeDetectorRef,
+                private modal: ModalService,
+                private injector: Injector,
+                @Inject(APP_MODEL) private appModel) {
         super();
+
     }
 
     writeValue(value: any): void {
@@ -69,33 +70,55 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             return;
         }
 
-        this.warning = undefined;
-        let update   = value;
+        const updateOptions = {emitEvent: false};
+        this.warning        = undefined;
 
+        let update = value;
         switch (this.inputType) {
 
             case "record":
+
                 update = value instanceof Object ? value : {} as InputParameterModel;
-                this.control.patchValue(update);
+                this.control.patchValue(update, updateOptions);
                 break;
 
             case "array":
+
                 if (this.inputType === "array" && !Array.isArray(value)) {
-                    update = [];
+                    this.patchArrayValue([]);
+                } else {
+                    this.patchArrayValue(update);
                 }
-                this.patchArrayValue(update);
+
+                break;
+
+            case "string":
+                this.control.setValue(update ? String(update) : "", updateOptions);
+                break;
+
+            case "float":
+            case "int":
+                this.control.setValue(~~update, updateOptions);
+                break;
+            case "boolean":
+                this.control.setValue(Boolean(update), updateOptions);
                 break;
 
             case "Directory":
             case "File":
 
                 update = value || {};
-
-                this.control.setValue({class: this.inputType, path: update.path || ""}, {emitEvent: false});
+                this.control.setValue({
+                    class: this.inputType,
+                    path: update.path || "",
+                    secondaryFiles: Array.isArray(update.secondaryFiles) ? update.secondaryFiles : [],
+                    metadata: Object.prototype.isPrototypeOf(update.metadata) ? update.metadata : {}
+                }, updateOptions);
+                this.recalculateSecondaryFilesAndMetadataCounts();
                 break;
 
             default:
-                this.control.setValue(update, {emitEvent: false});
+                this.control.setValue(update, updateOptions);
                 break;
 
         }
@@ -114,27 +137,35 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     ngAfterViewInit() {
 
+        // console.log("Inhjected model", this.appModel);
+
         this.arrayElements.changes.subscribeTracked(this, list => {
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];
 
-            if (plainInputTypes.indexOf(this.inputArrayItemsType) !== -1) {
+            if (plainInputTypes.indexOf(this.inputArrayItemsType) !== -1 && list.last) {
                 list.last.focus();
             }
         });
 
-        this.control.valueChanges.subscribeTracked(this, change => {
-            let typecheckedChange = change;
-
-            if (this.inputType === "int") {
-                typecheckedChange = ~~change;
-            } else if (this.inputType === "float") {
-                typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
-            }
-
-
-            this.propagateChange(typecheckedChange);
+        this.control.valueChanges.subscribeTracked(this, value => {
+            this.recalculateSecondaryFilesAndMetadataCounts();
         });
+
+        this.control.valueChanges
+            .filter(v => this.control.status !== "DISABLED")
+            .subscribeTracked(this, change => {
+
+                let typecheckedChange = change;
+
+                if (this.inputType === "int") {
+                    typecheckedChange = ~~change;
+                } else if (this.inputType === "float") {
+                    typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
+                }
+
+                this.propagateChange(typecheckedChange);
+            });
     }
 
 
@@ -157,6 +188,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
     }
 
+    clear() {
+        this.control.setValue(null);
+    }
+
     addArrayEntry(): void {
         this.warning = undefined;
 
@@ -172,10 +207,26 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "string":
                 newControl = new FormControl("");
                 break;
+            case "int":
+            case "float":
+                newControl = new FormControl(0);
+                break;
+            case "boolean":
+                newControl = new FormControl(false);
+                break;
+            case "Directory":
+                newControl = new FormControl({
+                    class: "Directory",
+                    path: ""
+                });
+                break;
             case "File":
                 newControl = new FormControl({
+                    path: "",
                     class: "File",
-                    path: ""
+                    metadata: {},
+                    secondaryFiles: [],
+
                 });
                 break;
             default:
@@ -195,17 +246,21 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     private setupFormControls(): void {
+
+        const disabled = this.readonly;
+
         switch (this.inputType) {
 
             case "array":
                 this.control = new FormArray([]);
+                disabled ? this.control.disable() : this.control.enable();
                 break;
 
             case "record":
 
                 const controls = {};
                 for (const field of this.inputRecordFields) {
-                    controls[field.id] = new FormControl({value: undefined, disabled: this.readonly});
+                    controls[field.id] = new FormControl({value: undefined, disabled});
                 }
 
                 this.control = new FormGroup(controls);
@@ -214,8 +269,10 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "File":
 
                 this.control = new FormGroup({
-                    class: new FormControl("File"),
-                    path: new FormControl({value: undefined, disabled: this.readonly})
+                    path: new FormControl({value: undefined, disabled}),
+                    class: new FormControl({value: "File", disabled}),
+                    metadata: new FormControl({value: {}, disabled}),
+                    secondaryFiles: new FormControl({value: [], disabled}),
                 });
                 break;
 
@@ -223,13 +280,14 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
                 this.control = new FormGroup({
                     class: new FormControl("Directory"),
-                    path: new FormControl({value: undefined, disabled: this.readonly})
+                    path: new FormControl({value: undefined, disabled})
                 });
 
                 break;
 
             default:
                 this.control = new FormControl();
+                disabled ? this.control.disable() : this.control.enable();
                 break;
         }
     }
@@ -245,5 +303,43 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
 
         control.patchValue(update);
+    }
+
+
+    setDisabledState(isDisabled: boolean): void {
+
+        if (isDisabled && this.control.enabled) {
+            this.control.disable();
+        } else if (!isDisabled && this.control.disabled) {
+            this.control.enable();
+        }
+
+        this.cdr.markForCheck();
+    }
+
+    promptFileMetadata() {
+        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
+
+        const {secondaryFiles, metadata} = this.control.value;
+
+        comp.secondaryFiles   = secondaryFiles;
+        comp.metadata         = metadata;
+        comp.allowDirectories = this.appModel.cwlVersion.indexOf("draft-2") === -1;
+
+        comp.submit.take(1).subscribeTracked(this, (data) => {
+            this.modal.close();
+            this.control.patchValue(data);
+            this.cdr.markForCheck();
+        });
+    }
+
+    private recalculateSecondaryFilesAndMetadataCounts() {
+        const ctrlVal = Object.prototype.isPrototypeOf(this.control.value) ? this.control.value : {};
+
+        const {secondaryFiles, metadata} = ctrlVal;
+
+        this.secondaryFilesCount = Array.isArray(secondaryFiles) ? secondaryFiles.length : 0;
+        this.metadataKeysCount   = Object.prototype.isPrototypeOf(metadata) ? Object.keys(metadata).length : 0;
+
     }
 }

@@ -1,9 +1,6 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {
-    CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel,
-    WorkflowStepOutputModel
-} from "cwlts/models";
+import {CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel, WorkflowStepOutputModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
@@ -13,6 +10,7 @@ import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -29,6 +27,7 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {Subscription} from "rxjs/Subscription";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -55,6 +54,11 @@ export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, moda
             provide: APP_META_MANAGER,
             useFactory: appMetaManagerFactory,
             deps: [ToolEditorComponent, LocalRepositoryService, PlatformRepositoryService]
+        },
+        {
+            provide: APP_MODEL,
+            useFactory: appModelFactory,
+            deps: [ToolEditorComponent]
         }
     ],
     templateUrl: "./tool-editor.component.html"
@@ -76,6 +80,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     commandLineParts: Subject<CommandLinePart[]> = new ReplaySubject(1);
 
     toolGroup: FormGroup;
+
+    jobSubscription: Subscription;
 
     constructor(statusBar: StatusBarService,
                 notificationBarService: NotificationBarService,
@@ -120,6 +126,11 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     switchTab(tabName): void {
         super.switchTab(tabName);
 
+        if (this.jobSubscription) {
+            this.jobSubscription.unsubscribe();
+            this.jobSubscription = null;
+        }
+
         if (!this.dataModel) return;
 
         if (tabName === "test") {
@@ -145,7 +156,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             });
 
             // set job on the tool to be the actual job, so the command line is the real thing
-            (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
+            this.jobSubscription = (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
                 this.dataModel.setJobInputs(job);
             });
         } else {
