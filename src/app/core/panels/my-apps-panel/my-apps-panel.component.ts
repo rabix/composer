@@ -158,7 +158,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                         } as TabData<any>,
 
                         dragEnabled: true,
-                        dragTransferData: {name: app.id, type: "cwl"},
+                        dragTransferData: {name: revisionlessID, type: "cwl"},
                         dragLabel: app.name,
                         dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                         dragDropZones: ["graph-editor"]
