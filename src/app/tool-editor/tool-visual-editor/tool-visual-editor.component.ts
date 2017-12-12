@@ -113,6 +113,8 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             baseCommand: new FormControl(this.model.baseCommand)
         });
 
+        this.form.valueChanges.skip(1).take(1).subscribeTracked(this, () => this.change.emit());
+
         this.form.get("baseCommand").valueChanges.debounceTime(300).subscribeTracked(this, () => {
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
         });
@@ -134,7 +136,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     }
 
     /**
-     * @deprecated move conditional clauses into separate methods
+     * @FIXME move conditional clauses into separate methods
      * @param {string} category
      * @param data
      */
