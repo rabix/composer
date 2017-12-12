@@ -16,7 +16,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                     <h1 class="h3" data-test="app-info-title">{{model.label}}</h1>
                 </ct-inline-editor>
-                <div>Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
+                <div *ngIf="createdBy">Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
                 <div *ngIf="revisionNote">Revision note: “<em>{{revisionNote}}</em>”</div>
             </div>
 
@@ -27,7 +27,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                   [disabled]="readonly"
                                   type="textarea"
                                   (saveData)="updateDescription($event)">
-                    <div [ct-markdown]="model.description"></div>
+                    <ct-markdown [value]="model.description"></ct-markdown>
                 </ct-inline-editor>
             </div>
 

@@ -1,9 +1,6 @@
 import {Component, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
-import {
-    CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel,
-    WorkflowStepOutputModel
-} from "cwlts/models";
+import {CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel, WorkflowStepOutputModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
 import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
@@ -13,6 +10,7 @@ import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -55,6 +53,11 @@ export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, moda
             provide: APP_META_MANAGER,
             useFactory: appMetaManagerFactory,
             deps: [ToolEditorComponent, LocalRepositoryService, PlatformRepositoryService]
+        },
+        {
+            provide: APP_MODEL,
+            useFactory: appModelFactory,
+            deps: [ToolEditorComponent]
         }
     ],
     templateUrl: "./tool-editor.component.html"

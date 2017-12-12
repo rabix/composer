@@ -5,6 +5,7 @@ import {CWLModule} from "../cwl/cwl.module";
 import {UIModule} from "../ui/ui.module";
 import {AppExecutionContextModalComponent} from "./app-execution-context-modal/app-execution-context-modal.component";
 import {AppExecutionPreviewComponent} from "./app-execution-panel/app-execution-preview.component";
+import {AppExportModalComponent} from "./app-export-modal/app-export-modal.component";
 import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
@@ -28,6 +29,7 @@ import {EditorLayoutComponent} from "./editor-layout/editor-layout.component";
 import {ExpressionEditorComponent} from "./expression-editor/expression-editor.component";
 import {ModelExpressionEditorComponent} from "./expression-editor/model-expression-editor.component";
 import {GraphJobEditorComponent} from "./graph-job-editor/graph-job-editor.component";
+import {JobFileMetadataModalComponent} from "./graph-job-editor/job-file-metadata-modal/job-file-metadata-modal.component";
 import {JobStepInspectorEntryComponent} from "./graph-job-editor/job-step-inspector-entry/job-step-inspector-entry.component";
 import {JobStepInspectorComponent} from "./graph-job-editor/job-step-inspector/job-step-inspector.component";
 import {DirectoryInputInspectorComponent} from "./inspector-forms/directory-input-inspector/directory-input-inspector.component";
@@ -35,6 +37,7 @@ import {FileInputInspectorComponent} from "./inspector-forms/file-input-inspecto
 import {EditorInspectorContentComponent} from "./inspector/editor-inspector-content.component";
 import {EditorInspectorComponent} from "./inspector/editor-inspector.component";
 import {EditorInspectorDirective} from "./inspector/editor-inspector.directive";
+import {JobImportExportComponent} from "./job-import-export/job-import-export.component";
 import {EditorPanelComponent} from "./layout/editor-panel/editor-panel.component";
 import {FileDefContentPipe} from "./pipes/file-def-content.pipe";
 import {FileDefNamePipe} from "./pipes/file-def-name.pipe";
@@ -42,8 +45,6 @@ import {ValidationTextPipe} from "./pipes/validation-text.pipes";
 import {CommonDocumentControlsComponent} from "./template-common/common-document-controls/common-document-controls.component";
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
-import { JobImportExportComponent } from './job-import-export/job-import-export.component';
-import { AppExportModalComponent } from './app-export-modal/app-export-modal.component';
 
 @NgModule({
     declarations: [
@@ -70,6 +71,9 @@ import { AppExportModalComponent } from './app-export-modal/app-export-modal.com
         GraphJobEditorComponent,
         HintsComponent,
         InputTypeSelectComponent,
+        JobFileMetadataModalComponent,
+        JobImportExportComponent,
+        JobStepInspectorComponent,
         JobStepInspectorEntryComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
@@ -93,7 +97,6 @@ import { AppExportModalComponent } from './app-export-modal/app-export-modal.com
         AppInfoComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
-        MapListComponent,
         CommonStatusControlsComponent,
         CompactListComponent,
         EditableDirective,
@@ -115,6 +118,7 @@ import { AppExportModalComponent } from './app-export-modal/app-export-modal.com
         KeyValueInputComponent,
         KeyValueListComponent,
         MapListComponent,
+        MapListComponent,
         ModelExpressionEditorComponent,
         QuickPickComponent,
         RequirementInputComponent,
@@ -130,6 +134,7 @@ import { AppExportModalComponent } from './app-export-modal/app-export-modal.com
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
+        JobFileMetadataModalComponent,
         JobImportExportComponent,
         ModelExpressionEditorComponent,
     ],

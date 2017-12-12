@@ -6,7 +6,7 @@ export class SVGRequiredInputMarkup extends PluginBase {
 
     private css = {
         plugin: "__plugin-required-input-markup",
-        required: "__plugin-require-input-markup-required"
+        required: "__plugin-required-input-markup-required"
     };
 
 

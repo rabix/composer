@@ -28,7 +28,7 @@ import {KeyvalueComponent} from "./inline-editor/keyvalue.component";
 import {InputComponent} from "./input/input.component";
 import {LineLoaderComponent} from "./line-loader/line-loader.component";
 import {LoaderButtonContentComponent} from "./loader-button/loader-button-content.component";
-import {MarkdownDirective} from "./markdown/markdown.directive";
+import {MarkdownComponent} from "./markdown/markdown.component";
 import {MenuItemComponent} from "./menu/menu-item.component";
 import {MenuComponent} from "./menu/menu.component";
 import {CheckboxPromptComponent} from "./modal/common/checkbox-prompt.component";
@@ -79,7 +79,7 @@ import {BlankStateComponent} from "./blank-state/blank-state.component";
         FormPanelComponent,
         InlineEditorComponent,
         KeyvalueComponent,
-        MarkdownDirective,
+        MarkdownComponent,
         ModalComponent,
         ProgressComponent,
         SearchFieldComponent,
@@ -140,7 +140,7 @@ import {BlankStateComponent} from "./blank-state/blank-state.component";
         KeyvalueComponent,
         LineLoaderComponent,
         LoaderButtonContentComponent,
-        MarkdownDirective,
+        MarkdownComponent,
         MenuComponent,
         MenuItemComponent,
         ModalComponent,

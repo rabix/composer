@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -42,6 +43,11 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             provide: APP_META_MANAGER,
             useFactory: appMetaManagerFactory,
             deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
+        },
+        {
+            provide: APP_MODEL,
+            useFactory: appModelFactory,
+            deps: [WorkflowEditorComponent]
         }
 
     ],
