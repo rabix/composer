@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from "@angular/core";
+import {ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output} from "@angular/core";
 import {SystemService} from "../../platform-providers/system.service";
 
 @Component({
@@ -9,15 +9,17 @@ import {SystemService} from "../../platform-providers/system.service";
             <div class="row text-xs-center mb-1">
                 <div class="offset-xs-1 col-xs-10">
                     <span *ngIf="title">{{ title }}</span>
-                        {{description}}
+                    {{description}}
+                    <ng-content select="[tc-description]"></ng-content>
+                    
                 </div>
             </div>
 
-            <div class="row text-xs-center mb-1" *ngIf="buttonText && !readonly">
+            <div class="row text-xs-center mb-1" *ngIf="hasAction && !readonly">
                 <div class="col-xs-12">
 
                     <div #contentWrapper>
-                        <ng-content></ng-content>
+                        <ng-content select="[tc-content]"></ng-content>
                     </div>
 
                     <button *ngIf="contentWrapper.children.length == 0"
@@ -26,6 +28,7 @@ import {SystemService} from "../../platform-providers/system.service";
                             (click)="buttonClick.emit(true)"
                             data-test="blank-state-add-button">
                         {{ buttonText }}
+                        <ng-content select="[tc-button-text]"></ng-content>
                     </button>
 
                 </div>
@@ -34,8 +37,8 @@ import {SystemService} from "../../platform-providers/system.service";
             <div class="row text-xs-center mb-1" *ngIf="learnMoreURL">
                 <div class="col-xs-12">
                     or
-                    <a href="" class="clickable nav-link"
-                       (click)="$event.preventDefault(); system.openLink(learnMoreURL)">
+                    <a #link [href]="learnMoreURL" class="clickable nav-link"
+                       (click)="$event.preventDefault(); system.openLink(link.href)">
                         Learn More
                     </a>
                 </div>
@@ -47,6 +50,9 @@ export class BlankStateComponent {
 
     @Input()
     readonly = false;
+
+    @Input()
+    hasAction = false;
 
     @Input()
     title = "";
@@ -62,6 +68,9 @@ export class BlankStateComponent {
 
     @Output()
     buttonClick = new EventEmitter<boolean>();
+
+
+
 
     constructor(public system: SystemService) {
     }

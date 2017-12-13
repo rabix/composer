@@ -24,6 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <!--Blank Tool Screen-->
             <ct-blank-state *ngIf="!readonly && !keyValueFormList.length"
+                            [hasAction]="true"
                             [title]="emptyListText"
                             [buttonText]="addEntryText"
                             [learnMoreURL]="helpLink"

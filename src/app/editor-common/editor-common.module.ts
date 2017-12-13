@@ -10,7 +10,6 @@ import {AppValidatorService} from "./app-validator/app-validator.service";
 import {AppInfoComponent} from "./components/app-info/app-info.component";
 import {CompactListComponent} from "./components/compact-list/compact-list.component";
 import {ExpressionInputComponent} from "./components/expression-input/expression-input.component";
-import {ExpressionModelListComponent} from "./components/expression-model-list/expression-model-list.component";
 import {HintsComponent} from "./components/hint-list/hint-list.component";
 import {RequirementInputComponent} from "./components/hint-list/requirement-input.component";
 import {KeyValueInputComponent} from "./components/key-value-component/key-value-input.component";
@@ -64,7 +63,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         EditorPanelComponent,
         ExpressionEditorComponent,
         ExpressionInputComponent,
-        ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         FileInputInspectorComponent,
@@ -106,7 +104,6 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
         EditorLayoutComponent,
         ExpressionEditorComponent,
         ExpressionInputComponent,
-        ExpressionModelListComponent,
         FileDefContentPipe,
         FileDefNamePipe,
         FileInputInspectorComponent,

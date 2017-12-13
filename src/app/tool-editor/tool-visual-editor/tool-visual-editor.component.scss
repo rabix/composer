@@ -1,4 +1,5 @@
 @import "../../../assets/sass/variables";
+@import "../../../assets/sass/mixins";
 
 :host {
     overflow-y: auto;
@@ -7,4 +8,8 @@
 
     display: flex;
     flex-direction: column;
+
+    .base-command-section {
+        @include cli-border($code-base-cmd);
+    }
 }
