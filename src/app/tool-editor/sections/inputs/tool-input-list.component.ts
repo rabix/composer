@@ -13,6 +13,7 @@ import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-
         <div>
             <!--Blank Tool Screen-->
             <ct-blank-state *ngIf="!readonly && !entries.length && isField"
+                            [hasAction]="true"
                             [title]="'Click the button to define a field for record.'"
                             [buttonText]="'Add field'"
                             (buttonClick)="addEntry()">

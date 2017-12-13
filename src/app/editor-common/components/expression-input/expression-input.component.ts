@@ -1,13 +1,11 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {ChangeDetectorRef, Component, forwardRef, Input} from "@angular/core";
+import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ExpressionModel} from "cwlts/models";
-import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
     selector: "ct-expression-input",
     styleUrls: ["./expression-input.component.scss"],
     providers: [
@@ -18,37 +16,35 @@ import {ModelExpressionEditorComponent} from "../../expression-editor/model-expr
         }
     ],
     template: `
-        <div *ngIf="model" class="expression-input-group clickable"
-             [ct-validation-class]="model"
-             [class.expr]="model?.isExpression || disableLiteralTextInput">
+        <div *ngIf="control.value" class="expression-input-group clickable"
+             [ct-validation-class]="control.value"
+             [class.direct-editing-disabled]="control.value.isExpression || disableLiteralTextInput || readonly || control.disabled">
 
-            <ct-validation-preview [entry]="model"></ct-validation-preview>
-            <b class="validation-icon result"
-               *ngIf="model?.isExpression && !(model?.errors.length || model?.warnings.length)"
-               [title]="result">E:</b>
+            <ct-validation-preview [entry]="control.value"></ct-validation-preview>
+
+            <b *ngIf="control.value.isExpression && !control.value.warnings.length && !control.value.errors.length"
+               [title]="result"
+               class="validation-icon result">E:</b>
 
             <div class="input-group">
 
-                <input class="form-control"
-                       data-test="expression-input"
-                       #input
-                       [type]="model?.isExpression ? 'text' : type"
-                       [value]="model?.toString() || ''"
-                       [readonly]="model?.isExpression || disableLiteralTextInput || readonly"
-                       (blur)="onTouch()"
-                       (click)="editExpr(model?.isExpression || disableLiteralTextInput && !readonly ? 'edit' : null, $event)"
-                       (change)="editString(input.value)"/>
+                <input #input class="form-control" data-test="expression-input"
+                       [type]="control.value.isExpression ? 'text' : type"
+                       [ngModel]="textFieldValue"
+                       (ngModelChange)="applyStringUpdate(input.value)"
+                       [readonly]="readonly || disableLiteralTextInput || control.value.isExpression || control.disabled"
+                       (click)="control.value.isExpression && editExpression()"/>
 
-                <span class="input-group-btn" *ngIf="!readonly">
-                        <button type="button"
-                                class="btn btn-secondary btn-icon"
-                                (click)="editExpr(model?.isExpression ? 'clear' : 'edit', $event)">
-                            <i class="fa"
-                               [ngClass]="{'fa-times': model?.isExpression,
-                                            'fa-code': !model?.isExpression}"></i>
-                        </button>
-                    </span>
+                <span *ngIf="!readonly" class="input-group-btn">
+                    <button type="button" class="btn btn-secondary btn-icon"
+                            (click)="control.value.isExpression ? clearExpression() : editExpression()">
+                        
+                        <i class="fa" [class.fa-times]="control.value.isExpression" [class.fa-code]="!control.value.isExpression"></i> 
+                    </button>
+                </span>
+
             </div>
+
         </div>
     `
 })
@@ -62,128 +58,126 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
     @Input()
     type: "string" | "number" = "string";
 
-    /** When set to true, only expressions are allowed */
+    /**
+     * When set to true, only expressions are allowed
+     * This is needed for conformance with sbg:draft-2 cases where CWL specs allow expressions, but not string literals.
+     * V1.0 has no places where an expression is accepted, but not a string.
+     *
+     * @see http://www.commonwl.org/draft-2/#commandoutputbinding outputEval, this is what we should handle
+     * @see http://www.commonwl.org/draft-2/#expressiontool expression, but ExpressionTool is not supported in Composer
+     */
     @Input()
     disableLiteralTextInput = false;
 
     @Input()
     readonly = false;
 
-    /**
-     * Internal ExpressionModel on which changes are made
-     */
-    model: ExpressionModel;
-
-    /**
-     * Result gotten from expression evaluation
-     */
+    /** Result gotten from expression evaluation */
     result: any;
 
     /**
-     * Declaration of change function
+     * @type {FormControl} contains {@see ExpressionModel} on which changes are made
      */
-    private onChange = noop;
+    control: FormControl;
 
     /**
-     * Declaration of touch function
+     * This reflects the string value of {@link control.value}
+     * but we do not want to bind the template to that value directly because editing would end up in a writing loop.
+     * This is updated only on external write, and after an expression is edited.
+     * Otherwise, user typing into the field would trigger a control value change that would then end up rewriting the field,
+     * stripping whitespaces in the process and doing other weird stuff.
      */
-    onTouch = noop;
+    textFieldValue = "";
 
 
-    /**
-     * From ControlValueAccessor
-     * Write a new value to the element when initially loading formControl
-     * @param obj
-     */
-    writeValue(obj: ExpressionModel): void {
-        if (!(obj instanceof ExpressionModel)) {
-            console.warn(`ct-expression-input expected ExpressionModel, instead got ${obj}`);
-        }
+    private propagateChange = (value?) => void 0;
+    private propagateTouch  = () => void 0;
 
-        if (obj) {
-            this.model  = obj;
-        }
-    }
-
-    /**
-     * From ControlValueAccessor
-     * @param fn
-     */
-    registerOnChange(fn: any): void {
-        this.onChange = fn;
-    }
-
-    /**
-     * From ControlValueAccessor
-     * @param fn
-     */
-    registerOnTouched(fn: any): void {
-        this.onTouch = fn;
-    }
-
-    constructor(private modal: ModalService) {
+    constructor(private modal: ModalService,
+                private cdr: ChangeDetectorRef) {
         super();
+    }
+
+    ngOnInit() {
+        this.control = new FormControl();
+
+        this.control.valueChanges.subscribeTracked(this, () => {
+            this.propagateChange(this.control.value);
+        });
+    }
+
+    writeValue(expressionModel: ExpressionModel): void {
+        if (!(expressionModel instanceof ExpressionModel)) {
+            console.warn(`ct-expression-input expected ExpressionModel, instead got ${expressionModel}`);
+            return;
+        }
+
+        this.control.setValue(expressionModel, {emitEvent: false});
+        this.textFieldValue = this.control.value.toString();
+    }
+
+    registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    registerOnTouched(fn: any): void {
+        this.propagateTouch = fn;
     }
 
     /**
      * Callback for setting string value to model
      * @param str
      */
-    editString(str: number | string) {
-        if (this.type === "number") {
-            str = Number(str);
-        }
-
-        this.model.setValue(str, this.type);
-        this.onChange(this.model);
+    applyStringUpdate(str: string) {
+        let val          = this.type === "number" ? Number(str) : str;
+        const expression = this.control.value as ExpressionModel;
+        expression.setValue(val, this.type);
+        this.propagateChange(expression);
     }
 
-    /**
-     * Callback for setting or clearing expression value
-     * @param action
-     * @param event
-     */
-    editExpr(action: "clear" | "edit", event: Event): void {
 
-        if (!action) {
-            return;
-        }
+    setDisabledState(isDisabled: boolean): void {
 
-        if (action === "edit") {
-            const editor = this.modal.fromComponent(ModelExpressionEditorComponent, {
-                backdrop: true,
-                closeOnOutsideClick: false,
-                closeOnEscape: false,
-                title: "Expression Editor"
-            });
+    }
 
-            editor.readonly = this.readonly;
+    editExpression() {
 
-            editor.model   = this.model.clone();
-            editor.context = this.context;
-            editor.action.first().subscribe(editorAction => {
+        const expression = this.control.value as ExpressionModel;
 
-                if (editorAction === "save") {
-                    const val = editor.model.serialize();
+        const expressionEditor = this.modal.fromComponent(ModelExpressionEditorComponent, "Expression Editor", {
+            readonly: this.readonly || this.control.value.disabled,
+            model: expression.clone(),// @TODO check why we need to clone the model
+            context: this.context,
+        });
 
-                    if (!val) {
-                        editor.model.setValue("", this.type);
-                    }
+        expressionEditor.submit.take(1).subscribeTracked(this, action => {
+            const val = expressionEditor.model.serialize();
 
-                    this.model.cloneStatus(editor.model);
-                    this.onChange(this.model);
-                }
+            if (!val) {
+                expressionEditor.model.setValue("", this.type);
+            }
 
-                this.modal.close();
-            });
-        }
+            // @TODO check what status cloning does
+            expression.cloneStatus(expressionEditor.model);
+            this.control.setValue(expression);
+            this.textFieldValue = this.control.value.toString();
+            this.cdr.markForCheck();
 
-        if (action === "clear") {
-            this.modal.delete("expression").then(() => {
-                this.model.setValue("", this.type);
-                this.onChange(this.model);
-                event.stopPropagation();
-            }, err => console.warn);
-        }
+            this.modal.close();
+        });
+    }
+
+    clearExpression() {
+        const expression = this.control.value as ExpressionModel;
+
+        this.modal.delete("expression").then(() => {
+
+            expression.setValue("", "string");
+            this.textFieldValue = expression.toString();
+
+            this.propagateChange(expression);
+            event.stopPropagation();
+            this.cdr.markForCheck();
+        }, err => console.warn);
     }
 }

@@ -20,6 +20,7 @@ import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-
 
                     <!--Blank Tool Screen-->
                     <ct-blank-state *ngIf="!readonly && !model.arguments.length"
+                                    [hasAction]="true"
                                     [buttonText]="'Add an Argument'"
                                     [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#arguments'"
                                     [description]="blankStateDescription"
