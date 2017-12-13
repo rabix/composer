@@ -32,11 +32,9 @@ export class EditorInspectorDirective extends DirectiveBase implements OnInit {
     }
 
     ngOnInit(){
-
         if(this.target && this.inspector.isInspecting(this.target)){
             this.inspector.show(this.content, this.target, true);
         }
-
     }
 
     @HostListener("click", ["$event"])
