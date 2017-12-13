@@ -16,10 +16,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
 
         <div>
-            <ct-blank-state *ngIf="controls.length === 0 && !readonly"
-                            buttonText="Add an entry"
-                            description="No entries defined"
-                            (buttonClick)="add()">
+            <ct-blank-state *ngIf="controls.length === 0 && !readonly" (buttonClick)="add()" [hasAction]="true">
+                <section tc-description>No entries defined</section>
+                <section tc-button-text>Add an entry</section>
             </ct-blank-state>
 
             <div *ngFor="let ctrl of controls.controls; let i = index" class="list-item">
