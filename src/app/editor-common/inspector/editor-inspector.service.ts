@@ -1,11 +1,14 @@
 import {EmbeddedViewRef, Injectable, TemplateRef, ViewContainerRef} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs/Subject";
 
 @Injectable()
 export class EditorInspectorService {
 
     /** Holds the reference to the currently inspected object source, can be anything comparable */
     readonly inspectedObject = new BehaviorSubject<any>(undefined);
+
+    public save = new Subject<string>();
 
     private hostView: ViewContainerRef;
 
@@ -30,15 +33,19 @@ export class EditorInspectorService {
         this.inspectedObject.next(obj);
     }
 
-    show(template: TemplateRef<any>, inspectedObject?) {
+    show(template: TemplateRef<any>, inspectedObject?, forceReopen = false) {
 
-        if (inspectedObject === this.inspectedObject.getValue()) {
+        if (inspectedObject === this.inspectedObject.getValue() && !forceReopen) {
             return;
         }
 
         this.clearView();
         this.embeddedView = this.hostView.createEmbeddedView(template);
         this.inspectedObject.next(inspectedObject);
+    }
+
+    onSave() {
+        this.save.next(this.inspectedObject.getValue());
     }
 
     private clearView() {

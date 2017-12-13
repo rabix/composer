@@ -1,10 +1,11 @@
 import {ChangeDetectorRef, Component, Input, OnInit, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CommandLineToolModel, CreateFileRequirementModel, DirentModel, ExpressionModel} from "cwlts/models";
-import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
+import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-inspector.directive";
 
 @Component({
     selector: "ct-file-def-list",
@@ -181,6 +182,9 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
+    @ViewChildren(EditorInspectorDirective)
+    inspectorDirectives: QueryList<EditorInspectorDirective>;
+
     isSBDraft2;
 
     blankStateDescription = `Any config or temporary files the tool expects to be present when it executes,
@@ -189,6 +193,14 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
 
     constructor(public inspector: EditorInspectorService, private modal: ModalService, private cdr: ChangeDetectorRef) {
         super();
+
+        this.inspector.save.delay(1).subscribeTracked(this, (target: string) => {
+            this.inspectorDirectives.forEach((insp) => {
+                if (insp.target === target) {
+                    insp.reopen();
+                }
+            });
+        });
     }
 
     ngOnInit(): void {

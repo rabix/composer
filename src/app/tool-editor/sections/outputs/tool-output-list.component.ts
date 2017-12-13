@@ -4,6 +4,7 @@ import {EditorInspectorService} from "../../../editor-common/inspector/editor-in
 import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-inspector.directive";
 
 @Component({
     selector: "ct-tool-output-list",
@@ -170,8 +171,19 @@ export class ToolOutputListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
+    @ViewChildren(EditorInspectorDirective)
+    inspectorDirectives: QueryList<EditorInspectorDirective>;
+
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
+
+        this.inspector.save.delay(1).subscribeTracked(this, (target: string) => {
+            this.inspectorDirectives.forEach((insp) => {
+                if (insp.target === target) {
+                    insp.reopen();
+                }
+            });
+        });
     }
 
     removeEntry(index) {

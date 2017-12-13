@@ -165,6 +165,12 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         }
     }
 
+    protected afterModelCreated(isFirstCreation?: boolean): void {
+        if (this.inspector.inspectedObject.getValue()) {
+            this.inspector.onSave();
+        }
+    }
+
     protected getPreferredTab(): string {
         return "gui";
     }
