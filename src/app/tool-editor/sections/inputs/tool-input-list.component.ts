@@ -1,9 +1,11 @@
-import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
+import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChild, ViewChildren} from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "rxjs/util/noop";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {Editor} from "brace";
+import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-inspector.directive";
 
 @Component({
     selector: "ct-tool-input-list",
@@ -143,8 +145,19 @@ export class ToolInputListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
+    @ViewChildren(EditorInspectorDirective)
+    inspectorDirectives: QueryList<EditorInspectorDirective>;
+
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
+
+        this.inspector.save.delay(1).subscribeTracked(this, (target: string) => {
+            this.inspectorDirectives.forEach((insp) => {
+                if (insp.target === target) {
+                    insp.reopen();
+                }
+            });
+        });
     }
 
     removeEntry(index) {

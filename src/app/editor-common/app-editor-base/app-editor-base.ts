@@ -353,7 +353,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 this.priorityCodeUpdates.next(update);
 
-
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
                 if (!err || !err.message) {

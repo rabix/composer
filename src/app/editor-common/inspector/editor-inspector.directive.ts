@@ -37,5 +37,7 @@ export class EditorInspectorDirective extends DirectiveBase {
         this.inspector.show(this.content, this.target);
     }
 
-
+    public reopen() {
+        this.inspector.show(this.content, this.target, true);
+    }
 }

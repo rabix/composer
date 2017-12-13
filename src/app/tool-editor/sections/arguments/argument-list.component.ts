@@ -3,6 +3,7 @@ import {CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {EditorInspectorDirective} from "../../../editor-common/inspector/editor-inspector.directive";
 
 @Component({
     selector: "ct-argument-list",
@@ -153,11 +154,22 @@ export class ArgumentListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
+    @ViewChildren(EditorInspectorDirective)
+    inspectorDirectives: QueryList<EditorInspectorDirective>;
+
     blankStateDescription = `Parameters or options that are hard-coded for every execution of the tool. For example, you may 
     want to use a fixed name for an output file, so the output file name would be an argument not an input port.`;
 
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
+
+        this.inspector.save.delay(1).subscribeTracked(this, (target: string) => {
+            this.inspectorDirectives.forEach((insp) => {
+                if (insp.target === target) {
+                    insp.reopen();
+                }
+            });
+        });
     }
 
     removeEntry(index) {
