@@ -108,7 +108,34 @@ export class RabixExecutor {
             });
         });
 
+        const javaIsRunning = new Promise((resolve, reject) => {
+            const java = spawn("java", ["-version"]);
+
+            java.stderr.once("data", (data) => {
+                data = data.toString().split('\n')[0];
+                const javaVersion = new RegExp(/(java version|openjdk version)/).test(data) ? data.split(' ')[2].replace(/"/g, '') : null;
+                if (javaVersion) {
+                    const jvInt = parseInt(javaVersion.split(".").slice(0, 2).join(""));
+
+                    // check if java version is 1.8.x or above
+                    if (jvInt >= 18) {
+                        resolve();
+                    } else {
+                        dataCallback(new Error("Update Java to version 1.8 or above."));
+                        cleanup();
+                        reject();
+                    }
+
+                } else {
+                    dataCallback(new Error("Please install Java 1.8 or higher in order to execute apps."));
+                    cleanup();
+                    reject();
+                }
+            });
+        });
+
         const dockerIsRunning = new Promise((resolve, reject) => {
+
             const docker = spawn("docker", ["version"]);
             docker.on("close", (exitCode) => {
 
@@ -137,7 +164,7 @@ export class RabixExecutor {
             new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
         ]);
 
-        dockerIsRunning.then(() => Promise.all([
+        Promise.all([javaIsRunning, dockerIsRunning]).then(() => Promise.all([
             appFile,
             jobFile,
             logFilesCreated
