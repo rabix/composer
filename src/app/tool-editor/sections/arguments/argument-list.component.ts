@@ -19,6 +19,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                     <!--Blank Tool Screen-->
                     <ct-blank-state *ngIf="!readonly && !model.arguments.length"
+                                    [hasAction]="true"
                                     [buttonText]="'Add an Argument'"
                                     [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#arguments'"
                                     [description]="blankStateDescription"
