@@ -26,7 +26,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                             [readonly]="readonly"
                                             [formControl]="form.get('baseCommand')"></ct-base-command-editor>
                 </div>
-            </ct-form-panel> 
+            </ct-form-panel>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
@@ -107,6 +107,12 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     ngOnChanges(changes: SimpleChanges) {
         this.context = this.model.getContext();
+
+        // We have to recreate form controls because model is changed in place
+        // so nested objects would still refer to the old model
+        if (this.model && this.form && changes.model) {
+            this.form.setControl("baseCommand", new FormControl(this.model.baseCommand));
+        }
     }
 
     ngOnInit() {
@@ -118,7 +124,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
         });
 
-        this.form.valueChanges.skip(1).subscribeTracked(this, () =>{
+        this.form.valueChanges.skip(1).subscribeTracked(this, () => {
             this.change.emit();
         });
     }
