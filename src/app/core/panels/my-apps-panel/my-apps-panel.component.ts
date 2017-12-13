@@ -101,7 +101,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 this.fileRepository.reloadPath(folder);
             });
         });
-        this.service.reloadPlatformData();
+        this.localRepository.getActiveCredentials().take(1).subscribeTracked(this, (creds) => {
+            if (creds) {
+                this.service.reloadPlatformData();
+            }
+        });
     }
 
     private attachSearchObserver() {
