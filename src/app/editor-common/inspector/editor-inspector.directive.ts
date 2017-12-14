@@ -1,11 +1,11 @@
-import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, TemplateRef} from "@angular/core";
+import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, OnInit, TemplateRef} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {EditorInspectorService} from "./editor-inspector.service";
 
 @Directive({
     selector: "[ct-editor-inspector]",
 })
-export class EditorInspectorDirective extends DirectiveBase {
+export class EditorInspectorDirective extends DirectiveBase implements OnInit {
 
     @Input("ct-editor-inspector")
     public content: TemplateRef<any>;
@@ -29,6 +29,12 @@ export class EditorInspectorDirective extends DirectiveBase {
 
                 cdRef.markForCheck();
             });
+    }
+
+    ngOnInit(){
+        if(this.target && this.inspector.isInspecting(this.target)){
+            this.inspector.show(this.content, this.target, true);
+        }
     }
 
     @HostListener("click", ["$event"])
