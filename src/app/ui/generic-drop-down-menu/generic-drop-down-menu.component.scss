@@ -38,8 +38,8 @@
         color: $smoke;
         text-align: left;
 
-        .text-muted {
-            white-space: nowrap;
+        &.dropdown-port-option {
+            width: 215px;
         }
 
         &:hover {
