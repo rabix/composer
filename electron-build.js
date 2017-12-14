@@ -3,6 +3,7 @@ const builder = require("electron-builder");
 const fs = require("fs-extra");
 const archiver = require("archiver");
 const glob = require("glob");
+const rimraf = require("rimraf");
 
 
 const projectRoot = path.resolve(__dirname + "/");
@@ -10,9 +11,14 @@ const ngDistDir = projectRoot + "/ng-dist";
 const electronDir = projectRoot + "/electron";
 const appDistDir = projectRoot + "/dist";
 
+rimraf.sync(appDistDir);
+
 // Copy ng-dist to dist
 console.log("Copying compiled frontend code...");
-fs.copySync(ngDistDir, appDistDir);
+fs.copySync(ngDistDir, appDistDir, {
+    overwrite: true
+});
+
 
 // Generate package.json for the distribution build
 console.log("Generating production package.json file...");
