@@ -52,7 +52,12 @@ import {Component, Input} from "@angular/core";
                     <i class="fa fa-fw fa-save"></i>
                 </button>
 
-                <button type="button" class="btn control-button" ct-tooltip="Export App" tooltipPlacement="bottom" (click)="host.exportApp()">
+                <button [disabled]="!host.dataModel"
+                        type="button" 
+                        class="btn control-button" 
+                        ct-tooltip="Export App" 
+                        tooltipPlacement="bottom" 
+                        (click)="host.exportApp()">
                     <i class="fa fa-fw fa-upload"></i>
                 </button>
 
