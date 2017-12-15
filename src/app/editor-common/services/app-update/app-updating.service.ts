@@ -1,9 +1,10 @@
-import {EventEmitter, Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
+import {Subject} from "rxjs/Subject";
 
 @Injectable()
 export class AppUpdateService {
 
-    update = new EventEmitter<any>();
+    update = new Subject<any>();
 
     constructor() {
     }
