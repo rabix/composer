@@ -25,6 +25,7 @@ $gradientDarken: 2%;
 .btn-link:disabled {
     border: none;
     background: none;
+    vertical-align: baseline;
 }
 
 .btn-inline-link,
@@ -38,7 +39,13 @@ $gradientDarken: 2%;
     line-height: inherit;
     outline: none;
     text-decoration: underline;
+    vertical-align: baseline;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
+
 
 .btn-primary:active {
     background: $btn-primary-bg;

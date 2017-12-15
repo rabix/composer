@@ -1,16 +1,8 @@
 import {
-    AfterViewInit,
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    forwardRef,
-    Input,
-    OnChanges,
-    OnInit,
-    Output,
+    AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output,
     SimpleChanges
 } from "@angular/core";
-import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -49,9 +41,23 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     private jobValue: Object;
 
-    writeValue(obj: any): void {
-        this.jobValue = obj;
-        this.jobGroup.patchValue(obj, {emitEvent: false});
+    writeValue(jobValue: any): void {
+
+        this.jobValue = jobValue;
+        this.jobGroup.patchValue(jobValue, {emitEvent: false});
+
+        for (const controlName in this.jobGroup.controls) {
+
+            const control = this.jobGroup.get(controlName);
+            const kval    = this.jobValue[controlName];
+
+            if (kval === null || kval === undefined) {
+                control.disable({emitEvent: false, onlySelf: true});
+            } else {
+                control.enable({emitEvent: false, onlySelf: true});
+            }
+        }
+
     }
 
     registerOnChange(fn: any): void {
@@ -66,9 +72,19 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     ngAfterViewInit(): void {
         super.ngAfterViewInit();
 
-        this.jobGroup.valueChanges.subscribeTracked(this, changes => {
-            this.propagateChange({...this.jobValue, ...changes});
-        });
+        this.jobGroup.valueChanges
+            .map(changes => {
+                const out = {...this.jobValue, ...changes};
+
+                for (const cname in this.jobGroup.controls) {
+                    if (this.jobGroup.controls[cname].disabled) {
+                        out[cname] = null;
+                    }
+                }
+
+                return out;
+            })
+            .subscribeTracked(this, changes => this.propagateChange(changes));
     }
 
     /**
@@ -154,6 +170,11 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         });
     }
 
+    clear(inputControl: AbstractControl) {
+        // inputControl.setValue(null);
+        inputControl.disable();
+    }
+
     private recreateForms(): void {
 
         for (let ctrl in this.jobGroup.controls) {
@@ -190,6 +211,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             name: key,
             inputs: grouped[key]
         }));
+
     }
 
     private stepInputsAreSame(previousValue: any[], currentValue: any[]) {

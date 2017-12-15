@@ -15,6 +15,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
             <div class="tc-body">
                 <form [formGroup]="form">
                     <ct-blank-state *ngIf="!readonly && !secondaryFiles.length"
+                                    [hasAction]="true"
                                     [buttonText]="'Add secondary file'"
                                     [description]="'No Secondary Files defined.'"
                                     (buttonClick)="addFile()">

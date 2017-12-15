@@ -6,6 +6,7 @@ import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
@@ -29,6 +30,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
+import {AppExportModalComponent} from "../app-export-modal/app-export-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
@@ -117,6 +119,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     protected appSavingService: AppSaver;
 
+    private modelCreated = false;
+
     /**
      * Used to emit signals that should stop app execution, if it's running.
      * It is used a breaking emit, so anything can be pushed through it.
@@ -171,8 +175,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
+        /** Replay subject used here because withLatestFrom operator did not work well for validationStateChanges stream */
+        const externalCodeChanges = new ReplaySubject(1);
+
         /** Changes to the code that did not come from user's typing. */
-        const externalCodeChanges = Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged();
+        Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
         /** We skip validation for first code changes in local apps because initial resolve will call validation */
         const codeChangesToValidate = Observable.merge(this.resolveDocumentChanges,
@@ -390,26 +397,23 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
         modal.appContent     = this.getModelText(true, true);
-        const originalSubmit = modal.onSubmit;
 
-        modal.onSubmit = (...args: any[]) => {
-            return originalSubmit.apply(modal, args).then(obj => {
-                this.updateService.updateApps({ id: obj.app["sbg:id"], app: obj.app });
+        modal.published.take(1).subscribeTracked(this, obj => {
+            this.updateService.updateApps({ id: obj.app["sbg:id"], app: obj.app });
 
-                // After new revision is load, app state is not Dirty any more
-                this.setAppDirtyState(false);
+            // After new revision is load, app state is not Dirty any more
+            this.setAppDirtyState(false);
 
-                const tab = this.workbox.getOrCreateAppTab({
-                    id: AppHelper.getRevisionlessID(obj.id),
-                    type: this.dataModel.class,
-                    label: modal.inputForm.get("name").value,
-                    isWritable: true,
-                    language: "json"
+            const tab = this.workbox.getOrCreateAppTab({
+                id: AppHelper.getRevisionlessID(obj.id),
+                type: this.dataModel.class,
+                label: modal.inputForm.get("name").value,
+                isWritable: true,
+                language: "json"
 
-                });
-                this.workbox.openTab(tab);
             });
-        };
+            this.workbox.openTab(tab);
+        });
     }
 
     provideStatusControls(): TemplateRef<any> {
@@ -642,6 +646,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const tryModelCreation = (text, resolve, reject) => {
             try {
                 this.recreateModel(text); // throws exception when generating graph
+                this.afterModelCreated(!this.modelCreated);
+                this.modelCreated = true;
+
                 resolve(text);
             } catch (err) {
                 reject(new Error("Model error: " + err.message));
@@ -700,6 +707,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     protected getPreferredReportPanel(): string {
         return undefined;
+    }
+
+    protected afterModelCreated(isFirstCreation: boolean): void {
     }
 
     protected updateSavingAvailability() {
@@ -913,7 +923,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         comp.import.take(1).subscribeTracked(this, (jobObject) => {
             metaManager.patchAppMeta("job", jobObject);
             this.modal.close();
-            if(this.jobEditor){
+            if (this.jobEditor) {
                 this.jobEditor.updateJob(jobObject);
             }
 
@@ -928,7 +938,20 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
             comp.action = "export";
             comp.appID  = this.tabData.id;
-            comp.job    = job;
+            comp.job    = Object.prototype.isPrototypeOf(job) ? job : {};
         });
+    }
+
+    exportApp() {
+        let serialized: Object;
+        if (this.dataModel instanceof WorkflowModel) {
+            serialized = this.dataModel.serializeEmbedded(false);
+        } else {
+            serialized = this.dataModel.serialize();
+        }
+        const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
+        comp.appID      = this.tabData.id;
+        comp.appContent = serialized;
+
     }
 }

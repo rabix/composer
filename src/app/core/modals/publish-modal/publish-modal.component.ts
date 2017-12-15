@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
@@ -69,6 +69,9 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
     @Input()
     appContent: string;
 
+    @Output()
+    published = new EventEmitter<{id: string, app: any}>();
+
     error: string;
 
     projectOptions = [];
@@ -130,7 +133,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             })));
     }
 
-    onSubmit(): Promise<void | { app: object, id: string}> {
+    onSubmit() {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
@@ -142,10 +145,11 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        return saveCall.then((str) => {
+        saveCall.then((str) => {
             this.isPublishing = false;
+            this.published.emit({id: appID, app: Yaml.safeLoad(str, {json: true} as LoadOptions)});
             this.close();
-            return {id: appID, app: Yaml.safeLoad(str, {json: true} as LoadOptions)};
+            return appID;
         }, (err) => {
             this.error        = "Failed to push the app. " + new ErrorWrapper(err);
             this.isPublishing = false;

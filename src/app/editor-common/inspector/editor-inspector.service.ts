@@ -30,9 +30,9 @@ export class EditorInspectorService {
         this.inspectedObject.next(obj);
     }
 
-    show(template: TemplateRef<any>, inspectedObject?, forceRecreate = false) {
+    show(template: TemplateRef<any>, inspectedObject?, forceReopen = false) {
 
-        if (inspectedObject === this.inspectedObject.getValue() && !forceRecreate) {
+        if (inspectedObject === this.inspectedObject.getValue() && !forceReopen) {
             return;
         }
 
