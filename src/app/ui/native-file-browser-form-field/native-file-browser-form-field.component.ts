@@ -70,7 +70,7 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
     private _value = "";
 
 
-    constructor(private dialog: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
+    constructor(private native: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
     }
 
     get value(): string {
@@ -93,12 +93,12 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
         switch (this.selectionType) {
             case "directory":
-                opener = this.dialog.openFolderChoiceDialog(params);
+                opener = this.native.openFolderChoiceDialog(params);
                 break;
 
             case "file":
             default:
-                opener = this.dialog.openFileChoiceDialog(params);
+                opener = this.native.openFileChoiceDialog(params);
                 break;
         }
 
