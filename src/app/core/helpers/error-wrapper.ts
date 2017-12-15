@@ -9,7 +9,7 @@ export class ErrorWrapper {
 
     toString() {
         if (this.err.error && this.err.error.syscall === "getaddrinfo" && !navigator.onLine) {
-            return "You are offline.";
+            return "You are currently offline - please check your internet connection.";
         }
 
         if (this.err.error && this.err.error.code === "ENOTFOUND") {
