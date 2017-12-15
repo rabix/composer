@@ -40,7 +40,7 @@ export class UpdatePlugin extends PluginBase {
         if (this.workflow.editingEnabled) {
             this.localRepository.getActiveCredentials().take(1).subscribe(creds => {
                 if (creds) {
-                    this.getStepUpdates();
+                    this.getStepUpdates(false);
                 }
             });
         }
@@ -85,7 +85,7 @@ export class UpdatePlugin extends PluginBase {
     /**
      * Call updates service to get information about steps if they have updates and mark ones that can be updated
      */
-    private getStepUpdates() {
+    private getStepUpdates(showOfflineErr = true) {
 
         this.updateStatusProcess       = this.statusBar.startProcess("Checking for app updates…");
         const nestedAppRevisionlessIDs = this.workflow.model.steps
@@ -137,7 +137,10 @@ export class UpdatePlugin extends PluginBase {
                 });
 
             }, err => {
-                this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
+                const isOffline = err.error && err.error.syscall === "getaddrinfo" && !navigator.onLine;
+                if (showOfflineErr || !isOffline) {
+                    this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
+                }
                 this.cleanUp();
             });
     }
