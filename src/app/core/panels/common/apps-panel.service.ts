@@ -12,8 +12,7 @@ import {AppHelper} from "../../helpers/AppHelper";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
 import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
-
-const {dialog} = window["require"]("electron").remote;
+import {NativeSystemService} from "../../../native/system/native-system.service";
 
 @Injectable()
 export class AppsPanelService {
@@ -23,7 +22,8 @@ export class AppsPanelService {
                 protected notificationBar: NotificationBarService,
                 protected workbox: WorkboxService,
                 protected statusBar: StatusBarService,
-                protected cdr: ChangeDetectorRef) {
+                protected cdr: ChangeDetectorRef,
+                protected native: NativeSystemService) {
     }
 
     makeCopyAppToLocalMenuItem(node: TreeNode<any>): MenuItem {
@@ -32,13 +32,13 @@ export class AppsPanelService {
             click: () => {
 
                 const nodeID = node.label || node.id;
-                dialog.showSaveDialog({
+                this.native.createFileChoiceDialog({
                     title: "Choose a File Path",
                     buttonLabel: "Save",
                     defaultPath: `${nodeID}.cwl`,
                     filters: [{name: "Common Workflow Language App", extensions: ["cwl"]}],
                     properties: ["openDirectory"]
-                }, (path) => {
+                }).then((path) => {
 
                     if (path) {
 
@@ -90,7 +90,7 @@ export class AppsPanelService {
                         });
 
                     }
-                });
+                }, () => {});
             }
         });
     }
