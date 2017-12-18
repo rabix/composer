@@ -241,7 +241,6 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 title: "Choose a File Path",
                 defaultPath: `${directoryPath}/${suggestedFilename}`,
                 buttonLabel: "Done",
-                properties: ["openDirectory"]
             }).then((path) => {
 
                 // Indication of whether we need to add .cwl extension to the file name
