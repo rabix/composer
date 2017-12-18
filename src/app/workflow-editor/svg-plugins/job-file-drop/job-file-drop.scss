@@ -16,6 +16,15 @@
             }
         }
 
+        .file-label {
+            text-anchor: middle;
+            fill: $light-gray;
+            paint-order: stroke;
+            stroke: #303030;
+            stroke-width: 4px;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+        }
     }
 
     .node.step .core .inner {

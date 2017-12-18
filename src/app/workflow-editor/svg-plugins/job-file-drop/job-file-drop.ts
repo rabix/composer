@@ -31,21 +31,29 @@ export class SVGJobFileDropPlugin extends PluginBase {
     }
 
     afterRender(): void {
-        this.replaceNodeNames();
+        this.appendNodeNames();
     }
 
-    replaceNodeNames() {
-        const fileInputLabels = this.workflow.workflow.querySelectorAll(".input.type-File .title.label");
-        for (const lb of fileInputLabels) {
-
-            lb.textContent = "No file added";
+    appendNodeNames() {
+        const fileInputNodes = this.workflow.workflow.querySelectorAll(".input.type-File");
+        for (const node of fileInputNodes) {
+            const text = document.createElementNS(this.svg.namespaceURI, 'text');
+            text.setAttribute("transform", "matrix(1 0 0 1 0 100)");
+            text.classList.add("title", "file-label", "label");
+            // text.classList.add("title", "file-label");
+            text.textContent = "No file added";
+            node.appendChild(text);
         }
 
-        const fileArrayInputLabels = this.workflow.workflow.querySelectorAll(".input.type-array.items-File  .title.label");
-        for (const lb of fileArrayInputLabels) {
-            lb.textContent = "No files added";
+        const arrayFileInputNodes = this.workflow.workflow.querySelectorAll(".input.type-array.items-File");
+        for (const node of arrayFileInputNodes) {
+            const text = document.createElementNS(this.svg.namespaceURI, 'text');
+            text.setAttribute("transform", "matrix(1 0 0 1 0 100)");
+            text.classList.add("title", "file-label", "label");
+            // text.classList.add("title", "file-label");
+            text.textContent = "No files added";
+            node.appendChild(text);
         }
-
     }
 
     updateToJobState(job = {}) {
@@ -82,7 +90,7 @@ export class SVGJobFileDropPlugin extends PluginBase {
     }
 
     private updateNodeLabel(node: SVGGElement, paths: string[] = []): void {
-        const label   = node.querySelector(`.title.label`);
+        const label   = node.querySelector(`.title.file-label`);
         const isArray = node.classList.contains("type-array");
 
 
