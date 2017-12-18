@@ -374,8 +374,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             modal.appContent     = this.getModelText(true);
 
             modal.published.take(1).subscribeTracked(this, (appID) => {
-                // After new revision is load, app state is not Dirty any more
-                this.setAppDirtyState(false);
 
                 const tab = this.workbox.getOrCreateAppTab({
                     id: AppHelper.getRevisionlessID(appID),
@@ -385,6 +383,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     language: "json"
 
                 });
+
                 this.workbox.openTab(tab);
             });
 
