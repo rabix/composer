@@ -37,7 +37,6 @@ export class AppsPanelService {
                     buttonLabel: "Save",
                     defaultPath: `${nodeID}.cwl`,
                     filters: [{name: "Common Workflow Language App", extensions: ["cwl"]}],
-                    properties: ["openDirectory"]
                 }).then((path) => {
 
                     if (path) {
