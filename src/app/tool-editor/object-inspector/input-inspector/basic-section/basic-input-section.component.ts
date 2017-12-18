@@ -1,8 +1,12 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewInit, Component, forwardRef, Input, ViewChild, ViewEncapsulation
+} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.component";
+import {ModalService} from "../../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -55,7 +59,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isBound']">
+                        <ct-toggle-slider [formControl]="form.controls['isBound']" #includeInCommandLine>
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -78,7 +82,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
+export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 
     @Input()
     context: { $job?: any, $self?: any } = {};
@@ -89,6 +93,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     @Input()
     model: CommandLineToolModel;
 
+    @ViewChild("includeInCommandLine")
+    private includeInCommandLine: ToggleSliderComponent;
+
     /** The currently displayed property */
     input: CommandInputParameterModel;
 
@@ -98,7 +105,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
         super();
     }
 
@@ -207,4 +214,32 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 : control.enable({onlySelf: true, emitEvent: false});
         });
     }
+
+    addIncludeInCommandLineToggleDecorator(): void {
+        const baseToggleFnc = this.includeInCommandLine.toggleCheck.bind(this.includeInCommandLine);
+
+        const toggleFunctionDecorator = (event) => {
+
+            // Show modal only in case when switching from on to off
+            if (this.input.isBound) {
+                event.preventDefault();
+
+                this.modal.confirm({
+                    content: `If you turn the "Include in command line" option off, you might loose some input values.\nDo you want to proceed ?`
+                }).then(() => {
+                    baseToggleFnc(event);
+                }, () => {
+                });
+            } else {
+                baseToggleFnc(event);
+            }
+        };
+
+        this.includeInCommandLine.toggleCheck = toggleFunctionDecorator.bind(this);
+    }
+
+    ngAfterViewInit() {
+        this.addIncludeInCommandLineToggleDecorator();
+    }
 }
+
