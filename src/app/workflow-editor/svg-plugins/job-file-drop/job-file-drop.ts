@@ -40,7 +40,6 @@ export class SVGJobFileDropPlugin extends PluginBase {
             const text = document.createElementNS(this.svg.namespaceURI, 'text');
             text.setAttribute("transform", "matrix(1 0 0 1 0 100)");
             text.classList.add("title", "file-label", "label");
-            // text.classList.add("title", "file-label");
             text.textContent = "No file added";
             node.appendChild(text);
         }
@@ -50,7 +49,6 @@ export class SVGJobFileDropPlugin extends PluginBase {
             const text = document.createElementNS(this.svg.namespaceURI, 'text');
             text.setAttribute("transform", "matrix(1 0 0 1 0 100)");
             text.classList.add("title", "file-label", "label");
-            // text.classList.add("title", "file-label");
             text.textContent = "No files added";
             node.appendChild(text);
         }
