@@ -14,6 +14,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 
 @Component({
     selector: "ct-create-app-modal",
@@ -160,7 +161,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                 private workbox: WorkboxService,
                 private platformRepository: PlatformRepositoryService,
                 private localRepository: LocalRepositoryService,
-                private fileRepository: FileRepositoryService) {
+                private fileRepository: FileRepositoryService,
+                private native: NativeSystemService) {
 
         super();
     }
@@ -211,7 +213,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
     chooseFilepath() {
 
-        const {app, dialog} = window["require"]("electron").remote;
+        const {app} = window["require"]("electron").remote;
 
         const defaultFolder = Observable.combineLatest(
             this.localRepository.getExpandedFolders(),
@@ -235,12 +237,11 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             const {name}            = this.localForm.getRawValue();
             const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
 
-            dialog.showSaveDialog({
+            this.native.createFileChoiceDialog({
                 title: "Choose a File Path",
                 defaultPath: `${directoryPath}/${suggestedFilename}`,
                 buttonLabel: "Done",
-                properties: ["openDirectory"]
-            }, (path) => {
+            }).then((path) => {
 
                 // Indication of whether we need to add .cwl extension to the file name
                 this.localAppCreationInfo = undefined;
@@ -265,7 +266,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                     this.cdr.detectChanges();
                 });
 
-            });
+            }, () => {});
         });
     }
 

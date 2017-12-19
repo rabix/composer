@@ -7,6 +7,7 @@ import {AuthCredentials} from "../../../auth/model/auth-credentials";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {IpcService} from "../../../services/ipc.service";
@@ -36,9 +37,10 @@ export class MyAppsPanelService extends AppsPanelService {
                 protected workbox: WorkboxService,
                 protected statusBar: StatusBarService,
                 cdr: ChangeDetectorRef,
-                protected platformRepository: PlatformRepositoryService) {
+                protected platformRepository: PlatformRepositoryService,
+                protected native: NativeSystemService) {
 
-        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
+        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr, native);
 
         this.localFolders       = this.localRepository.getLocalFolders();
         this.projects           = this.platformRepository.getOpenProjects().map(projects => projects || []);
