@@ -15,8 +15,8 @@ import {TreeViewService} from "../tree-view.service";
 @Component({
     selector: "ct-tree-node",
     template: `
-        <div (dblclick)="toggle($event)"
-             (click)="select()"
+        <div (dblclick)="isExpandable ? noop : toggle($event)"
+             (click)="select(); isExpandable ? toggle($event) : noop"
 
              [ct-drop-zones]="dragDropZones"
              [ct-drag-enabled]="dragEnabled"
