@@ -52,7 +52,6 @@ export class SVGJobFileDropPlugin extends PluginBase {
 
         const id = document.createElementNS(this.svg.namespaceURI, 'tspan');
         id.setAttribute("x", "0");
-        id.setAttribute("dy", "15");
         id.textContent = idText;
         txtEl.appendChild(id);
 
