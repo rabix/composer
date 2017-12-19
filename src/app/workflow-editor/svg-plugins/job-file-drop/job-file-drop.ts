@@ -37,12 +37,12 @@ export class SVGJobFileDropPlugin extends PluginBase {
     renderNodeLabels() {
         const fileInputNodeLabels = this.workflow.workflow.querySelectorAll(".input.type-File .title.label");
         for (const txtEl of fileInputNodeLabels) {
-            this.createLabelTSpanElements(txtEl);
+            this.createLabelTSpanElements(<SVGTextElement>txtEl);
         }
 
         const arrayFileInputNodeLabels = this.workflow.workflow.querySelectorAll(".input.type-array.items-File .title.label");
         for (const txtEl of arrayFileInputNodeLabels) {
-            this.createLabelTSpanElements(txtEl);
+            this.createLabelTSpanElements(<SVGTextElement>txtEl);
         }
     }
 
