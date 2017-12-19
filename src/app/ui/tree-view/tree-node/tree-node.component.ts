@@ -15,8 +15,8 @@ import {TreeViewService} from "../tree-view.service";
 @Component({
     selector: "ct-tree-node",
     template: `
-        <div (dblclick)="isExpandable ? noop : toggle($event)"
-             (click)="select(); isExpandable ? toggle($event) : noop"
+        <div (dblclick)="toggle($event)"
+             (click)="select()"
 
              [ct-drop-zones]="dragDropZones"
              [ct-drag-enabled]="dragEnabled"
@@ -28,15 +28,22 @@ import {TreeViewService} from "../tree-view.service";
              [class.selected]="this === (tree.selected | async)"
              class="deep-unselectable clickable node-base {{ type }}">
 
+        <!--(click)="select(); isExpandable ? toggle($event) : noop"-->
             <!--Loading icon has a priority-->
             <i *ngIf="loading" class="fa fa-fw fa-circle-o-notch fa-spin"></i>
 
             <!--Standard icon if the node is contracted or there is no expansion icon-->
-            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw" data-toggle-icon
+            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))"
+               class="fa fa-fw" 
+               data-toggle-icon
+               (click)="isExpandable ? toggle($event) : noop"
                [ngClass]="icon"></i>
 
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
-            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw expand" data-toggle-icon
+            <i *ngIf="!loading && _isExpanded && !!iconExpanded" 
+               class="fa fa-fw expand" 
+               data-toggle-icon
+               (click)="toggle($event)"
                [ngClass]="iconExpanded"></i>
 
             <ng-container *ngIf="labelTemplate[type]; else plain">
