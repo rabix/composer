@@ -113,21 +113,25 @@ export class RabixExecutor {
 
             java.stderr.once("data", (data) => {
                 data = data.toString().split('\n')[0];
-                const javaVersion = new RegExp(/(java version|openjdk version)/).test(data) ? data.split(' ')[2].replace(/"/g, '') : null;
-                if (javaVersion) {
-                    const jvInt = parseInt(javaVersion.split(".").slice(0, 2).join(""));
 
-                    // check if java version is 1.8.x or above
-                    if (jvInt >= 18) {
+                let javaVersion;
+                try {
+                    javaVersion = parseFloat(data.match(/\"(.*?)\"/)[1])
+                } catch (err) {
+                    javaVersion = null;
+                }
+
+                if (javaVersion) {
+                    if (javaVersion >= 1.8) {
                         resolve();
                     } else {
-                        dataCallback(new Error("Update Java to version 1.8 or above."));
+                        dataCallback(new Error("Update Java to version 8 or above."));
                         cleanup();
                         reject();
                     }
 
                 } else {
-                    dataCallback(new Error("Please install Java 1.8 or higher in order to execute apps."));
+                    dataCallback(new Error("Please install Java 8 or higher in order to execute apps."));
                     cleanup();
                     reject();
                 }
