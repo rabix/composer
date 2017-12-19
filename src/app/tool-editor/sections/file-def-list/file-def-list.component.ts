@@ -24,11 +24,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 [description]="blankStateDescription"
                                 (buttonClick)="addDirent()">
 
-                    <section tc-content>
+                    <section tc-content *ngIf="!isSBDraft2">
+                        
                         <!--In case that tool is not draft2 then show dropdown for adding items-->
-                        <ct-generic-dropdown-menu *ngIf="!isSBDraft2" [ct-menu]="menu" #addItemDropDown>
-                            <button class="btn btn-primary" type="button"
-                                    (click)="addItemDropDown.toggleMenu()">
+                        <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
+                            <button class="btn btn-primary" type="button" (click)="addItemDropDown.toggleMenu()">
                                 Add
                             </button>
                         </ct-generic-dropdown-menu>
