@@ -28,6 +28,7 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {Subscription} from "rxjs/Subscription";
+import {ExportAppService} from "../services/export-app/export-app.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -95,6 +96,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 platformAppService: PlatformAppService,
                 localRepository: LocalRepositoryService,
                 workbox: WorkboxService,
+                exportApp: ExportAppService,
                 executor: ExecutorService) {
 
         super(
@@ -110,6 +112,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             platformRepository,
             localRepository,
             workbox,
+            exportApp,
             executor,
         );
     }

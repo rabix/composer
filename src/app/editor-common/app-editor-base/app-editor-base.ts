@@ -30,7 +30,6 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
-import {AppExportModalComponent} from "../app-export-modal/app-export-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
@@ -39,6 +38,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
+import {ExportAppService} from "../../services/export-app/export-app.service";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -148,6 +148,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected platformRepository: PlatformRepositoryService,
                 protected localRepository: LocalRepositoryService,
                 protected workbox: WorkboxService,
+                protected exportApp: ExportAppService,
                 public executor: ExecutorService) {
 
         super();
@@ -911,16 +912,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
-    exportApp() {
-        let serialized: Object;
-        if (this.dataModel instanceof WorkflowModel) {
-            serialized = this.dataModel.serializeEmbedded(false);
-        } else {
-            serialized = this.dataModel.serialize();
-        }
-        const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
-        comp.appID      = this.tabData.id;
-        comp.appContent = serialized;
+    exportAppInFormat(format: "yaml" | "json") {
+        const serialized = this.dataModel instanceof WorkflowModel
+            ? this.dataModel.serializeEmbedded(false) : this.dataModel.serialize();
 
+        this.exportApp.chooseExportFile(this.tabData.id, serialized, format);
     }
 }

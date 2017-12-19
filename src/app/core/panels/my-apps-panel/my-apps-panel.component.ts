@@ -378,12 +378,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
             this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
         });
 
-        platformApp.subscribeTracked(this, (data) => {
-            const contextMenu = [
-                this.service.makeCopyAppToLocalMenuItem(data.node),
-            ];
-
-            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
-        });
+        // platformApp.subscribeTracked(this, (data) => {
+        //     const contextMenu = [
+        //         this.service.makeCopyAppToLocalMenuItem(data.node),
+        //     ];
+        //
+        //     this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
+        // });
     }
 }
