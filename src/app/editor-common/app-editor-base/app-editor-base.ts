@@ -69,8 +69,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     reportPanel: "validation" | string;
 
-    showExecutionReportPanel = false;
-
     /** Flag to indicate if resolving content is in progress */
     isResolvingContent = false;
 
@@ -815,7 +813,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.executionPreview.clear();
             this.executionPreview.job = job;
 
-            this.showExecutionReportPanel = true;
             this.toggleReport("execution", true);
 
             this.isExecuting = true;
