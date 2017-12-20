@@ -129,7 +129,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * {@link revisionHackFlagSwitchOff}
      * {@link revisionHackFlagSwitchOn}
      */
-    private revisionChangingInProgress = false;
+    protected revisionChangingInProgress = false;
 
     /**
      * Show modal when app is dirty when changing revisions to prevent loosing changes
@@ -461,7 +461,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.dataGateway.fetchFileContent(fid).take(1)
             .toPromise().then(result => {
                 this.priorityCodeUpdates.next(result);
+
                 this.setAppDirtyState(false);
+
                 return result;
             }).catch(err => {
                 this.revisionChangingInProgress   = false;
@@ -571,6 +573,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     protected syncModelAndCode(resolveRDF = true): Promise<any> {
+        console.log("Syncing model and code");
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
@@ -591,7 +594,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         if (!resolveRDF) {
-            this.codeEditorContent.setValue(this.getModelText());
+            this.codeEditorContent.setValue(this.getModelText(), {
+                emitEvent: false
+            });
             return Promise.resolve();
         }
 
@@ -601,7 +606,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const serialized = JSON.stringify(data, null, 4);
             this.codeEditorContent.setValue(serialized);
             return data;
-        }, err => console.warn);
+        }, console.warn);
     }
 
     protected afterModelValidation(): void {

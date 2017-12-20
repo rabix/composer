@@ -1,4 +1,4 @@
-import {Component, Injector, OnInit} from "@angular/core";
+import {Component, EventEmitter, Injector, OnInit} from "@angular/core";
 import {FormGroup} from "@angular/forms";
 import {CommandLineToolModel, isType, WorkflowFactory, WorkflowModel, WorkflowStepInputModel, WorkflowStepOutputModel} from "cwlts/models";
 import {CommandLineToolFactory} from "cwlts/models/generic/CommandLineToolFactory";
@@ -6,6 +6,7 @@ import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
+import {Subscription} from "rxjs/Subscription";
 import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
@@ -27,7 +28,6 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
-import {Subscription} from "rxjs/Subscription";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -81,7 +81,10 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     toolGroup: FormGroup;
 
+    dirty = new EventEmitter();
+
     jobSubscription: Subscription;
+
 
     constructor(statusBar: StatusBarService,
                 notificationBarService: NotificationBarService,
@@ -117,10 +120,17 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     ngOnInit(): any {
         super.ngOnInit();
         this.toolGroup = new FormGroup({});
+
+        this.dirty.subscribeTracked(this, () => {
+            this.setAppDirtyState(true);
+            this.syncModelAndCode(false);
+        });
     }
 
     openRevision(revisionNumber: number | string) {
-        return super.openRevision(revisionNumber).then(() => this.toolGroup.reset());
+        return super.openRevision(revisionNumber).then(() => {
+            this.toolGroup.reset()
+        });
     }
 
     switchTab(tabName): void {
@@ -184,6 +194,12 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.updateCommandLine();
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
+
+        if (this.revisionChangingInProgress) {
+            this.dirty.take(1).subscribeTracked(this, () => {
+                setTimeout(() => this.setAppDirtyState(false))
+            });
+        }
     }
 
     onGraphJobEditorDraw(editor: GraphJobEditorComponent) {
