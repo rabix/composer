@@ -92,7 +92,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
             return;
         }
 
-        const ctrl = this.formGroup.get("baseCommand");
+        const ctrl = this.formGroup.get("baseCommand") as FormArray;
 
         if (expressions.length === ctrl.value.length) {
             ctrl.setValue(expressions, {emitEvent: false});

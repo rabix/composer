@@ -39,6 +39,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
+import {SyncConfig} from "./sync-config";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -572,8 +573,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return Yaml.dump(modelObject);
     }
 
-    protected syncModelAndCode(resolveRDF = true): Promise<any> {
-        console.log("Syncing model and code");
+    protected syncModelAndCode(resolveRDF = true, options: SyncConfig = {}): Promise<any> {
+
+        const opts = Object.assign({
+            emitCodeChange: true
+        } as SyncConfig, options);
+
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
@@ -594,9 +599,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         if (!resolveRDF) {
-            this.codeEditorContent.setValue(this.getModelText(), {
-                emitEvent: false
-            });
+            this.codeEditorContent.setValue(this.getModelText(), {emitEvent: opts.emitCodeChange});
             return Promise.resolve();
         }
 

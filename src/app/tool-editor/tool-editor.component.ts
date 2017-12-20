@@ -205,4 +205,11 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     onGraphJobEditorDraw(editor: GraphJobEditorComponent) {
         editor.inspectStep(this.workflowWrapper.steps[0].connectionId);
     }
+
+
+    protected syncModelAndCode(resolveRDF: boolean): Promise<any> {
+        return super.syncModelAndCode(resolveRDF, {
+            emitCodeChange: false,
+        });
+    }
 }
