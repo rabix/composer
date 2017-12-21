@@ -39,7 +39,6 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
-import {SyncConfig} from "./sync-config";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -176,7 +175,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
         /** On user interactions (changes) set app state to Dirty */
-        this.codeEditorContent.valueChanges.skip(1).subscribeTracked(this, () => {
+        this.codeEditorContent.valueChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
             this.setAppDirtyState(true);
         }, (err) => {
             console.warn("Error on dirty checking stream", err);
@@ -573,11 +572,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return Yaml.dump(modelObject);
     }
 
-    protected syncModelAndCode(resolveRDF = true, options: SyncConfig = {}): Promise<any> {
-
-        const opts = Object.assign({
-            emitCodeChange: true
-        } as SyncConfig, options);
+    protected syncModelAndCode(resolveRDF = true): Promise<any> {
 
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
@@ -599,7 +594,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         if (!resolveRDF) {
-            this.codeEditorContent.setValue(this.getModelText(), {emitEvent: opts.emitCodeChange});
+            this.codeEditorContent.setValue(this.getModelText());
             return Promise.resolve();
         }
 
@@ -696,12 +691,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.isReadonly = locked;
         if (locked) {
-            this.codeEditorContent.disable();
+            this.codeEditorContent.disable({emitEvent: false});
 
             return;
         }
 
-        this.codeEditorContent.enable();
+        this.codeEditorContent.enable({emitEvent: false});
 
     }
 

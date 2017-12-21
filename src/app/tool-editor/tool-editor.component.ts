@@ -122,14 +122,13 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.toolGroup = new FormGroup({});
 
         this.dirty.subscribeTracked(this, () => {
-            this.setAppDirtyState(true);
             this.syncModelAndCode(false);
         });
     }
 
     openRevision(revisionNumber: number | string) {
         return super.openRevision(revisionNumber).then(() => {
-            this.toolGroup.reset()
+            this.toolGroup.reset();
         });
     }
 
@@ -194,22 +193,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.dataModel.updateCommandLine();
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
-
-        if (this.revisionChangingInProgress) {
-            this.dirty.take(1).subscribeTracked(this, () => {
-                setTimeout(() => this.setAppDirtyState(false))
-            });
-        }
     }
 
     onGraphJobEditorDraw(editor: GraphJobEditorComponent) {
         editor.inspectStep(this.workflowWrapper.steps[0].connectionId);
-    }
-
-
-    protected syncModelAndCode(resolveRDF: boolean): Promise<any> {
-        return super.syncModelAndCode(resolveRDF, {
-            emitCodeChange: false,
-        });
     }
 }
