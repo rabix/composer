@@ -2,7 +2,7 @@ import {User} from "../../sbg-api-client/interfaces";
 import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 import {TabData} from "./tab-data-interface";
-import * as path from "path";
+import {defaultExecutionOutputDirectory} from "../../controllers/execution-results.controller";
 
 export interface CredentialsCache {
     id: string;
@@ -27,7 +27,8 @@ export class LocalRepository extends RepositoryType {
 
     executorConfig: ExecutorConfig = {
         path: "",
-        choice: "bundled"
+        choice: "bundled",
+        outDir: defaultExecutionOutputDirectory
     };
 
     openTabs: TabData<any> [] = [{
