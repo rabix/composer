@@ -190,7 +190,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
             if (state.isValidCWL && this.dataModel) {
-                state.errors   = state.errors.concat(this.dataModel.errors);
+                state.errors = state.errors.concat(this.dataModel.errors);
                 state.warnings = state.warnings.concat(this.dataModel.warnings);
             }
 
@@ -212,7 +212,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         }, (err) => {
             this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
-            this.isLoading        = false;
+            this.isLoading = false;
         });
 
         /**
@@ -272,7 +272,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 // copyOf property really matters only if we are working with the latest revision
                 // otherwise, apps detached from copy state at some revision will still show locked state
                 // and notification when switched to an older revision
-                const props             = this.dataModel.customProps || {};
+                const props = this.dataModel.customProps || {};
                 const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
                 if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
@@ -298,7 +298,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
-            this.viewMode    = state.isValidCWL ? this.getPreferredTab() : "code";
+            this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         }, (err) => {
             console.warn("Error on first validation end", err);
@@ -370,8 +370,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
-            modal.appContent     = this.getModelText(true);
+            const modal = this.modal.fromComponent(PublishModalComponent, "Push an App");
+            modal.appContent = this.getModelText(true);
 
             modal.published.take(1).subscribeTracked(this, (appID) => {
 
@@ -466,7 +466,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 return result;
             }).catch(err => {
-                this.revisionChangingInProgress   = false;
+                this.revisionChangingInProgress = false;
                 this.revisionList.loadingRevision = false;
                 this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
             });
@@ -529,7 +529,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     editRunConfiguration() {
-        const appID     = this.tabData.id;
+        const appID = this.tabData.id;
         const appConfig = this.executor.getAppConfig(appID).take(1);
 
         appConfig.take(1).subscribeTracked(this, (context) => {
@@ -539,7 +539,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             });
 
             modal.context = context;
-            modal.appID   = appID;
+            modal.appID = appID;
 
             modal.onSubmit = (raw) => {
                 this.executor.setAppConfig(appID, raw);
@@ -668,7 +668,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.notificationBar.showNotification(err.message || "An error has occurred");
 
             this.validationState.isValidCWL = false;
-            this.validationState.errors     = [{
+            this.validationState.errors = [{
                 loc: "document",
                 type: "error",
                 message: err.message
@@ -746,8 +746,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
 
                 modal.confirmLabel = "Run";
-                modal.context      = context;
-                modal.appID        = appID;
+                modal.context = context;
+                modal.appID = appID;
 
                 return new Observable(observer => {
                     modal.onSubmit = (raw) => {
@@ -783,14 +783,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution stopped")))
 
                     // When done, turn off the UI flag
-                    .finally(() => {
-                        this.isExecuting = false;
-
-                        // Update output folder in the tree
-                        this.localRepository.getExecutorConfig().take(1).subscribeTracked(this, (config) => {
-                            this.fileRepository.reloadPath(config.outDir);
-                        });
-                    })
+                    .finally(() => this.isExecuting = false)
 
                     // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {
@@ -800,6 +793,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     });
             })
             .subscribeTracked(this, (output: ExecutorOutput) => {
+
+                // Update output folder in the tree
+                if (output.type === "OUTDIR") {
+                    this.fileRepository.reloadPath(output.message);
+                }
 
                 // Output result comes as a JSON object with info about execution results
                 // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
@@ -874,7 +872,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             });
 
             modal.confirmationLabel = "Save";
-            modal.discardLabel      = "Change without saving";
+            modal.discardLabel = "Change without saving";
 
             modal.decision.take(1).subscribe((result) => {
 
@@ -894,9 +892,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     importJob() {
         const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
-        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
-        comp.appID        = this.tabData.id;
-        comp.action       = "import";
+        const comp = this.modal.fromComponent(JobImportExportComponent, "Import Job");
+        comp.appID = this.tabData.id;
+        comp.action = "import";
 
         comp.import.take(1).subscribeTracked(this, (jobObject) => {
             metaManager.patchAppMeta("job", jobObject);
@@ -913,10 +911,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
 
         metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
-            const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
+            const comp = this.modal.fromComponent(JobImportExportComponent, "Export Job");
             comp.action = "export";
-            comp.appID  = this.tabData.id;
-            comp.job    = Object.prototype.isPrototypeOf(job) ? job : {};
+            comp.appID = this.tabData.id;
+            comp.job = Object.prototype.isPrototypeOf(job) ? job : {};
         });
     }
 
@@ -927,8 +925,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         } else {
             serialized = this.dataModel.serialize();
         }
-        const comp      = this.modal.fromComponent(AppExportModalComponent, "Export App");
-        comp.appID      = this.tabData.id;
+        const comp = this.modal.fromComponent(AppExportModalComponent, "Export App");
+        comp.appID = this.tabData.id;
         comp.appContent = serialized;
 
     }
