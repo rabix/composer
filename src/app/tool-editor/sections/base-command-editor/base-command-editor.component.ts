@@ -15,7 +15,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         multi: true
     }],
     template: `
-        <ct-blank-state *ngIf="formControl.enabled && formControl.value.length === 0" (buttonClick)="addEntry()"
+        <ct-blank-state *ngIf="formControl.enabled && formControl.length === 0" (buttonClick)="addEntry()"
                         [hasAction]="true">
             <section tc-button-text>Add base command</section>
             <section tc-description>
@@ -27,11 +27,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </section>
         </ct-blank-state>
 
-        <div *ngIf="formControl.value.length === 0" class="text-xs-center">
+        <div *ngIf="formControl.length === 0" class="text-xs-center">
             This tool doesn't specify a base command
         </div>
 
-        <ol *ngIf="formControl.value.length > 0" class="list-unstyled">
+        <ol *ngIf="formControl.length > 0" class="list-unstyled">
             <li *ngFor="let control of formControl.controls; let i = index" class="removable-form-control">
 
 
@@ -50,7 +50,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </li>
         </ol>
 
-        <button *ngIf="!readonly && formControl.enabled && formControl.value.length > 0" type="button"
+        <button *ngIf="!readonly && formControl.enabled && formControl.length > 0" type="button"
                 class="btn btn-link add-btn-link no-underline-hover"
                 (click)="addEntry()">
             <i class="fa fa-plus"></i> Add base command
@@ -100,9 +100,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements Control
     }
 
     setDisabledState(isDisabled: boolean): void {
-        const list = this.formControl;
-
-        isDisabled ? list.disable() : list.enable();
+        isDisabled ? this.formControl.disable({emitEvent: false}) : this.formControl.enable({emitEvent: false});
     }
 
     addEntry(): void {
@@ -110,24 +108,21 @@ export class BaseCommandEditorComponent extends DirectiveBase implements Control
         // we need to cast it to a value in order to avoid runtime issues
         // FIXME: make this uniform in cwlts
         const cmd  = this.appModel.addBaseCommand() || "";
-        const list = this.formControl;
-        list.push(new FormControl(cmd));
+        this.formControl.push(new FormControl(cmd));
     }
 
     removeEntry(index: number): void {
         this.modal.delete("base command").then(() => {
 
-            const list = this.formControl;
-
             // Reset the expression's validity
             // @TODO: if this is an ExpressionModel, model won't revalidate when an entry is removed
-            const entryAtIndex = list.at(index).value;
+            const entryAtIndex = this.formControl.at(index).value;
 
             if (entryAtIndex instanceof ExpressionModel) {
                 entryAtIndex.clearIssue(ErrorCode.EXPR_ALL);
             }
 
-            list.removeAt(index);
+            this.formControl.removeAt(index);
             this.cdr.markForCheck();
         }, err => {
             console.warn(err);
