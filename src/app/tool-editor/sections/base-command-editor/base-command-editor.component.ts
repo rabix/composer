@@ -1,9 +1,8 @@
-import {ChangeDetectorRef, Component, forwardRef, Inject, Input, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, forwardRef, Inject, Input} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {ErrorCode} from "cwlts/models/helpers/validation";
 import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
-import {adaptFormArraySize} from "../../../core/forms/helpers/form-array-helpers";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
@@ -16,7 +15,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         multi: true
     }],
     template: `
-        <ct-blank-state *ngIf="formList.enabled && formList.length === 0" (buttonClick)="addEntry()" [hasAction]="true">
+        <ct-blank-state *ngIf="formControl.enabled && formControl.length === 0" (buttonClick)="addEntry()"
+                        [hasAction]="true">
             <section tc-button-text>Add base command</section>
             <section tc-description>
                 The part of the command that comes before any tool parameters or options. You can also
@@ -27,12 +27,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </section>
         </ct-blank-state>
 
-        <div *ngIf="formList.length === 0" class="text-xs-center">
+        <div *ngIf="formControl.length === 0" class="text-xs-center">
             This tool doesn't specify a base command
         </div>
 
-        <ol *ngIf="formList.length > 0" class="list-unstyled">
-            <li *ngFor="let control of formList.controls; let i = index" class="removable-form-control">
+        <ol *ngIf="formControl.length > 0" class="list-unstyled">
+            <li *ngFor="let control of formControl.controls; let i = index" class="removable-form-control">
 
 
                 <ct-expression-input *ngIf="allowExpressions; else stringInput" [formControl]="control"
@@ -43,20 +43,21 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <input class="form-control" data-test="base-command-string" [formControl]="control" [readonly]="readonly"/>
                 </ng-template>
 
-                <div *ngIf="formList.enabled && !readonly" class="remove-icon">
+                <div *ngIf="formControl.enabled && !readonly" class="remove-icon">
                     <i ct-tooltip="Delete" class="fa fa-trash clickable" (click)="removeEntry(i)"></i>
                 </div>
 
             </li>
         </ol>
 
-        <button *ngIf="!readonly && formList.enabled && formList.length > 0" type="button" class="btn btn-link add-btn-link no-underline-hover"
+        <button *ngIf="!readonly && formControl.enabled && formControl.length > 0" type="button"
+                class="btn btn-link add-btn-link no-underline-hover"
                 (click)="addEntry()">
             <i class="fa fa-plus"></i> Add base command
         </button>
     `,
 })
-export class BaseCommandEditorComponent extends DirectiveBase implements OnInit, ControlValueAccessor {
+export class BaseCommandEditorComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     allowExpressions = false;
@@ -64,7 +65,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
     @Input()
     readonly = false;
 
-    formList: FormArray;
+    formControl: FormArray;
 
     private propagateChange = (commands: Array<string | ExpressionModel>) => void 0;
 
@@ -76,21 +77,18 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
         super();
     }
 
-    ngOnInit() {
-        this.formList = new FormArray([]);
-        this.formList.valueChanges.subscribeTracked(this, () => {
-            this.propagateChange(this.formList.value);
-        });
-
-    }
-
     writeValue(expressions: ExpressionModel[]): void {
         if (!expressions) {
             return;
         }
 
-        adaptFormArraySize(this.formList, expressions.length, () => new FormControl());
-        this.formList.patchValue(expressions, {emitEvent: false});
+        const arrayControls = expressions.map(expr => new FormControl(expr));
+
+        this.formControl = new FormArray(arrayControls);
+
+        this.formControl.valueChanges.subscribeTracked(this, v => {
+            this.propagateChange(this.formControl.value || []);
+        });
     }
 
     registerOnChange(fn: any): void {
@@ -102,28 +100,29 @@ export class BaseCommandEditorComponent extends DirectiveBase implements OnInit,
     }
 
     setDisabledState(isDisabled: boolean): void {
-        isDisabled ? this.formList.disable() : this.formList.enable();
+        isDisabled ? this.formControl.disable({emitEvent: false}) : this.formControl.enable({emitEvent: false});
     }
 
     addEntry(): void {
         // CMD will be undefined if this is a v1.0 app, adding returns only for draft-2
         // we need to cast it to a value in order to avoid runtime issues
         // FIXME: make this uniform in cwlts
-        const cmd = this.appModel.addBaseCommand() || "";
-        this.formList.push(new FormControl(cmd));
+        const cmd  = this.appModel.addBaseCommand() || "";
+        this.formControl.push(new FormControl(cmd));
     }
 
     removeEntry(index: number): void {
         this.modal.delete("base command").then(() => {
+
             // Reset the expression's validity
             // @TODO: if this is an ExpressionModel, model won't revalidate when an entry is removed
-            const entryAtIndex = this.formList.at(index).value;
+            const entryAtIndex = this.formControl.at(index).value;
 
             if (entryAtIndex instanceof ExpressionModel) {
                 entryAtIndex.clearIssue(ErrorCode.EXPR_ALL);
             }
 
-            this.formList.removeAt(index);
+            this.formControl.removeAt(index);
             this.cdr.markForCheck();
         }, err => {
             console.warn(err);

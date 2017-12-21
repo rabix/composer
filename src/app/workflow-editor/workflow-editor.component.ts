@@ -155,4 +155,5 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             this.graphDrawQueue.shift()();
         }
     }
+
 }
