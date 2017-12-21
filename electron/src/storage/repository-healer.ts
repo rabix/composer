@@ -16,9 +16,7 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
 
             const checks = [];
             repository.localFolders = repository.localFolders.filter((v, i, arr) => {
-                const isString = typeof v === "string";
-                const isUnique = arr.indexOf(v) === i;
-                return isString && isUnique;
+                return typeof v === "string" && arr.indexOf(v) === i;
             });
 
             for (let i = 0; i < repository.localFolders.length; i++) {
@@ -27,11 +25,9 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
 
                 const access = new Promise((res, rej) => {
 
-                    console.log("healing", dirPath);
                     fs.stat(dirPath, (err, stats) => {
 
                         if (err || !stats.isDirectory()) {
-                            console.log("Removing", dirPath);
                             repository.localFolders.splice(i, 1);
                             modified = true;
                         }
