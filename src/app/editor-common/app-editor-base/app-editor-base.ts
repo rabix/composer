@@ -39,6 +39,7 @@ import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -107,7 +108,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected inspectorHostView: ViewContainerRef;
 
     @ViewChild(GraphJobEditorComponent)
-    protected jobEditor: GraphJobEditorComponent
+    protected jobEditor: GraphJobEditorComponent;
 
     protected appSavingService: AppSaver;
 
@@ -145,6 +146,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected platformAppService: PlatformAppService,
                 protected platformRepository: PlatformRepositoryService,
                 protected localRepository: LocalRepositoryService,
+                protected fileRepository: FileRepositoryService,
                 protected workbox: WorkboxService,
                 public executor: ExecutorService) {
 
@@ -781,7 +783,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution stopped")))
 
                     // When done, turn off the UI flag
-                    .finally(() => this.isExecuting = false)
+                    .finally(() => {
+                        this.isExecuting = false;
+
+                        // Update output folder in the tree
+                        this.localRepository.getExecutorConfig().take(1).subscribeTracked(this, (config) => {
+                            this.fileRepository.reloadPath(config.outDir);
+                        });
+                    })
 
                     // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {

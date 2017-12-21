@@ -28,6 +28,7 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {FileRepositoryService} from "../file-repository/file-repository.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -97,6 +98,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 platformRepository: PlatformRepositoryService,
                 platformAppService: PlatformAppService,
                 localRepository: LocalRepositoryService,
+                fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
                 executor: ExecutorService) {
 
@@ -112,6 +114,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             platformAppService,
             platformRepository,
             localRepository,
+            fileRepository,
             workbox,
             executor,
         );
