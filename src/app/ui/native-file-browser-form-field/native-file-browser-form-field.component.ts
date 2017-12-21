@@ -43,7 +43,7 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     @Input() selectionType: SelectionType = "file";
 
-    @Input() disableTextInput = true;
+    @Input() disableTextInput = false;
 
     @Input() dialogOptions: {
         title?: string;

@@ -36,6 +36,7 @@ import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service
 
                         <ng-container *ngIf="form.get('choice').value === 'custom'">
                             <ct-native-file-browser-form-field class="input-group mt-1"
+                                                               [disableTextInput]="true"
                                                                [hidden]=""
                                                                formControlName="path"></ct-native-file-browser-form-field>
 
@@ -47,6 +48,7 @@ import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service
                 <label>Output folder:</label>
                 <ct-native-file-browser-form-field class="input-group"
                                                    formControlName="outDir"
+                                                   [disableTextInput]="true"
                                                    [hidden]=""
                                                    selectionType="directory">
                 </ct-native-file-browser-form-field>
