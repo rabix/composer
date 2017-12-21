@@ -1,10 +1,10 @@
 import {ChangeDetectorRef, Component, Input, OnInit, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CommandLineToolModel, CreateFileRequirementModel, DirentModel, ExpressionModel} from "cwlts/models";
+import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
 @Component({
     selector: "ct-file-def-list",
@@ -18,31 +18,34 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length"
+                                [hasAction]="true"
                                 [buttonText]="'Create a file'"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
                                 [description]="blankStateDescription"
                                 (buttonClick)="addDirent()">
 
-                    <!--In case that tool is not draft2 then show dropdown for adding items-->
-                    <ct-generic-dropdown-menu *ngIf="!isSBDraft2" [ct-menu]="menu" #addItemDropDown>
-                        <button class="btn btn-primary" type="button"
-                                (click)="addItemDropDown.toggleMenu()">
-                            Add
-                        </button>
-                    </ct-generic-dropdown-menu>
+                    <section tc-content *ngIf="!isSBDraft2">
+                        
+                        <!--In case that tool is not draft2 then show dropdown for adding items-->
+                        <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
+                            <button class="btn btn-primary" type="button" (click)="addItemDropDown.toggleMenu()">
+                                Add
+                            </button>
+                        </ct-generic-dropdown-menu>
 
-                    <!--Template for add item dropdown -->
-                    <ng-template #menu class="mr-1">
-                        <ul class="list-unstyled" (click)="addItemDropDown.hide()">
-                            <li (click)="addDirent()">
-                                File
-                            </li>
+                        <!--Template for add item dropdown -->
+                        <ng-template #menu class="mr-1">
+                            <ul class="list-unstyled" (click)="addItemDropDown.hide()">
+                                <li (click)="addDirent()">
+                                    File
+                                </li>
 
-                            <li (click)="addExpression()">
-                                Expression
-                            </li>
-                        </ul>
-                    </ng-template>
+                                <li (click)="addExpression()">
+                                    Expression
+                                </li>
+                            </ul>
+                        </ng-template>
+                    </section>
 
                 </ct-blank-state>
 
@@ -59,11 +62,11 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
 
                         <!--If entry is ExpressionModel-->
                         <ct-expression-input
-                                *ngIf="isExpressionModel(entry); else notExpressionModel"
-                                [context]="context"
-                                [ngModel]="entry"
-                                (ngModelChange)="onExpressionEntryChanges()"
-                                [readonly]="readonly">
+                            *ngIf="isExpressionModel(entry); else notExpressionModel"
+                            [context]="context"
+                            [ngModel]="entry"
+                            (ngModelChange)="onExpressionEntryChanges()"
+                            [readonly]="readonly">
                         </ct-expression-input>
 
                         <!--If entry is Dirent Model-->
@@ -104,10 +107,10 @@ import {ErrorCode} from "cwlts/models/helpers/validation/ErrorCode";
                                 <div class="tc-header">{{ entry.loc || "FileDef" }}</div>
                                 <div class="tc-body">
                                     <ct-file-def-inspector
-                                            (save)="updateFileDef($event, i)"
-                                            [context]="context"
-                                            [dirent]="entry"
-                                            [readonly]="readonly">
+                                        (save)="updateFileDef($event, i)"
+                                        [context]="context"
+                                        [dirent]="entry"
+                                        [readonly]="readonly">
                                     </ct-file-def-inspector>
                                 </div>
                             </ct-editor-inspector-content>

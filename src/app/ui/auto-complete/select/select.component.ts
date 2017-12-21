@@ -129,7 +129,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     sortField = "text";
 
     @Input()
-    sortDirection = "asc";
+    sortDirection: "asc" | "desc" = "asc";
 
     @ViewChild("el", {read: ElementRef})
     private el;
@@ -184,7 +184,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     ngAfterViewInit() {
         this.zone.runOutsideAngular(() => {
-            let selectizeOptions = {
+            const selectizeOptions = {
                 // Add remove button only if its not a mono-selection (suggested input)
                 plugins: this.maxItems !== 1 ? ["remove_button"] : [],
                 delimiter: this.delimiter,
@@ -205,10 +205,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
                 selectOnTab: this.selectOnTab,
                 valueField: this.valueField,
                 labelField: this.labelField,
-                sortField: this.sortField ? {
+                sortField: [this.sortField ? {
                     field: this.sortField,
                     direction: this.sortDirection || "asc"
-                } : undefined,
+                } : undefined],
                 onChange: this.onChange.bind(this)
             };
 

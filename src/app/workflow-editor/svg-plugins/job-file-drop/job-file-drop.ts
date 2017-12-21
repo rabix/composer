@@ -31,21 +31,36 @@ export class SVGJobFileDropPlugin extends PluginBase {
     }
 
     afterRender(): void {
-        this.replaceNodeNames();
+        this.renderNodeLabels();
     }
 
-    replaceNodeNames() {
-        const fileInputLabels = this.workflow.workflow.querySelectorAll(".input.type-File .title.label");
-        for (const lb of fileInputLabels) {
-
-            lb.textContent = "No file added";
+    renderNodeLabels() {
+        const fileInputNodeLabels = this.workflow.workflow.querySelectorAll(".input.type-File .title.label");
+        for (const txtEl of fileInputNodeLabels) {
+            this.createLabelTSpanElements(<SVGTextElement>txtEl);
         }
 
-        const fileArrayInputLabels = this.workflow.workflow.querySelectorAll(".input.type-array.items-File  .title.label");
-        for (const lb of fileArrayInputLabels) {
-            lb.textContent = "No files added";
+        const arrayFileInputNodeLabels = this.workflow.workflow.querySelectorAll(".input.type-array.items-File .title.label");
+        for (const txtEl of arrayFileInputNodeLabels) {
+            this.createLabelTSpanElements(<SVGTextElement>txtEl);
         }
+    }
 
+    createLabelTSpanElements(txtEl: SVGTextElement) {
+        const idText = txtEl.textContent;
+        txtEl.textContent = "";
+
+        const id = document.createElementNS(this.svg.namespaceURI, 'tspan');
+        id.setAttribute("x", "0");
+        id.textContent = idText;
+        txtEl.appendChild(id);
+
+        const fileLabel = document.createElementNS(this.svg.namespaceURI, 'tspan');
+        fileLabel.classList.add("file-label");
+        fileLabel.setAttribute("x", "0");
+        fileLabel.setAttribute("dy", "15");
+        fileLabel.textContent = "No file added";
+        txtEl.appendChild(fileLabel);
     }
 
     updateToJobState(job = {}) {
@@ -67,6 +82,11 @@ export class SVGJobFileDropPlugin extends PluginBase {
 
             const filePaths = [];
             for (const entry of [].concat(job[inputID])) {
+
+                if (entry === null) {
+                    continue;
+                }
+
                 if (entry.class === "File" && entry.path) {
                     filePaths.push(entry.path);
                 }
@@ -77,7 +97,7 @@ export class SVGJobFileDropPlugin extends PluginBase {
     }
 
     private updateNodeLabel(node: SVGGElement, paths: string[] = []): void {
-        const label   = node.querySelector(`.title.label`);
+        const label   = node.querySelector(`.title .file-label`);
         const isArray = node.classList.contains("type-array");
 
 

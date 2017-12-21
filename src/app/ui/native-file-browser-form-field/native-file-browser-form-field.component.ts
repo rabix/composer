@@ -1,6 +1,8 @@
-import {ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, Component, forwardRef, Input, Renderer2} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NativeSystemService} from "../../native/system/native-system.service";
+
+type SelectionType = "file" | "directory";
 
 @Component({
     selector: "ct-native-file-browser-form-field",
@@ -12,18 +14,19 @@ import {NativeSystemService} from "../../native/system/native-system.service";
         }
     ],
     template: `
-        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()"/>
+        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()" [disabled]="isDisabled"/>
 
         <span class="input-group-btn">
-            <button class="btn btn-secondary" type="button" (click)="onBrowse()">
-                <i *ngIf="useIcon; else textTpl" class="fa {{ browseIcon }}"></i>
+            <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
+                <i *ngIf="useIcon; else textTpl" class="browse-icon fa {{ browseIcon }}"></i>
                 
                 <ng-template #textTpl>
                     {{ browseLabel }}
                 </ng-template>
             </button>
         </span>
-    `
+    `,
+
 })
 export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor {
 
@@ -37,7 +40,7 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     @Input() useIcon = false;
 
-    @Input() selectionType: "file" | "directory" = "file";
+    @Input() selectionType: SelectionType = "file";
 
     @Input() dialogOptions: {
         title?: string;
@@ -58,16 +61,16 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
         message?: string;
     } = {};
 
+    isDisabled = false;
+
     onTouched = () => void 0;
 
     onChange = (value: any) => void 0;
 
-    @ViewChild("pathInput", {read: ElementRef})
-    private pathInput: ElementRef;
-
     private _value = "";
 
-    constructor(private dialog: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
+
+    constructor(private native: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
     }
 
     get value(): string {
@@ -88,10 +91,15 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
         let opener;
 
-        if (this.selectionType === "file") {
-            opener = this.dialog.openFileChoiceDialog(params);
-        } else {
-            opener = this.dialog.openFolderChoiceDialog(params)
+        switch (this.selectionType) {
+            case "directory":
+                opener = this.native.openFolderChoiceDialog(params);
+                break;
+
+            case "file":
+            default:
+                opener = this.native.openFileChoiceDialog(params);
+                break;
         }
 
         opener.then(files => this.value = files[0])
@@ -118,6 +126,6 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
     }
 
     setDisabledState(isDisabled: boolean): void {
-        this.renderer.setProperty(this.pathInput.nativeElement, "disabled", isDisabled);
+        this.isDisabled = isDisabled;
     }
 }

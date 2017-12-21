@@ -6,6 +6,10 @@
     display: flex;
     flex-direction: column;
 
+    ct-search-field {
+        margin: 0.5rem;
+    }
+
     ct-nav-search-result {
         opacity: 0;
         margin-left: -1em;
@@ -23,7 +27,7 @@
     }
 
     .grouping-toggle {
-        padding: 0 1em 0 1em;
+        padding: 0.4rem 1em 0.1rem 1em;
     }
 
     .group-by-item {

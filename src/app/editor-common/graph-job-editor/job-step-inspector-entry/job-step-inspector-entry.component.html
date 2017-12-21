@@ -36,7 +36,7 @@
 
         <!--Booleans-->
         <ng-template ngSwitchCase="boolean">
-            <ct-toggle-slider [formControl]="control" [disabled]="readonly"></ct-toggle-slider>
+            <ct-toggle-slider [formControl]="control"></ct-toggle-slider>
         </ng-template>
 
         <!--Maps-->
@@ -51,6 +51,19 @@
                                                [formControl]="control.get('path')"
                                                selectionType="file">
             </ct-native-file-browser-form-field>
+
+            <button *ngIf="control.get('path').enabled" class="btn btn-link file-meta-edit-btn" type="button"
+                    (click)="promptFileMetadata()">
+                <ng-container *ngIf="metadataKeysCount > 0 || secondaryFilesCount > 0; else defaultTitle">
+
+                    {{ secondaryFilesCount }} secondary {{ secondaryFilesCount === 1 ? 'file' : 'files'}},
+                    {{ metadataKeysCount }} metadata
+                </ng-container>
+
+                <ng-template #defaultTitle>Add secondary files and metadata</ng-template>
+
+            </button>
+
         </ng-template>
 
         <!--Directories and array of Directories-->
@@ -61,7 +74,6 @@
                                                selectionType="directory">
             </ct-native-file-browser-form-field>
         </ng-template>
-
 
     </div>
 
@@ -113,14 +125,16 @@
 
             <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
             <span class="delete-btn-group">
-                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)" [disabled]="readonly">
+                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)"
+                        [disabled]="readonly">
                     <i class="fa fa-trash"></i>
                 </button>
             </span>
         </div>
 
 
-        <button (click)="addArrayEntry()" type="button" class="btn pl-0 btn-link no-outline no-underline-hover"
+        <button *ngIf="control.enabled" (click)="addArrayEntry()" type="button"
+                class="btn pl-0 btn-link no-outline no-underline-hover"
                 [disabled]="readonly">
             <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
         </button>
@@ -128,6 +142,7 @@
 
     <!--Unknown-->
     <ng-template ngSwitchDefault>
-        <div class="alert alert-info">Unknown input type: {{ inputType || "null" }}</div>
+        Unknown input type: {{ inputType || "null" }}
     </ng-template>
+
 </div>
