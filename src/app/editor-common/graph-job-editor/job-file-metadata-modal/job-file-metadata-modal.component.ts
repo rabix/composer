@@ -11,7 +11,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <div class="form-group ">
                     <label>Secondary files</label>
 
-                    <div *ngFor="let group of form.get('secondaryFiles')['controls']; let idx = i" class="mb-1 secondary-file-row">
+                    <div *ngFor="let group of form.get('secondaryFiles')['controls']; let idx = index" class="mb-1 secondary-file-row">
 
                         <ct-native-file-browser-form-field class="input-group secondary-file-input"
                                                            [formControl]="group.get('path')"

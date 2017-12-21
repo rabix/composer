@@ -69,8 +69,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     reportPanel: "validation" | string;
 
-    showExecutionReportPanel = false;
-
     /** Flag to indicate if resolving content is in progress */
     isResolvingContent = false;
 
@@ -174,6 +172,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** Changes to the code that did not come from user's typing. */
         Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
+        /** On user interactions (changes) set app state to Dirty */
+        this.codeEditorContent.valueChanges.skip(1).subscribeTracked(this, () => {
+            this.setAppDirtyState(true);
+        }, (err) => {
+            console.warn("Error on dirty checking stream", err);
+        });
+
         /** Changes to the code from user's typing, slightly debounced */
         const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
 
@@ -239,16 +244,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 AppHelper.isLocal(this.tabData.id) ? Observable.of(true)
                     : this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
                 (outer, inner) => [...outer, inner]).share();
-
-
-        // On user interactions (changes) set app state to Dirty
-        validationStateChanges.skip(1).filter(() => this.revisionChangingInProgress === false)
-            .subscribeTracked(this, () => {
-                this.setAppDirtyState(true);
-            }, (err) => {
-                console.warn("Error on dirty checking stream", err);
-            });
-
 
         validationStateChanges.subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
             const [code, validation, unlocked] = data;
@@ -348,11 +343,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     this.revisionChangingInProgress = true;
                 }
 
-                // After app is saved, app state is not Dirty any more
-                this.setAppDirtyState(false);
-
                 this.priorityCodeUpdates.next(update);
 
+                // After app is saved, app state is not Dirty any more
+                this.setAppDirtyState(false);
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
             }, err => {
@@ -378,8 +372,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             modal.appContent     = this.getModelText(true);
 
             modal.published.take(1).subscribeTracked(this, (appID) => {
-                // After new revision is load, app state is not Dirty any more
-                this.setAppDirtyState(false);
 
                 const tab = this.workbox.getOrCreateAppTab({
                     id: AppHelper.getRevisionlessID(appID),
@@ -389,6 +381,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     language: "json"
 
                 });
+
                 this.workbox.openTab(tab);
             });
 
@@ -820,7 +813,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.executionPreview.clear();
             this.executionPreview.job = job;
 
-            this.showExecutionReportPanel = true;
             this.toggleReport("execution", true);
 
             this.isExecuting = true;

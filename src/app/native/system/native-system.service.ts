@@ -32,13 +32,13 @@ export class NativeSystemService {
     }
 
     private openDialog(options: Electron.OpenDialogOptions = {}): Promise<string[]> {
-        const {app, dialog} = this.electron.getRemote();
-        const config        = Object.assign({
+        const {app, dialog, getCurrentWindow} = this.electron.getRemote();
+        const config = Object.assign({
             defaultPath: app.getPath("home"),
         }, options);
 
         return new Promise((resolve, reject) => {
-            dialog.showOpenDialog(config, paths => {
+            dialog.showOpenDialog(getCurrentWindow(), config, paths => {
                 paths ? resolve(paths) : reject();
             });
         });
@@ -61,7 +61,7 @@ export class NativeSystemService {
     }
 
     createFileChoiceDialog(options: Electron.SaveDialogOptions = {}): Promise<string> {
-        const {app, dialog} = this.electron.getRemote();
+        const {app, dialog, getCurrentWindow} = this.electron.getRemote();
 
         const config = Object.assign({
             title: "Choose a File",
@@ -69,7 +69,7 @@ export class NativeSystemService {
         } as Electron.SaveDialogOptions, options);
 
         return new Promise((resolve, reject) => {
-            dialog.showSaveDialog(config, path => {
+            dialog.showSaveDialog(getCurrentWindow(), config, path => {
                 path ? resolve(path) : reject();
             });
         });
