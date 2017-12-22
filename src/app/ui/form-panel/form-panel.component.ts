@@ -12,7 +12,7 @@ import {Component, Input} from "@angular/core";
                             'fa-caret-down': !collapsed,
                             'fa-caret-up': collapsed
                        }"></i>
-            <div class="text-title clickable" (click)="collapsed = !collapsed">
+            <div class="text-title clickable" data-test="panel-title" (click)="collapsed = !collapsed">
                 <ng-content select=".tc-header"></ng-content>
             </div>
 

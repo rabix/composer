@@ -27,6 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Label</label>
                     <input type="text"
                            class="form-control"
+                           data-test="label-field"
                            [formControl]="form.controls['label']">
                 </div>
 
@@ -35,6 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Description</label>
                     <textarea class="form-control"
                               rows="4"
+                              data-test="desc-textarea"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
                 
@@ -44,6 +46,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Alternative Prefix</label>
                     <input class="form-control"
                            type="text"
+                           data-test="alt-prefix-field"
                            [formControl]="form.controls['altPrefix']">
                 </div>
 
@@ -52,6 +55,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Category</label>
                     <input class="form-control"
                            type="text"
+                           data-test="category-field"
                            [formControl]="form.controls['category']">
                 </div>
 
@@ -60,6 +64,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Tool Defaults</label>
                     <input class="form-control"
                            type="text"
+                           data-test="tool-defaults-field"
                            [formControl]="form.controls['toolDefaults']">
                 </div>
 

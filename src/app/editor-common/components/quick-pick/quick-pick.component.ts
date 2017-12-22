@@ -23,6 +23,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="radio-container" *ngFor="let item of list">
                 <button class="btn btn-secondary"
                         type="button"
+                        data-test="quick-pick-button"
+                        [attr.data-value]="item.value"
                         [class.active]="computedVal?.toString() === item.value.toString()"
                         [disabled]="readonly"
                         (click)="selectDefault(item.value)">
@@ -33,6 +35,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
         <button type="button"
                 class="btn btn-secondary custom-btn"
+                data-test="quick-pick-custom-button"
                 *ngIf="!showCustom && !readonly"
                 (click)="addCustom(true)">Custom
         </button>
@@ -46,7 +49,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <span class="remove-icon"
                   (click)="removeCustom($event, true)">
-                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" class="fa fa-trash clickable"></i>
+                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" data-test="custom-quick-pick-remove" class="fa fa-trash clickable"></i>
             </span>
         </div>
     `

@@ -23,7 +23,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group flex-container">
                 <label class="form-control-label">Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
+                        <ct-toggle-slider data-test="require-toggle"
+                                          [formControl]="form.controls['isRequired']"
                                           [on]="'Yes'"
                                           [off]="'No'">
                         </ct-toggle-slider>
@@ -35,6 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">ID</label>
                 <input type="text" 
                        class="form-control"
+                       data-test="id-field"
                        [readonly]="readonly"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
@@ -51,7 +53,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group"
                  *ngIf="isType('enum')">
                 <label>Symbols</label>
-                <ct-auto-complete [create]="true"
+                <ct-auto-complete data-test="symbols-field"
+                                  [create]="true"
                                   [formControl]="form.controls['symbols']"
                                   [readonly]="readonly"></ct-auto-complete>
             </div>
@@ -59,7 +62,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--Glob-->
             <div class="form-group">
                 <label class="form-control-label">Glob</label>
-                <ct-expression-input [context]="context"
+                <ct-expression-input data-test="glob-expr"
+                                     [context]="context"
                                      [formControl]="form.controls['glob']"
                                      [readonly]="readonly">
                 </ct-expression-input>

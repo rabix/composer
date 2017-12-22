@@ -48,6 +48,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                             <!--List item-->
                             <div class="form-control editor-list-item clickable"
+                                 data-test="argument"
                                  [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -97,6 +98,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             <!--Actions Column-->
                             <div *ngIf="!readonly" class="remove-icon">
                                 <i [ct-tooltip]="'Delete'"
+                                   data-test="argument-remove"
                                    class="fa fa-trash clickable"
                                    (click)="removeEntry(i)"></i>
                             </div>

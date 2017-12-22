@@ -44,7 +44,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 </ng-template>
 
                 <div *ngIf="formList.enabled && !readonly" class="remove-icon">
-                    <i ct-tooltip="Delete" class="fa fa-trash clickable" (click)="removeEntry(i)"></i>
+                    <i ct-tooltip="Delete" class="fa fa-trash clickable" data-test="base-command-remove" (click)="removeEntry(i)"></i>
                 </div>
 
             </li>
