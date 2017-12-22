@@ -14,7 +14,8 @@ type SelectionType = "file" | "directory";
         }
     ],
     template: `
-        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()" [disabled]="isDisabled"/>
+        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()"
+               [disabled]="isDisabled || disableTextInput"/>
 
         <span class="input-group-btn">
             <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
@@ -41,6 +42,8 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
     @Input() useIcon = false;
 
     @Input() selectionType: SelectionType = "file";
+
+    @Input() disableTextInput = false;
 
     @Input() dialogOptions: {
         title?: string;

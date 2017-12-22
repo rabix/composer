@@ -1,3 +1,4 @@
+import {Observable} from "rxjs/Observable";
 import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
@@ -5,9 +6,11 @@ import {ExecutorService} from "../../../executor/executor.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";
+import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service";
 
 @Component({
     selector: "ct-executor-config",
+    styleUrls: ["./executor-config.component.scss"],
     styles: [`
         :host {
             display: block;
@@ -27,11 +30,13 @@ import {NotificationBarService} from "../../notification-bar/notification-bar.se
 
                 <div class="form-group">
                     <label class="form-check-label">
-                        <input type="radio" class="form-check-input" value="custom" formControlName="choice" name="choice" #radio/>
+                        <input type="radio" class="form-check-input" value="custom" formControlName="choice"
+                               name="choice" #radio/>
                         Custom
 
                         <ng-container *ngIf="form.get('choice').value === 'custom'">
                             <ct-native-file-browser-form-field class="input-group mt-1"
+                                                               [disableTextInput]="true"
                                                                [hidden]=""
                                                                formControlName="path"></ct-native-file-browser-form-field>
 
@@ -39,6 +44,18 @@ import {NotificationBarService} from "../../notification-bar/notification-bar.se
                         </ng-container>
                     </label>
                 </div>
+
+                <label>Output folder:</label>
+                <ct-native-file-browser-form-field class="input-group"
+                                                   formControlName="outDir"
+                                                   [disableTextInput]="true"
+                                                   [hidden]=""
+                                                   selectionType="directory">
+                </ct-native-file-browser-form-field>
+
+                <button *ngIf="outDirExistsInTree | async" class="btn btn-link add-output-folder-btn" (click)="addOutputFolderToTree()">
+                    Add this folder to the file tree
+                </button>
 
             </div>
 
@@ -52,8 +69,11 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     versionMessage = "Version: checking...";
 
+    outDirExistsInTree: Observable<boolean>;
+
     constructor(private localRepository: LocalRepositoryService,
                 private notificationBar: NotificationBarService,
+                private electronProxy: ElectronProxyService,
                 public executorService: ExecutorService) {
         super();
     }
@@ -66,12 +86,13 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
             this.form = new FormGroup({
                 path: new FormControl(config.path, [Validators.required]),
-                choice: new FormControl(config.choice, [Validators.required])
+                choice: new FormControl(config.choice, [Validators.required]),
+                outDir: new FormControl(config.outDir)
             });
 
             const changes = this.form.valueChanges;
 
-            changes.subscribeTracked(this, () => this.versionMessage = "checking...");
+            this.form.get("path").valueChanges.subscribeTracked(this, () => this.versionMessage = "checking...");
 
             changes.debounceTime(300).subscribeTracked(this, () => {
                 this.localRepository.setExecutorConfig(this.form.getRawValue());
@@ -92,5 +113,20 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
         }, err => {
             console.warn("Probe unhandled error", err);
         });
+
+        this.outDirExistsInTree = this.localRepository
+            .getLocalFolders()
+            .map(folders => {
+              const result = !~folders.indexOf(this.form.get("outDir").value);
+              return result;
+            });
+    }
+
+    addOutputFolderToTree() {
+        this.electronProxy.getRemote().require("fs-extra").ensureDir((this.form.get("outDir").value))
+            .then(() => {
+                this.localRepository.addLocalFolders([this.form.get("outDir").value], true)
+                    .then(() => {});
+            }).catch((err) => console.warn(err));
     }
 }
