@@ -28,7 +28,6 @@ import {TreeViewService} from "../tree-view.service";
              [class.selected]="this === (tree.selected | async)"
              class="deep-unselectable clickable node-base {{ type }}">
 
-        <!--(click)="select(); isExpandable ? toggle($event) : noop"-->
             <!--Loading icon has a priority-->
             <i *ngIf="loading" class="fa fa-fw fa-circle-o-notch fa-spin"></i>
 
