@@ -10,7 +10,7 @@ import {SystemService} from "../../../platform-providers/system.service";
             <!--Header-->
             <div class="header">
 
-                <div class="logo mb-1">
+                <div class="logo-img mb-1">
                 </div>
 
                 <div class="header-text">

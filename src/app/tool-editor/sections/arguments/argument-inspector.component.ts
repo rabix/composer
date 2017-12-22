@@ -1,8 +1,10 @@
-import {Component, Input, OnInit, Output, ViewEncapsulation} from "@angular/core";
+import {AfterViewInit, Component, Input, OnInit, Output, ViewChild, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {CommandArgumentModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {ToggleSliderComponent} from "../../../ui/toggle-slider/toggle-slider.component";
+import {ModalService} from "../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -12,7 +14,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="form-group">
                 <label>Use command line binding</label>
                 <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
+                    <ct-toggle-slider #useCommandLineBinding [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
                 </span>
             </div>
 
@@ -79,7 +81,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class ArgumentInspectorComponent extends DirectiveBase implements OnInit {
+export class ArgumentInspectorComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     disabled = false;
 
@@ -104,10 +106,13 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
     @Input()
     public context: { $job: any };
 
+    @ViewChild("useCommandLineBinding")
+    private useCommandLineBinding: ToggleSliderComponent;
+
     @Output()
     public save = new Subject<FormGroup>();
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
         super();
     }
 
@@ -157,4 +162,26 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit 
                 : control.enable({onlySelf: true, emitEvent: false});
         });
     }
+
+    addUseCommandLineBindingToggleDecorator(): void {
+        const baseToggleFnc = this.useCommandLineBinding.toggleCheck.bind(this.useCommandLineBinding);
+
+        const toggleFunctionDecorator = (event) => {
+            event.preventDefault();
+
+            this.modal.confirm({
+                content: `If you toggle "Use command line binding" option, you might loose some argument values.\nDo you want to proceed?`
+            }).then(() => {
+                baseToggleFnc(event);
+            }, () => {
+            });
+        };
+
+        this.useCommandLineBinding.toggleCheck = toggleFunctionDecorator.bind(this);
+    }
+
+    ngAfterViewInit() {
+        this.addUseCommandLineBindingToggleDecorator();
+    }
 }
+

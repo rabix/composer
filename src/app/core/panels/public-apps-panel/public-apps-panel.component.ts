@@ -21,8 +21,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
 @Component({
     selector: "ct-public-apps-panel",
     template: `
-        <ct-search-field class="m-1" 
-                         [formControl]="searchContent"
+        <ct-search-field [formControl]="searchContent"
                          [placeholder]="'Search Public Apps'"></ct-search-field>
 
         <div class="btn-group grouping-toggle" *ngIf="!searchContent?.value">

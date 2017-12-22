@@ -91,3 +91,10 @@ html, body {
         color: $light-gray;
     }
 }
+
+.logo-img {
+    height: 100px;
+    width: 100px;
+    background: url("../img/rc-icon-256x256.png") no-repeat center;
+    background-size: contain;
+}

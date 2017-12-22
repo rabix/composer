@@ -109,7 +109,7 @@ export class DomEventService {
 
     public onDrag(element: Element, ctName = "", ctData = {}): Observable<Observable<MouseEvent>> {
 
-        const down = Observable.fromEvent(element, "mousedown").do((ev: MouseEvent) => {
+        const down = Observable.fromEvent(element, "mousedown").filter((ev: MouseEvent) => ev.button === 0).do((ev: MouseEvent) => {
             if (ev.stopPropagation) {
                 ev.stopPropagation();
             }
