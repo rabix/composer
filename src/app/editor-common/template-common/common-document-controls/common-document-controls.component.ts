@@ -52,6 +52,15 @@ import {Component, Input} from "@angular/core";
                     <i class="fa fa-fw fa-save"></i>
                 </button>
 
+                <button [disabled]="!host.dataModel"
+                        type="button" 
+                        class="btn control-button" 
+                        ct-tooltip="Export App" 
+                        tooltipPlacement="bottom" 
+                        (click)="host.exportApp()">
+                    <i class="fa fa-fw fa-upload"></i>
+                </button>
+
                 <!--Push to Platform-->
                 <button class="btn control-button" data-test="publish-button"
                         [disabled]="!host.appIsPublishable()"

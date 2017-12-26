@@ -28,6 +28,24 @@
 
                             </label>
 
+                            <div>
+                                <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" #portChangeDropDown>
+                                    <button type="button" class="btn btn-unstyled"
+                                            (click)="portChangeDropDown.toggleMenu()">
+                                        <i class="fa fa-fw fa-ellipsis-h"></i>
+                                    </button>
+                                </ct-generic-dropdown-menu>
+
+                                <ng-template #menu class="mr-1">
+                                    <ul class="list-unstyled" (click)="portChangeDropDown.hide()">
+                                        <li (click)="clear(jobGroup.get(input.id))">
+                                            Clear value
+                                        </li>
+                                    </ul>
+                                </ng-template>
+
+                            </div>
+
                         </div>
 
                         <!--Input-->
@@ -38,6 +56,13 @@
                                                      [inputRecordFields]="input.type.fields"
                                                      class="mb-0">
                         </ct-job-step-inspector-entry>
+
+                        <div *ngIf="jobGroup.get(input.id).disabled">
+                            Value of this input is set to <i>null</i>.
+                            <button class="btn btn-inline-link text-primary" type="button" (click)="jobGroup.get(input.id).enable({onlySelf: true})">
+                                Enable
+                            </button>
+                        </div>
 
                         <!--Connections-->
                         <!--Only steps have sources, inputs and outputs don't-->
@@ -84,5 +109,5 @@
 </ng-container>
 
 <ng-template #noInputs>
-    No inputs are exposed for this app.
+    No app parameters are exposed for this app.
 </ng-template>

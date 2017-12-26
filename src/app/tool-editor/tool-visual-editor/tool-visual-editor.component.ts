@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output} from "@angular/core";
-import {FormGroup} from "@angular/forms";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from "@angular/core";
+import {FormControl, FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
 
@@ -15,28 +15,29 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         <form [formGroup]="formGroup">
 
             <ct-docker-requirement [docker]="model.docker"
-                                   (update)="change.emit()"
+                                   (update)="dirty.emit()"
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
-            <ct-base-command [baseCommand]="model.baseCommand"
-                             [model]="model"
-                             [context]="context"
-                             (updateCmd)="updateModel('baseCommand', $event)"
-                             (updateStream)="setStreams($event)"
-                             [readonly]="readonly">
-            </ct-base-command>
+            <ct-form-panel class="base-command-section">
+                <div class="tc-header">Base Command</div>
+                <div class="tc-body">
+                    <ct-base-command-editor [allowExpressions]="model.cwlVersion === 'sbg:draft-2'"
+                                            [readonly]="readonly"
+                                            [formControl]="form.get('baseCommand')"></ct-base-command-editor>
+                </div>
+            </ct-form-panel>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="change.emit(); model.updateCommandLine()"
+                              (update)="dirty.emit(); model.updateCommandLine()"
                               [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>
 
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
-                           (update)="change.emit(); model.updateCommandLine()"
+                           (update)="dirty.emit(); model.updateCommandLine()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -44,7 +45,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                             [model]="model"
                             [context]="context"
                             [inputs]="model.inputs || []"
-                            (update)="change.emit()"
+                            (update)="dirty.emit()"
                             [readonly]="readonly">
             </ct-tool-output>
 
@@ -56,7 +57,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-tool-hints [model]="model"
                            [context]="context"
-                           (update)="change.emit()"
+                           (update)="dirty.emit()"
                            [readonly]="readonly">
             </ct-tool-hints>
 
@@ -71,7 +72,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-tool-other [model]="model"
                            [context]="context"
                            (updateStream)="setStreams($event)"
-                           (updateCodes)="change.emit()"
+                           (updateCodes)="dirty.emit()"
                            [readonly]="readonly">
             </ct-tool-other>
         </form>
@@ -86,37 +87,73 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     @Input()
     readonly: boolean;
 
-    /** ControlGroup that encapsulates the validation for all the nested forms */
+    /**
+     * ControlGroup that encapsulates the validation for all the nested forms
+     * @deprecated  remove this, use internal {@link form}
+     */
     @Input()
     formGroup: FormGroup;
 
     @Output()
-    change = new EventEmitter<any>();
+    dirty = new EventEmitter<any>();
 
     context: any;
+
+    form: FormGroup;
 
     constructor(public inspector: EditorInspectorService) {
         super();
     }
 
-    ngOnChanges() {
+    ngOnChanges(changes: SimpleChanges) {
         this.context = this.model.getContext();
+
+        // We have to recreate form controls because model is changed in place
+        // so nested objects would still refer to the old model
+        if (this.model && this.form && changes.model) {
+            this.form.setValue({
+                baseCommand: this.model.baseCommand
+            }, { emitEvent: false });
+        }
     }
 
+    ngOnInit() {
+        this.form = new FormGroup({
+            baseCommand: new FormControl(this.model.baseCommand)
+        });
+
+        this.form.get("baseCommand").valueChanges.subscribeTracked(this, (old) => {
+            this.updateBaseCommand(this.form.getRawValue().baseCommand);
+        });
+
+        this.form.valueChanges.subscribeTracked(this, (old) => {
+            this.dirty.emit();
+        });
+    }
+
+    private updateBaseCommand(values: any[]): void {
+
+        this.model.baseCommand = [];
+
+        for (let command of values) {
+            if (command instanceof ExpressionModel) {
+                this.model.addBaseCommand(command.serialize());
+            } else {
+                this.model.addBaseCommand(command);
+            }
+        }
+
+        this.model.updateCommandLine();
+    }
+
+    /**
+     * @FIXME move conditional clauses into separate methods
+     * @param {string} category
+     * @param data
+     */
     updateModel(category: string, data: any) {
 
-        if (category === "baseCommand") {
-            this.model.baseCommand = [];
-
-            data.forEach(cmd => {
-                if (cmd instanceof ExpressionModel) {
-                    cmd = cmd.serialize();
-                }
-                this.model.addBaseCommand(cmd);
-            });
-            this.model.updateCommandLine();
-
-        } else if (category === "fileRequirement") {
+        if (category === "fileRequirement") {
             if (!this.model.fileRequirement) {
                 if (this.model.cwlVersion === "v1.0") {
                     this.model.setRequirement(<ProcessRequirement>{
@@ -176,7 +213,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         }
 
-        this.change.emit();
+        this.dirty.emit();
     }
 
     setStreams(change) {
@@ -186,7 +223,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         });
         this.model.updateCommandLine();
-        this.change.emit();
+        this.dirty.emit();
     }
 
 

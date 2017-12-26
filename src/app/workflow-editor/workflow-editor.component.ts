@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
@@ -21,6 +22,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {FileRepositoryService} from "../file-repository/file-repository.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -42,6 +44,11 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             provide: APP_META_MANAGER,
             useFactory: appMetaManagerFactory,
             deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
+        },
+        {
+            provide: APP_MODEL,
+            useFactory: appModelFactory,
+            deps: [WorkflowEditorComponent]
         }
 
     ],
@@ -64,6 +71,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 protected cdr: ChangeDetectorRef,
                 platformAppService: PlatformAppService,
                 localRepository: LocalRepositoryService,
+                fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
                 executorService: ExecutorService) {
         super(
@@ -78,6 +86,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             platformAppService,
             platformRepository,
             localRepository,
+            fileRepository,
             workbox,
             executorService
         );
@@ -149,4 +158,5 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             this.graphDrawQueue.shift()();
         }
     }
+
 }

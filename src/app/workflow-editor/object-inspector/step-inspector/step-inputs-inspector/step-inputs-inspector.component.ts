@@ -47,7 +47,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <div *ngIf="isType(input, ['File', 'Directory'])" class="port-controls">
 
                                     <ct-toggle-slider
-                                        (valueChange)="onPortOptionChange(input, $event ? 'port' : 'editable')"
+                                        (valueChange)="onPortOptionChange(input, $event ? 'port' : 'default')"
                                         *ngIf="input.type.isNullable"
                                         [disabled]="readonly"
                                         on="Show"
@@ -182,22 +182,25 @@ export class StepInputsInspectorComponent extends DirectiveBase implements OnIni
     @Output()
     change = new EventEmitter();
 
+    /** This input exists in order to call ngOnChange (by changing its reference) to update inputs when step is updated */
+    @Input()
+    public stepIsUpdatedReference: any;
 
     dropDownPortOptions = [
         {
-            value: "editable",
-            caption: "Editable",
-            description: "Set port value"
+            value: "default",
+            caption: "Default",
+            description: "Set default value for execution"
         },
         {
             value: "exposed",
             caption: "Exposed",
-            description: "Set port value on draft task page"
+            description: "Set value with the option to edit on the test page"
         },
         {
             value: "port",
             caption: "Port",
-            description: "Connect the port with other ports"
+            description: "Get value from another node on the canvas"
         }
     ];
 
@@ -214,7 +217,7 @@ export class StepInputsInspectorComponent extends DirectiveBase implements OnIni
      */
     onPortOptionChange(input, value) {
         switch (value) {
-            case "editable":
+            case "default":
                 this.workflowModel.clearPort(input);
                 break;
             case "exposed":

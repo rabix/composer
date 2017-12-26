@@ -1,4 +1,8 @@
+@import "../../../../assets/sass/variables";
+@import "../../../../assets/sass/mixins";
+
 :host {
+
     .removable-form-control {
         display: flex;
         width: 100%;

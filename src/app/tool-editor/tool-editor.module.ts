@@ -18,9 +18,8 @@ import {ToolOutputInspectorComponent} from "./object-inspector/output-inspector/
 import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {ArgumentInspectorComponent} from "./sections/arguments/argument-inspector.component";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
-import {BaseCommandListComponent} from "./sections/base-command/base-command-list/base-command-list.component";
-import {BaseCommandStringComponent} from "./sections/base-command/base-command-string/base-command-string.component";
-import {BaseCommandComponent} from "./sections/base-command/base-command.component";
+import {BaseCommandEditorComponent} from "./sections/base-command-editor/base-command-editor.component";
+import {BaseCommandExpressionListComponent} from "./sections/base-command-editor/base-command-expression-list/base-command-expression-list.component";
 import {DockerRequirementComponent} from "./sections/docker/docker-requirement.component";
 import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
@@ -63,13 +62,12 @@ import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor
         ToolEditorComponent,
         ToolVisualEditorComponent,
         DockerRequirementComponent,
-        BaseCommandComponent,
         ToolHintsComponent,
-        BaseCommandListComponent,
         ToolStreamsComponent,
-        BaseCommandStringComponent,
         ToolOtherComponent,
-        ToolCodesComponent
+        ToolCodesComponent,
+        BaseCommandEditorComponent,
+        BaseCommandExpressionListComponent,
     ],
     exports: [
         ToolEditorComponent,

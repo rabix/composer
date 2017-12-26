@@ -47,7 +47,7 @@ import {AppHelper} from "../../../../core/helpers/AppHelper";
             <div>
                 <span class="text-title">Description{{ getDescription() ? '' : ':'}}</span>
                 <div class="form-group" [ngClass]="{'format': getDescription()}">
-                    <div [ct-markdown]="getDescription()"></div>
+                    <ct-markdown [value]="getDescription()"></ct-markdown>
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@ export class WorkflowStepInspectorTabInfo {
     getSource() {
 
         const rdfID = this.step.customProps["sbg:rdfId"];
-        if(rdfID){
+        if (rdfID) {
             return AppHelper.getDirname(rdfID);
         }
 

@@ -6,37 +6,17 @@ import {AppHelper} from "../core/helpers/AppHelper";
 import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
-import {takeWhile} from "rxjs/operator/takeWhile";
 
 @Injectable()
 export class ExecutorService {
 
     private config        = new ReplaySubject<ExecutorConfig>(1);
-    private executorState = new ReplaySubject<"VALID" | "INVALID" | "UNSET">(1);
 
     constructor(private ipc: IpcService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
         this.localRepository.getExecutorConfig().subscribe(this.config);
-
-        this.bindExecutorStateStream();
-    }
-
-    private bindExecutorStateStream() {
-        this.getConfig("path").switchMap(path => {
-            if (!path) {
-                return Observable.of("UNSET");
-            }
-
-            return this.ipc.request("probeExecutorVersion").map(versionString => {
-                if (versionString.startsWith("Version:")) {
-                    return "VALID";
-                }
-
-                return "INVALID";
-            });
-        }).subscribe(this.executorState);
     }
 
     getConfig<T extends keyof ExecutorConfig>(key: T): Observable<ExecutorConfig[T]> {
@@ -48,11 +28,9 @@ export class ExecutorService {
      * Returns a message in the format “Version: #” if successful, or a description why it failed
      */
     getVersion(): Observable<string> {
-        return this.getConfig("path").switchMap(path => this.ipc.request("probeExecutorVersion"))
-    }
-
-    getExecutorState() {
-        return this.executorState.asObservable();
+        return this.getConfig("path")
+            .distinctUntilChanged()
+            .switchMap(path => this.ipc.request("probeExecutorVersion"));
     }
 
     run(appID: string, content: string, options = {}): Observable<string> {
@@ -67,11 +45,6 @@ export class ExecutorService {
             options
         }).takeWhile(val => val !== null);
     }
-
-    getEnvironment(appID: string): Observable<ExecutorConfig> {
-        return this.localRepository.getExecutorConfig()
-    }
-
     /**
      * Gets the configuration parameters for the execution context of a specific app
      */
@@ -96,19 +69,3 @@ export class ExecutorService {
     }
 }
 
-export interface RabixExecutorResult {
-    output: RabixExecutorResultOutput[]
-}
-
-export interface RabixExecutorResultOutput {
-    basename: string,
-    checksum: string,
-    class: string,
-    dirname: string,
-    location: string,
-    nameext: string,
-    nameroot: string,
-    path: string,
-    secondaryFiles: string[],
-    size: number
-}

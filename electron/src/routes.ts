@@ -11,6 +11,7 @@ import {ExecutorDefaultPathLoader} from "./storage/hooks/executor-config-hook";
 import {AppMetaEntry} from "./storage/types/app-meta";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
+import {heal} from "./storage/repository-healer";
 
 
 const userDataPath   = require("electron").app.getPath("userData");
@@ -57,7 +58,16 @@ export function loadDataRepository() {
                 return reject(err);
             }
 
-            return resolve(1);
+            heal(repository.local).then(isModified => {
+                if (isModified) {
+                    repository.updateLocal(repository.local, () => {
+                        resolve(1);
+                    });
+                }
+
+                resolve(1);
+            });
+
         });
     }).catch(err => void 0);
 }

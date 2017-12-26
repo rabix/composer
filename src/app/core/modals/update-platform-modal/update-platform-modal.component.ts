@@ -11,7 +11,8 @@ import {SystemService} from "../../../platform-providers/system.service";
 
             <div class="header">
                 
-                <img class="logo mb-1" src="../../../../assets/img/rc_icon_256x256.png">                    
+                <div class="logo-img mb-1">
+                </div>
 
                 <div class="header-text">                    
                     <ng-container *ngIf="platformIsOutdated; else upToDate">
@@ -29,8 +30,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                 <ng-container *ngIf="platformIsOutdated; else upToDateSection">
                     What's new:
-                    <div [ct-markdown]="description">
-                    </div>
+                    <ct-markdown [value]="description"></ct-markdown>
 
                     <div class="version-info">Current version: Rabix Composer ({{currentVersion}})</div>
                     <div class="version-info">New version: Rabix Composer ({{newVersion}})</div>
