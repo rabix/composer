@@ -25,6 +25,10 @@ export class ContextService {
         nEl.style.left = x + "px";
         nEl.style.top = y + "px";
 
+        Observable.fromEvent(nEl, "contextmenu").subscribe((ev: MouseEvent) => {
+            ev.stopPropagation();
+        });
+
         Observable.fromEvent(document, "click").first().subscribe(() => {
             this.close();
         });

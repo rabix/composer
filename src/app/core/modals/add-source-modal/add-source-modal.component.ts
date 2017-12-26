@@ -74,7 +74,7 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                             data-test="add-source-modal-connection-button" 
                             class="btn btn-primary" 
                             (click)="openCredentialsForm()">
-                        Add a connection
+                        Add an Account
                     </button>
                 </p>
             </ng-template>

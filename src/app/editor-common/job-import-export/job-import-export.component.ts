@@ -1,4 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output, Renderer2, SimpleChanges, ViewChild} from "@angular/core";
+import {
+    Component, EventEmitter, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges,
+    ViewChild
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
@@ -9,6 +12,7 @@ import {NativeSystemService} from "../../native/system/native-system.service";
 import {AceEditorOptions} from "../../ui/code-editor-new/ace-editor-options";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
+import {stringifyObject} from "../../helpers/yaml-helper";
 
 type JobFormat = "json" | "yaml";
 
@@ -17,7 +21,7 @@ type JobFormat = "json" | "yaml";
     templateUrl: "./job-import-export.component.html",
     styleUrls: ["./job-import-export.component.scss"]
 })
-export class JobImportExportComponent implements OnInit {
+export class JobImportExportComponent implements OnInit, OnChanges {
 
 
     @Input()
@@ -58,7 +62,7 @@ export class JobImportExportComponent implements OnInit {
 
     ngOnInit() {
 
-        this.jobControl = new FormControl(this.stringifyJob(), [],
+        this.jobControl = new FormControl(stringifyObject(this.job, this.exportFormat), [],
             FormAsyncValidator.debounceValidator(control => {
                 return new Promise(resolve => {
 
@@ -79,7 +83,7 @@ export class JobImportExportComponent implements OnInit {
     ngOnChanges(changes: SimpleChanges) {
 
         if (changes["job"]) {
-            this.jobControl.setValue(this.stringifyJob());
+            this.jobControl.setValue(stringifyObject(this.job, this.exportFormat));
         }
 
         if (changes["action"]) {
@@ -93,24 +97,8 @@ export class JobImportExportComponent implements OnInit {
 
         if (changes["exportFormat"]) {
 
-            this.onFormatUpdate()
+            this.onFormatUpdate();
         }
-    }
-
-    private stringifyJob(format: JobFormat = this.exportFormat): string {
-        if (format === "json") {
-            return JSON.stringify(this.job, null, 4);
-        }
-
-        const yamled = Yaml.safeDump(this.job);
-
-        // Handle the bug with js-yaml where an empty object would be serialized as "{}" (yaml should not do that)
-        if (yamled === "{}\n") {
-            return "";
-        }
-
-        return yamled;
-
     }
 
     toggleFormat() {
@@ -126,12 +114,12 @@ export class JobImportExportComponent implements OnInit {
         this.editorOptions = {mode: this.exportFormat === "json" ? jsonMode : yamlMode};
         this.codeEditor.getEditorInstance().setOptions(this.editorOptions);
 
-        this.jobControl.setValue(this.stringifyJob());
+        this.jobControl.setValue(stringifyObject(this.job, this.exportFormat));
     }
 
     chooseImportFile() {
         this.native.openFileChoiceDialog().then(paths => {
-            return this.fileRepository.fetchFile(paths[0], true)
+            return this.fileRepository.fetchFile(paths[0], true);
         }).then(content => {
             return Yaml.safeLoad(content, {json: true} as LoadOptions);
         }).then(jobObject => {
@@ -156,7 +144,7 @@ export class JobImportExportComponent implements OnInit {
         }
 
         this.native.createFileChoiceDialog({defaultPath}).then(path => {
-            const formatted = this.stringifyJob(format);
+            const formatted = stringifyObject(this.job, format);
 
             return this.fileRepository.saveFile(path, formatted);
         }).then(() => {
@@ -165,8 +153,12 @@ export class JobImportExportComponent implements OnInit {
     }
 
     importCode() {
-        const loaded = Yaml.safeLoad(this.jobControl.value);
-        this.import.emit(loaded);
+        try {
+            const loaded = Yaml.safeLoad(this.jobControl.value);
+            this.import.emit(loaded);
+        } catch (err) {
+            this.importError = err;
+        }
     }
 
     copyToClipboard(event: MouseEvent) {

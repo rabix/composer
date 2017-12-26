@@ -1,11 +1,18 @@
-<ct-search-field class="m-1"
-                 [formControl]="searchContent"
+<ct-search-field [formControl]="searchContent"
                  [placeholder]="'Search Apps'"></ct-search-field>
 
 <div>
     <button class="btn btn-link app-sources-btn" data-test="add-sources-button"
             (click)="openAddAppSourcesDialog()">
         <i class="fa fa-fw fa-plus"></i> Open a Project
+    </button>
+
+    <button class="btn btn-link sync-btn"
+            data-test="sync-button"
+            ct-tooltip="Synchronize"
+            tooltipPlacement="bottom"
+            (click)="syncFileTree()">
+        <i class="fa fa-refresh"></i>
     </button>
 </div>
 
