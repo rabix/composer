@@ -137,9 +137,9 @@ export class UpdatePlugin extends PluginBase {
                 });
 
             }, err => {
-                const isOffline = err.error && err.error.syscall === "getaddrinfo" && !navigator.onLine;
-                if (showOfflineErr || !isOffline) {
-                    this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
+                const errWrapper = new ErrorWrapper(err);
+                if (showOfflineErr || !errWrapper.isOffline()) {
+                    this.notificationBar.showNotification("Cannot get app updates. " + errWrapper);
                 }
                 this.cleanUp();
             });

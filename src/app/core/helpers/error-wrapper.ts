@@ -8,7 +8,7 @@ export class ErrorWrapper {
     }
 
     toString() {
-        if (this.err.error && this.err.error.syscall === "getaddrinfo" && !navigator.onLine) {
+        if (this.isOffline()) {
             return "You are currently offline - please check your internet connection.";
         }
 
@@ -66,5 +66,9 @@ export class ErrorWrapper {
         }
 
         return this.err.message;
+    }
+
+    public isOffline() {
+        return this.err.error && this.err.error.syscall === "getaddrinfo" && !navigator.onLine;
     }
 }
