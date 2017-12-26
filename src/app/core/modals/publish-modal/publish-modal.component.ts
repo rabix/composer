@@ -182,21 +182,13 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
     }
 
     private formatAppID(id: string) {
-        // unidecode represents UTF-8 characters in US-ASCII characters
-        const str        = unidecode(id.trim()).replace(/[^a-z1-9-]/gi, '-').toLowerCase();
-        let formattedStr = "";
-        let index        = -1;
-
-        for (let c in str) {
-            if (str[c] !== "-" || (index !== -1 && formattedStr[index] !== "-")) {
-                formattedStr += str[c];
-                index++;
-            }
-        }
-        if (formattedStr[index] === '-') {
-            formattedStr = formattedStr.slice(0, -1);
-        }
-        return formattedStr;
+        /*
+         * Unidecode represents UTF-8 characters in US-ASCII characters
+         * All special characters should be replaced with hyphens,
+         * and leading and trailing hyphens should then be removed
+         */
+        const str = unidecode(id).replace(/[^a-z1-9-]/gi, '-').replace(/--+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+        return str;
     }
 
     close() {
