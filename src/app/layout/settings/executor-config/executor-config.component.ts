@@ -93,7 +93,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
             const changes = this.form.valueChanges;
 
             this.outDirExistsInTree = this.localRepository
-                .getLocalFolders().combineLatest(this.form.get("outDir").valueChanges.startWith(this.form.get("outDir").value))
+                .getLocalFolders().combineLatest(this.localRepository.getExecutorConfig().map(config => config.outDir))
                 .map(result => {
                     const [folders, outDir] = result;
                     return !~folders.indexOf(outDir);
