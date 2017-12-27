@@ -151,7 +151,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
         this.inputForm.controls["project"].valueChanges
             .flatMap(val =>  {
-                return this.platformRepository.getAppsForProject(val)
+                return this.platformRepository.getAppsForProject(val);
             })
             .subscribeTracked(this, (apps: App[]) => {
                 this.appOptions = apps.map(app => ({value: app.id.split("/")[2], text: app.id.split("/")[2]}));
