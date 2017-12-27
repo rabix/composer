@@ -14,7 +14,6 @@ export interface ExecutorParamsConfig {
     configurationDir: string;
     cacheDir: string;
     noContainer: boolean;
-    outDir: string;
     quiet: boolean;
     verbose: boolean;
 }

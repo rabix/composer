@@ -54,10 +54,9 @@ describe("rabix executor runner", function () {
 
 
         rabix.execute(app, YAML.safeLoad(job), {
-            outDir: outdir,
             noContainer: true,
             quiet: true
-        }, (err, data) => {
+        }, outdir, (err, data) => {
 
             if (err) {
                 return done(err);

@@ -87,11 +87,11 @@ export class RabixExecutor {
      * @param dataCallback
      * @param emitter
      */
-    execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, emitter?: EventEmitter) {
+    execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {},
+            outDir: string, dataCallback, emitter?: EventEmitter) {
 
-        const outdir      = executionParams.outDir;
-        const appFilePath = `${outdir}/app.cwl`;
-        const jobFilePath = `${outdir}/job.json`;
+        const appFilePath = `${outDir}/app.cwl`;
+        const jobFilePath = `${outDir}/job.json`;
 
         const cleanupHandlers = [] as Function[];
         const cleanup         = () => cleanupHandlers.forEach(c => c());
@@ -156,8 +156,8 @@ export class RabixExecutor {
         });
 
 
-        const stdoutLogPath   = executionParams.outDir + "/stdout.log";
-        const stderrLogPath   = executionParams.outDir + "/stderr.log";
+        const stdoutLogPath   = outDir + "/stdout.log";
+        const stderrLogPath   = outDir + "/stderr.log";
         const logFilesCreated = Promise.all([
             new Promise((resolve, reject) => fs.ensureFile(stdoutLogPath, err => err ? reject(err) : resolve())),
             new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
@@ -183,7 +183,7 @@ export class RabixExecutor {
                 this.jarPath,
                 appFilePath,
                 jobFilePath,
-                ...this.parseExecutorParamsToArgs(executionParams)
+                ...this.parseExecutorParamsToArgs(executionParams, outDir)
             ];
 
             const rabixProcess = spawn(this.jrePath, executorArgs, {});
@@ -248,7 +248,7 @@ export class RabixExecutor {
 
                 dataCallback(null, {
                     type: "OUTDIR",
-                    message: executionParams.outDir
+                    message: outDir
                 } as ExecutorOutput);
 
                 if (code !== 0) {
@@ -282,7 +282,7 @@ export class RabixExecutor {
         }
     }
 
-    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}): string[] {
+    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}, outDir: string): string[] {
 
 
         const output = [];
@@ -315,8 +315,8 @@ export class RabixExecutor {
             output.push("--configuration-dir", params.configurationDir);
         }
 
-        if (params.outDir) {
-            output.push("--outdir", params.outDir);
+        if (outDir) {
+            output.push("--outdir", outDir);
         }
 
         return output;
