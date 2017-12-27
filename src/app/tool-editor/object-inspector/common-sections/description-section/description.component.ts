@@ -36,7 +36,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     <label class="form-control-label">Description</label>
                     <textarea class="form-control"
                               rows="4"
-                              data-test="desc-textarea"
+                              data-test="desc-field"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
                 

@@ -34,7 +34,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div [class.hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
                 <select class="form-control"
-                        data-test="array-type-select"
+                        data-test="items-type-select"
                         [formControl]="form.controls['items']">
                     <option *ngFor="let item of itemTypes"
                             [disabled]="readonly"

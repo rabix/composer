@@ -24,12 +24,14 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
-                    <input class="form-control  col-xs-5" formControlName="key" [placeholder]="keyLabel"/>
+                    <input class="form-control  col-xs-5" formControlName="key" data-test="key-field" [placeholder]="keyLabel"/>
                     <span class="input-group-addon">:</span>
-                    <input class="form-control col-xs-5" formControlName="value" [placeholder]="valueLabel"/>
+                    <input class="form-control col-xs-5" formControlName="value" data-test="value-field" [placeholder]="valueLabel"/>
                     <span class="input-group-btn">
-                        <button (click)="remove(i)" type="button"
-                                class="input-group-addon btn btn-secondary ">
+                        <button (click)="remove(i)" 
+                                type="button"
+                                class="input-group-addon btn btn-secondary"
+                                data-test="remove-entry">
                             <i class="fa fa-trash"></i></button>
                     </span>
 
@@ -38,6 +40,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                 <div class="row">
                     <button class="pull-right btn btn-secondary btn-sm"
                             type="button"
+                            data-test="add-entry-button"
                             (click)="add()">Add an Entry
                     </button>
                 </div>

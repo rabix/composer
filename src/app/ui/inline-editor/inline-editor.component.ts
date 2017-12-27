@@ -12,27 +12,49 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                 <!--Editing mode-->
                 <div *ngIf="editing">
-                    <input class="form-control" *ngIf="type === 'text'" [type]="type" [placeholder]="label" [(ngModel)]="value"/>
+                    <input class="form-control"
+                           *ngIf="type === 'text'" 
+                           data-test="inline-input" 
+                           [type]="type" 
+                           [placeholder]="label" 
+                           [(ngModel)]="value"/>
                     
-                    <textarea class="form-control" *ngIf="type === 'textarea'" [name]="value" rows="20" [(ngModel)]="value"></textarea>
+                    <textarea class="form-control" 
+                              *ngIf="type === 'textarea'" 
+                              data-test="inline-textarea" 
+                              [name]="value" rows="20" 
+                              [(ngModel)]="value"></textarea>
                     
-                    <ct-key-value *ngIf="type === 'keyvalue'" [(ngModel)]="value" [keyLabel]="keyLabel" [valueLabel]="valueLabel"></ct-key-value>
+                    <ct-key-value *ngIf="type === 'keyvalue'" 
+                                  [(ngModel)]="value" 
+                                  [keyLabel]="keyLabel" 
+                                  [valueLabel]="valueLabel"></ct-key-value>
 
-                    <ct-auto-complete *ngIf="type === 'tags'"  [name]="value" [options]="options"
-                                      [(ngModel)]="value" [create]="true">
+                    <ct-auto-complete *ngIf="type === 'tags'" 
+                                      [name]="value" 
+                                      [options]="options"
+                                      [(ngModel)]="value" 
+                                      [create]="true">
 
                     </ct-auto-complete>
 
                     <!--Save/Cancel button-->
                     <div *ngIf="editing" class="button-section">
-                        <button type="button" class="btn btn-secondary btn-sm inline-control-btn" (click)="onCancel($event)">Cancel</button>
-                        <button type="button" class="btn btn-primary btn-sm inline-control-btn" (click)="onSave($event)">Save</button>
+                        <button type="button" 
+                                class="btn btn-secondary btn-sm inline-control-btn" 
+                                data-test="cancel-button" 
+                                (click)="onCancel($event)">Cancel</button>
+                        <button type="button" 
+                                class="btn btn-primary btn-sm inline-control-btn" 
+                                data-test="save-button" 
+                                (click)="onSave($event)">Save</button>
                     </div>
                 </div>
 
                 <!--Edit button-->
                 <div *ngIf="isHover && !editing" class="button-section">
                     <button class="btn btn-secondary btn-sm"
+                            data-test="edit-button"
                             (click)="edit($event)">Edit
                     </button>
                 </div>
@@ -42,6 +64,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
                     <div *ngIf="isHover" class="button-section">
                         <button class="btn btn-secondary btn-sm"
+                                data-test="edit-button"
                                 (click)="edit($event)">Edit
                         </button>
                     </div>
@@ -49,7 +72,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <ng-content></ng-content>
 
                     <!--Empty state-->
-                    <div *ngIf="isEmpty()">None</div>
+                    <div data-test="inline-content" *ngIf="isEmpty()">None</div>
                 </div>
 
             </div>
