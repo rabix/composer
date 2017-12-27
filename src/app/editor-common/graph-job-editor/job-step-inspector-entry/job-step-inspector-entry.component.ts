@@ -98,7 +98,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
             case "float":
             case "int":
-                this.control.setValue(~~update, updateOptions);
+                this.control.setValue(parseInt(update, 10), updateOptions);
                 break;
             case "boolean":
                 this.control.setValue(Boolean(update), updateOptions);
@@ -159,7 +159,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 let typecheckedChange = change;
 
                 if (this.inputType === "int") {
-                    typecheckedChange = ~~change;
+                    typecheckedChange = parseInt(change, 10);
                 } else if (this.inputType === "float") {
                     typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
                 }

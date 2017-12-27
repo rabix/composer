@@ -92,6 +92,13 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
             const changes = this.form.valueChanges;
 
+            this.outDirExistsInTree = this.localRepository
+                .getLocalFolders().combineLatest(this.localRepository.getExecutorConfig().map(config => config.outDir))
+                .map(result => {
+                    const [folders, outDir] = result;
+                    return !~folders.indexOf(outDir);
+                });
+
             this.form.get("path").valueChanges.subscribeTracked(this, () => this.versionMessage = "checking...");
 
             changes.debounceTime(300).subscribeTracked(this, () => {
@@ -114,12 +121,6 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
             console.warn("Probe unhandled error", err);
         });
 
-        this.outDirExistsInTree = this.localRepository
-            .getLocalFolders()
-            .map(folders => {
-              const result = !~folders.indexOf(this.form.get("outDir").value);
-              return result;
-            });
     }
 
     addOutputFolderToTree() {
