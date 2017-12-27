@@ -31,7 +31,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         <button (click)="remove(i)" 
                                 type="button"
                                 class="input-group-addon btn btn-secondary"
-                                data-test="remove-entry">
+                                data-test="remove-entry-button">
                             <i class="fa fa-trash"></i></button>
                     </span>
 

@@ -69,7 +69,9 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                         </button>
                     </div>
                     
-                    <ng-content></ng-content>
+                    <div data-test="inline-content">
+                        <ng-content></ng-content>
+                    </div>
 
                     <!--Empty state-->
                     <div data-test="inline-content" *ngIf="isEmpty()">None</div>

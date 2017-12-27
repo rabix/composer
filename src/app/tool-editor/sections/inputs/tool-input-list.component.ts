@@ -98,7 +98,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--Actions Column-->
                     <div *ngIf="!readonly" class="remove-icon">
                         <i [ct-tooltip]="'Delete'"
-                           data-test="input-port-remove"
+                           data-test="remove-input-button"
                            class="fa fa-trash clickable"
                            (click)="removeEntry(i)"></i>
                     </div>

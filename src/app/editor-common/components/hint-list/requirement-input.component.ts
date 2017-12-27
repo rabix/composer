@@ -30,7 +30,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <!--Regular input if no autocomplete for classes provided-->
             <input type="text" 
                    class="form-control"
-                   data-test="requirement-input-class"
+                   data-test="requirement-input-class-field"
                    *ngIf="!classSuggest"
                    [formControl]="form.controls['class']">
             <input type="text" [value]="value" readonly class="form-control col-xs-6">
@@ -48,7 +48,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <input type="text"
                    *ngIf="!classSuggest"
                    class="form-control"
-                   data-test="requirement-input-class"
+                   data-test="requirement-input-class-field"
                    [formControl]="form.controls['class']">
             <ct-expression-input
                     [context]="context"

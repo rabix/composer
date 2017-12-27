@@ -49,7 +49,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
             <span class="remove-icon"
                   (click)="removeCustom($event, true)">
-                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" data-test="custom-quick-pick-remove" class="fa fa-trash clickable"></i>
+                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" data-test="custom-quick-pick-remove-button" class="fa fa-trash clickable"></i>
             </span>
         </div>
     `

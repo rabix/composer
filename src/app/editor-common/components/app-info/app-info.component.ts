@@ -50,7 +50,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                               [value]="model.customProps['sbg:toolkit']"
                                               type="text"
                                               (saveData)="updateCustomProp('sbg:toolkit', $event)">
-                                <div data-test="inline-content">{{model.customProps['sbg:toolkit']}}</div>
+                                {{model.customProps['sbg:toolkit']}}
                             </ct-inline-editor>
                             <ct-inline-editor class="toolkit"
                                               data-test="app-toolkit-version"
@@ -58,7 +58,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                               [value]="model.customProps['sbg:toolkitVersion']"
                                               type="text"
                                               (saveData)="updateCustomProp('sbg:toolkitVersion', $event)">
-                                <div data-test="inline-content">{{model.customProps['sbg:toolkitVersion']}}</div>
+                                {{model.customProps['sbg:toolkitVersion']}}
                             </ct-inline-editor>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
-                            <div data-test="inline-content">{{model.customProps['sbg:toolAuthor']}}</div>
+                            {{model.customProps['sbg:toolAuthor']}}
                         </ct-inline-editor>
                     </div>
 
@@ -83,7 +83,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:license', $event)">
-                            <div data-test="inline-content">{{model.customProps['sbg:license']}}</div>
+                            {{model.customProps['sbg:license']}}
                         </ct-inline-editor>
                     </div>
 
@@ -102,7 +102,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:wrapperAuthor', $event)">
-                            <div data-test="inline-content">{{model.customProps['sbg:wrapperAuthor']}}</div>
+                            {{model.customProps['sbg:wrapperAuthor']}}
                         </ct-inline-editor>
                     </div>
 
@@ -114,7 +114,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:wrapperLicense', $event)">
-                            <div data-test="inline-content">{{model.customProps['sbg:wrapperLicense']}}</div>
+                            {{model.customProps['sbg:wrapperLicense']}}
                         </ct-inline-editor>
                     </div>
 
@@ -127,7 +127,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                                           [disabled]="readonly"
                                           [options]="categories"
                                           (saveData)="updateCustomProp('sbg:categories', $event)">
-                            <div data-test="inline-content">{{ (model.customProps['sbg:categories'] || []).join(", ")}}</div>
+                            {{ (model.customProps['sbg:categories'] || []).join(", ")}}
                         </ct-inline-editor>
                     </div>
 
@@ -150,6 +150,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                             <span *ngFor="let link of model.customProps['sbg:links']" class="links">
                                     <a href=""
+                                       data-test="app-link"
                                        (click)="$event.preventDefault();
                                        $event.stopPropagation();
                                        openWebPage(link.id)">{{link.label}}</a>

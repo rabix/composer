@@ -46,7 +46,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
                         <!--Actions Column-->
                         <div *ngIf="!readonly" class="remove-icon">
                             <i [ct-tooltip]="'Delete'"
-                               data-test="hint-remove"
+                               data-test="remove-hint-button"
                                class="fa fa-trash clickable"
                                (click)="removeEntry(i)"></i>
                         </div>
