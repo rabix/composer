@@ -16,4 +16,5 @@ export interface ExecutorParamsConfig {
     noContainer: boolean;
     quiet: boolean;
     verbose: boolean;
+    outDir: string;
 }

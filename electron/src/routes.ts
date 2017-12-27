@@ -626,7 +626,7 @@ export function executeApp(data: {
             userID = repository.local.activeCredentials.id;
         }
 
-        const outDir = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
+        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
 
         let appJob = {};
 
@@ -649,7 +649,7 @@ export function executeApp(data: {
 
         }).then((content: string) => {
 
-            rabix.execute(content, appJob, options, outDir, callback, emitter);
+            rabix.execute(content, appJob, options, callback, emitter);
 
         }, callback);
 

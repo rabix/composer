@@ -88,8 +88,9 @@ export class RabixExecutor {
      * @param emitter
      */
     execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {},
-            outDir: string, dataCallback, emitter?: EventEmitter) {
+            dataCallback, emitter?: EventEmitter) {
 
+        const outDir = executionParams.outDir;
         const appFilePath = `${outDir}/app.cwl`;
         const jobFilePath = `${outDir}/job.json`;
 
@@ -183,7 +184,7 @@ export class RabixExecutor {
                 this.jarPath,
                 appFilePath,
                 jobFilePath,
-                ...this.parseExecutorParamsToArgs(executionParams, outDir)
+                ...this.parseExecutorParamsToArgs(executionParams)
             ];
 
             const rabixProcess = spawn(this.jrePath, executorArgs, {});
@@ -282,7 +283,7 @@ export class RabixExecutor {
         }
     }
 
-    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}, outDir: string): string[] {
+    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}): string[] {
 
 
         const output = [];
@@ -315,8 +316,8 @@ export class RabixExecutor {
             output.push("--configuration-dir", params.configurationDir);
         }
 
-        if (outDir) {
-            output.push("--outdir", outDir);
+        if (params.outDir) {
+            output.push("--outdir", params.outDir);
         }
 
         return output;
