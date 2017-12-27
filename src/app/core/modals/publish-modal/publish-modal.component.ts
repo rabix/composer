@@ -137,7 +137,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         this.inputForm.statusChanges.filter(() => this.inputForm.valid).subscribe(() => {
             const {id, project} = this.inputForm.getRawValue();
             this.outputForm.patchValue({
-                appID: project + "/" + this.slugify.transform(id.toLowerCase()) + "/" + this.revision
+                appID: `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`
             });
         });
 
@@ -187,8 +187,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
          * All special characters should be replaced with hyphens,
          * and leading and trailing hyphens should then be removed
          */
-        const str = unidecode(id).replace(/[^a-z1-9-]/gi, '-').replace(/--+/g, '-').replace(/^-|-$/g, '').toLowerCase();
-        return str;
+        return unidecode(id).replace(/[^a-z1-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
     }
 
     close() {
