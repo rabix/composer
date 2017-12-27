@@ -35,7 +35,7 @@ import {WorkboxService} from "./workbox.service";
                         {{ c.user.username }} 
                         <i *ngIf="active?.equals(c)" class="active-icon fa fa-check-circle"></i>
                     </span>
-                    <span class="text-muted d-block small">{{ getPlatformLabel(c.url) }}</span>
+                    <span class="text-muted text-nowrap d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openDocumentation()" data-test="documentation-button"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
