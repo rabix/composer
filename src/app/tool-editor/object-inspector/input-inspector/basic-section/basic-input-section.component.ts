@@ -1,5 +1,6 @@
+import {Observable} from "rxjs/Observable";
 import {
-    AfterViewInit, Component, forwardRef, Input, ViewChild, ViewEncapsulation
+    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChild, ViewChildren, ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
@@ -93,8 +94,8 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     @Input()
     model: CommandLineToolModel;
 
-    @ViewChild("includeInCommandLine")
-    private includeInCommandLine: ToggleSliderComponent;
+    @ViewChildren("includeInCommandLine")
+    private includeInCommandLine: QueryList<ToggleSliderComponent>;
 
     /** The currently displayed property */
     input: CommandInputParameterModel;
@@ -216,7 +217,10 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     }
 
     addIncludeInCommandLineToggleDecorator(): void {
-        const baseToggleFnc = this.includeInCommandLine.toggleCheck.bind(this.includeInCommandLine);
+
+        const toggleSlider = this.includeInCommandLine.first;
+
+        const baseToggleFnc = toggleSlider.toggleCheck.bind(toggleSlider);
 
         const toggleFunctionDecorator = (event) => {
 
@@ -235,11 +239,14 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             }
         };
 
-        this.includeInCommandLine.toggleCheck = toggleFunctionDecorator.bind(this);
+        toggleSlider.toggleCheck = toggleFunctionDecorator.bind(this);
     }
 
     ngAfterViewInit() {
-        this.addIncludeInCommandLineToggleDecorator();
+        Observable.merge(Observable.of(this.includeInCommandLine.length), this.includeInCommandLine.changes.map(l => l.length))
+            .distinctUntilChanged().filter(a => !!a)
+            .subscribeTracked(this, () => {
+                this.addIncludeInCommandLineToggleDecorator();
+            });
     }
 }
-
