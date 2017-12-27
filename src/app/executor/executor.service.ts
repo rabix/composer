@@ -38,12 +38,15 @@ export class ExecutorService {
         const isLocal = AppHelper.isLocal(appID);
         const appSource = isLocal ? "local" : "user";
 
-        return this.ipc.watch("executeApp", {
-            appID,
-            content,
-            appSource,
-            options
-        }).takeWhile(val => val !== null);
+        return this.config.take(1).switchMap((config) => {
+            return this.ipc.watch("executeApp", {
+                appID,
+                content,
+                appSource,
+                options,
+                config
+            }).takeWhile(val => val !== null);
+        });
     }
     /**
      * Gets the configuration parameters for the execution context of a specific app
