@@ -32,11 +32,17 @@ import {TreeViewService} from "../tree-view.service";
             <i *ngIf="loading" class="fa fa-fw fa-circle-o-notch fa-spin"></i>
 
             <!--Standard icon if the node is contracted or there is no expansion icon-->
-            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))" class="fa fa-fw" data-toggle-icon
+            <i *ngIf="!loading && (!_isExpanded || (_isExpanded && !iconExpanded))"
+               class="fa fa-fw" 
+               data-toggle-icon
+               (click)="isExpandable ? toggle($event) : noop"
                [ngClass]="icon"></i>
 
             <!--Expansion icon if the node is expanded and there is an expansion icon-->
-            <i *ngIf="!loading && _isExpanded && !!iconExpanded" class="fa fa-fw expand" data-toggle-icon
+            <i *ngIf="!loading && _isExpanded && !!iconExpanded" 
+               class="fa fa-fw expand" 
+               data-toggle-icon
+               (click)="toggle($event)"
                [ngClass]="iconExpanded"></i>
 
             <ng-container *ngIf="labelTemplate[type]; else plain">

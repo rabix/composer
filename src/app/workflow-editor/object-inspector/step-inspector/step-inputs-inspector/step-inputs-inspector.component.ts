@@ -86,7 +86,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                                 <span>
                                                     {{ c.caption }}
                                                 </span>
-                                                <span class="text-muted d-block">{{ c.description }}</span>
+                                                <span class="text-muted d-block small">{{ c.description }}</span>
                                             </li>
                                         </ul>
                                     </ng-template>
