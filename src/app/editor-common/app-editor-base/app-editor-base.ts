@@ -371,7 +371,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
 
         this.syncModelAndCode(true).then(() => {
-            const modal = this.modal.fromComponent(PublishModalComponent, "Push an App");
+            const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
+            modal.appID      = this.dataModel.id;
             modal.appContent = this.getModelText(true);
 
             modal.published.take(1).subscribeTracked(this, (appID) => {
@@ -379,7 +380,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const tab = this.workbox.getOrCreateAppTab({
                     id: AppHelper.getRevisionlessID(appID),
                     type: this.dataModel.class,
-                    label: modal.inputForm.get("name").value,
+                    label: modal.inputForm.get("id").value,
                     isWritable: true,
                     language: "json"
 
