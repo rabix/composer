@@ -25,7 +25,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div *ngIf="isInputPort()" class="form-group flex-container">
             <label>Required</label>
             <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']"
+                        <ct-toggle-slider data-test="required-toggle"
+                                          [formControl]="form.controls['isRequired']"
                                           [off]="'No'"
                                           [on]="'Yes'">
                         </ct-toggle-slider>
@@ -37,6 +38,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <label class="form-control-label">ID</label>
             <input type="text"
                    class="form-control"
+                   data-test="id-field"
                    [formControl]="form.controls['id']">
             <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                 {{form.controls['id'].errors['error']}}
@@ -64,6 +66,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
+                   data-test="label-field"
                    (blur)="labelUpdate($event)"
                    [formControl]="form.controls['label']">
         </div>
@@ -75,14 +78,16 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group"
              *ngIf="isEnumType()">
             <label>Symbols</label>
-            <ct-auto-complete [create]="true"
+            <ct-auto-complete data-test="symbols-field"
+                              [create]="true"
                               [formControl]="form.controls['symbols']"></ct-auto-complete>
         </div>
 
         <!--File Types-->
         <div *ngIf="isFileType()">
             <label class="form-control-label">File types</label>
-            <ct-auto-complete [formControl]="form.controls['fileTypes']"
+            <ct-auto-complete data-test="file-types-field"
+                              [formControl]="form.controls['fileTypes']"
                               [create]="true"></ct-auto-complete>
         </div>
 
@@ -105,7 +110,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </label>
 
             <!--Batch select-->
-            <select class="form-control" *ngIf="!workflowModel.batchInput || workflowModel.batchInput === port.id"
+            <select class="form-control" 
+                    data-test="batch-select"
+                    *ngIf="!workflowModel.batchInput || workflowModel.batchInput === port.id"
                     [formControl]="form.controls['batchType']">
                 <option *ngFor="let propertyType of batchByList"
                         [disabled]="readonly"
@@ -128,6 +135,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <label class="form-control-label">Description</label>
             <textarea class="form-control"
                       rows="4"
+                      data-test="desc-field"
                       [formControl]="form.controls['description']"></textarea>
         </div>
 

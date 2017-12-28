@@ -16,22 +16,23 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     template: `
 
         <div>
-            <ct-blank-state *ngIf="controls.length === 0 && !readonly"
-                            buttonText="Add an entry"
-                            description="No entries defined"
-                            (buttonClick)="add()">
+            <ct-blank-state *ngIf="controls.length === 0 && !readonly" (buttonClick)="add()" [hasAction]="true">
+                <section tc-description>No entries defined</section>
+                <section tc-button-text>Add an entry</section>
             </ct-blank-state>
 
             <div *ngFor="let ctrl of controls.controls; let i = index" class="list-item">
 
-                <input class="form-control key-input" [formControl]="ctrl.get('key')" placeholder="key"/>
+                <input class="form-control key-input" [formControl]="ctrl.get('key')" data-test="key-field" placeholder="key"/>
 
                 <span class="input-group-addon add-on">:</span>
 
-                <input class="form-control value-input" [formControl]="ctrl.get('value')" placeholder="value"/>
+                <input class="form-control value-input" [formControl]="ctrl.get('value')" data-test="value-field" placeholder="value"/>
 
-                <div *ngIf="!readonly" class="remove-icon"
+                <div *ngIf="!readonly" 
+                     class="remove-icon"
                      ct-tooltip="Delete"
+                     data-test="remove-entry-button"
                      (click)="remove(i)">
                     <i class="fa fa-trash clickable"></i>
                 </div>
@@ -42,6 +43,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
         <button type="button" *ngIf="controls.length !== 0 && !readonly"
                 class="btn pl-0 btn-link no-outline no-underline-hover"
+                data-test="add-entry-button"
                 (click)="add()">
             <i class="fa fa-plus"></i> Add an Entry
         </button>

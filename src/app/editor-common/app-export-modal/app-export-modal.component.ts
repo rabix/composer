@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Renderer2, SimpleChanges, ViewChild} from "@angular/core";
+import {Component, Input, OnChanges, OnInit, Renderer2, SimpleChanges, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import * as Yaml from "js-yaml";
 import {AppHelper} from "../../core/helpers/AppHelper";
@@ -7,6 +7,7 @@ import {NativeSystemService} from "../../native/system/native-system.service";
 import {AceEditorOptions} from "../../ui/code-editor-new/ace-editor-options";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
+import {stringifyObject} from "../../helpers/yaml-helper";
 
 type ExportFormat = "json" | "yaml";
 
@@ -61,7 +62,7 @@ type ExportFormat = "json" | "yaml";
 
     `
 })
-export class AppExportModalComponent implements OnInit {
+export class AppExportModalComponent implements OnInit, OnChanges {
 
     @Input()
     activeTab: "file" | "code" = "file";
@@ -106,7 +107,7 @@ export class AppExportModalComponent implements OnInit {
         }
 
         if (changes["exportFormat"]) {
-            this.onFormatUpdate()
+            this.onFormatUpdate();
         }
     }
 
@@ -155,7 +156,7 @@ export class AppExportModalComponent implements OnInit {
         }
 
         this.native.createFileChoiceDialog({defaultPath}).then(path => {
-            const formatted = this.contentControl.value;
+            const formatted = stringifyObject(this.appContent, format);
 
             return this.fileRepository.saveFile(path, formatted);
         }).then(() => {

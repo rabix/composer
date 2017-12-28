@@ -15,7 +15,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
         <form [formGroup]="formGroup">
 
             <ct-docker-requirement [docker]="model.docker"
-                                   (update)="change.emit()"
+                                   (update)="dirty.emit()"
                                    [readonly]="readonly">
             </ct-docker-requirement>
 
@@ -26,18 +26,18 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                                             [readonly]="readonly"
                                             [formControl]="form.get('baseCommand')"></ct-base-command-editor>
                 </div>
-            </ct-form-panel> 
+            </ct-form-panel>
 
             <ct-argument-list [location]="model.loc + '.arguments'"
                               [model]="model"
-                              (update)="change.emit(); model.updateCommandLine()"
+                              (update)="dirty.emit(); model.updateCommandLine()"
                               [context]="context"
                               [readonly]="readonly">
             </ct-argument-list>
 
             <ct-tool-input [location]="model.loc + '.inputs'"
                            [model]="model"
-                           (update)="change.emit(); model.updateCommandLine()"
+                           (update)="dirty.emit(); model.updateCommandLine()"
                            [readonly]="readonly">
             </ct-tool-input>
 
@@ -45,7 +45,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                             [model]="model"
                             [context]="context"
                             [inputs]="model.inputs || []"
-                            (update)="change.emit()"
+                            (update)="dirty.emit()"
                             [readonly]="readonly">
             </ct-tool-output>
 
@@ -57,7 +57,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 
             <ct-tool-hints [model]="model"
                            [context]="context"
-                           (update)="change.emit()"
+                           (update)="dirty.emit()"
                            [readonly]="readonly">
             </ct-tool-hints>
 
@@ -72,7 +72,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             <ct-tool-other [model]="model"
                            [context]="context"
                            (updateStream)="setStreams($event)"
-                           (updateCodes)="change.emit()"
+                           (updateCodes)="dirty.emit()"
                            [readonly]="readonly">
             </ct-tool-other>
         </form>
@@ -95,7 +95,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
     formGroup: FormGroup;
 
     @Output()
-    change = new EventEmitter<any>();
+    dirty = new EventEmitter<any>();
 
     context: any;
 
@@ -107,6 +107,14 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     ngOnChanges(changes: SimpleChanges) {
         this.context = this.model.getContext();
+
+        // We have to recreate form controls because model is changed in place
+        // so nested objects would still refer to the old model
+        if (this.model && this.form && changes.model) {
+            this.form.setValue({
+                baseCommand: this.model.baseCommand
+            }, { emitEvent: false });
+        }
     }
 
     ngOnInit() {
@@ -114,12 +122,12 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             baseCommand: new FormControl(this.model.baseCommand)
         });
 
-        this.form.get("baseCommand").valueChanges.subscribeTracked(this, () => {
+        this.form.get("baseCommand").valueChanges.subscribeTracked(this, (old) => {
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
         });
 
-        this.form.valueChanges.skip(1).subscribeTracked(this, () =>{
-            this.change.emit();
+        this.form.valueChanges.subscribeTracked(this, (old) => {
+            this.dirty.emit();
         });
     }
 
@@ -205,7 +213,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         }
 
-        this.change.emit();
+        this.dirty.emit();
     }
 
     setStreams(change) {
@@ -215,7 +223,7 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
             }
         });
         this.model.updateCommandLine();
-        this.change.emit();
+        this.dirty.emit();
     }
 
 

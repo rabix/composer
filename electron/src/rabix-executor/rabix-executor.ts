@@ -87,11 +87,12 @@ export class RabixExecutor {
      * @param dataCallback
      * @param emitter
      */
-    execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {}, dataCallback, emitter?: EventEmitter) {
+    execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {},
+            dataCallback, emitter?: EventEmitter) {
 
-        const outdir      = executionParams.outDir;
-        const appFilePath = `${outdir}/app.cwl`;
-        const jobFilePath = `${outdir}/job.json`;
+        const outDir = executionParams.outDir;
+        const appFilePath = `${outDir}/app.cwl`;
+        const jobFilePath = `${outDir}/job.json`;
 
         const cleanupHandlers = [] as Function[];
         const cleanup         = () => cleanupHandlers.forEach(c => c());
@@ -108,7 +109,33 @@ export class RabixExecutor {
             });
         });
 
+        const javaIsRunning = new Promise((resolve, reject) => {
+            const java = spawn("java", ["-version"]);
+
+            java.stderr.once("data", (data) => {
+                data = data.toString().split('\n')[0];
+
+                try {
+                    const javaVersion = parseFloat(data.match(/\"(.*?)\"/)[1])
+
+                    if (javaVersion >= 1.8) {
+                        return resolve();
+                    }
+
+                    dataCallback(new Error("Update Java to version 8 or above."));
+                    cleanup();
+                    reject();
+
+                } catch (err) {
+                    dataCallback(new Error("Please install Java 8 or higher in order to execute apps."));
+                    cleanup();
+                    reject();
+                }
+            });
+        });
+
         const dockerIsRunning = new Promise((resolve, reject) => {
+
             const docker = spawn("docker", ["version"]);
             docker.on("close", (exitCode) => {
 
@@ -130,14 +157,14 @@ export class RabixExecutor {
         });
 
 
-        const stdoutLogPath   = executionParams.outDir + "/stdout.log";
-        const stderrLogPath   = executionParams.outDir + "/stderr.log";
+        const stdoutLogPath   = outDir + "/stdout.log";
+        const stderrLogPath   = outDir + "/stderr.log";
         const logFilesCreated = Promise.all([
             new Promise((resolve, reject) => fs.ensureFile(stdoutLogPath, err => err ? reject(err) : resolve())),
             new Promise((resolve, reject) => fs.ensureFile(stderrLogPath, err => err ? reject(err) : resolve())),
         ]);
 
-        dockerIsRunning.then(() => Promise.all([
+        Promise.all([javaIsRunning, dockerIsRunning]).then(() => Promise.all([
             appFile,
             jobFile,
             logFilesCreated
@@ -222,7 +249,7 @@ export class RabixExecutor {
 
                 dataCallback(null, {
                     type: "OUTDIR",
-                    message: executionParams.outDir
+                    message: outDir
                 } as ExecutorOutput);
 
                 if (code !== 0) {

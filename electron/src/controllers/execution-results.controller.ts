@@ -1,9 +1,12 @@
-const userDataPath = require("electron").app.getPath("userData");
-const path         = require("path");
+import * as os from "os";
 
-export function makeOutputDirectoryName(appID, user = "local", time = new Date()) {
+const path = require("path");
 
-    const base = userDataPath + path.sep + "execution-results";
+export const defaultExecutionOutputDirectory = [os.homedir(), "RabixComposer", "Executions"].join(path.sep);
+
+export function makeOutputDirectoryName(outputDir, appID, user = "local", time = new Date()) {
+
+    const base = outputDir + path.sep + "execution-results";
 
     let projectSlug;
     let appSlug;

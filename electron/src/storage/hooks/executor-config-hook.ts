@@ -11,11 +11,11 @@ export class ExecutorDefaultPathLoader implements RepositoryHook {
         if (executorConfig.choice === "custom") {
             return;
         }
-
         repository.updateLocal({
             executorConfig: {
                 choice: "bundled",
-                path: findDefaultExecutorJar()
+                path: findDefaultExecutorJar(),
+                outDir: executorConfig.outDir
             }
         });
     }

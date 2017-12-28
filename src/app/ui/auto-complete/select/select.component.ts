@@ -214,7 +214,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
             this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;
 
-            jQuery(".selectize-input").find("input:text").attr("data-test", "dropdown-input-field");
+            this.el.nativeElement.nextSibling.querySelector("input[type=text]").dataset["test"] = "dropdown-input-field";
         });
 
 

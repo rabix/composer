@@ -60,15 +60,15 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     </tbody>
                 </table>
                 <div class="text-xs-right">
-                    <button class="btn btn-primary" (click)="openCredentialsForm()">Add a Connection</button></div>
+                    <button class="btn btn-primary" (click)="openCredentialsForm()">Add an Account</button></div>
                 </div>
                 
             </div>
 
             <ng-template #blankState>
                 <ct-blank-state data-test="settings-blank-state-add-button"
+                                buttonText="Add an Account"
                                 [hasAction]="true"
-                                [buttonText]="'Add a Connection'"
                                 [learnMoreURL]="'http://docs.rabix.io/rabix-composer-configuration#connect-a-platform-account'"
                                 [description]="'Create a connection to one of the Seven Bridges platforms to be able to create, edit and sync platform apps.'"
                                 (buttonClick)="openCredentialsForm()">

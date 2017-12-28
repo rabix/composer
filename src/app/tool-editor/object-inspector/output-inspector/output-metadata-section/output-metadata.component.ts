@@ -31,6 +31,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                         <div class="form-group" *ngIf="metadataForm.controls['inheritMetadata']">
                             <label class="form-control-label">Inherit</label>
                             <select class="form-control"
+                                    data-test="inherit-select"
                                     [formControl]="metadataForm.controls['inheritMetadata']">
                                 <option value="" [disabled]="readonly">-- none --</option>
                                 <option *ngFor="let item of inputs"
