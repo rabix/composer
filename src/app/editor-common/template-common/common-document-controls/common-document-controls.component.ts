@@ -7,26 +7,26 @@ import {Component, Input} from "@angular/core";
 
             <ng-container *ngIf="host.viewMode !== 'test'; else testControls">
 
-                <!--Edit-->
-                <button *ngIf="host.isUnlockable"
-                        class="btn control-button"
-                        type="button"
-                        ct-tooltip="Unlock this app for editing"
-                        tooltipPlacement="bottom"
+                <!--Revisions-->
+                <button
+                    *ngIf="host.tabData.dataSource !== 'local' && host.dataModel && host.dataModel.customProps['sbg:revisionsInfo']"
+                    data-test="revision-button"
+                    class="btn control-button" type="button"
+                    ct-tooltip="See Revision History"
+                    tooltipPlacement="bottom"
+                    [ct-editor-inspector-target]="'revisions'"
+                    [ct-editor-inspector]="revisions">
+                    <i class="fa fa-fw fa-history"></i>
+                    {{ host.dataModel.customProps['sbg:revision']}}
 
-                        (click)="host.unlockEditing()">
-                    <i class="fa fa-fw fa-lock"></i> Edit
-                </button>
-
-                <!--Resolve-->
-                <button class="btn control-button"
-                        type="button"
-                        [disabled]="!host.appIsResolvable()"
-                        *ngIf="host.viewMode === 'code' && host.tabData.dataSource === 'local'"
-                        ct-tooltip="Resolve"
-                        tooltipPlacement="bottom"
-                        (click)="host.resolveCurrentContent()">
-                    <i class="fa fa-fw fa-refresh"></i>
+                    <ng-template #revisions>
+                        <ct-revision-list *ngIf="host.dataModel" [active]="host.dataModel.customProps['sbg:revision']"
+                                          #revisionList
+                                          [beforeChange]="host.showModalIfAppIsDirtyBound"
+                                          [revisions]="host.dataModel.customProps['sbg:revisionsInfo']"
+                                          (select)="host.openRevision($event)">
+                        </ct-revision-list>
+                    </ng-template>
                 </button>
 
                 <!--Go to app-->
@@ -40,27 +40,6 @@ import {Component, Input} from "@angular/core";
                     <i class="fa fa-fw fa-external-link"></i>
                 </button>
 
-
-                <!--Save-->
-                <button *ngIf="host.tabData.isWritable"
-                        [disabled]="!host.appIsSavable()"
-                        (click)="host.save()"
-                        ct-tooltip="Save"
-                        tooltipPlacement="bottom"
-                        data-test="save-button"
-                        class="btn control-button" type="button">
-                    <i class="fa fa-fw fa-save"></i>
-                </button>
-
-                <button [disabled]="!host.dataModel"
-                        type="button" 
-                        class="btn control-button" 
-                        ct-tooltip="Export App" 
-                        tooltipPlacement="bottom" 
-                        (click)="host.exportApp()">
-                    <i class="fa fa-fw fa-upload"></i>
-                </button>
-
                 <!--Push to Platform-->
                 <button class="btn control-button" data-test="publish-button"
                         [disabled]="!host.appIsPublishable()"
@@ -71,40 +50,31 @@ import {Component, Input} from "@angular/core";
                     <i class="fa fa-fw fa-cloud-upload"></i>
                 </button>
 
+                <!--Save-->
+                <button *ngIf="host.tabData.isWritable && !host.isUnlockable"
+                        [disabled]="!host.appIsSavable()"
+                        (click)="host.save()"
+                        ct-tooltip="Save"
+                        tooltipPlacement="bottom"
+                        data-test="save-button"
+                        class="btn control-button" type="button">
+                    <i class="fa fa-fw fa-save"></i>
+                </button>
 
-                <!--Revisions-->
-                <button
-                    *ngIf="host.tabData.dataSource !== 'local' && host.dataModel && host.dataModel.customProps['sbg:revisionsInfo']"
-                    data-test="revision-button"
-                    class="btn control-button" type="button"
-                    ct-tooltip="See Revision History"
-                    tooltipPlacement="bottom"
-                    [ct-editor-inspector-target]="'revisions'"
-                    [ct-editor-inspector]="revisions">
+                <!--Edit-->
+                <button *ngIf="host.isUnlockable"
+                        class="btn control-button"
+                        type="button"
+                        ct-tooltip="Unlock this app for editing"
+                        tooltipPlacement="bottom"
 
-                    Revision: {{ host.dataModel.customProps['sbg:revision']}}
-
-                    <ng-template #revisions>
-                        <ct-revision-list *ngIf="host.dataModel" [active]="host.dataModel.customProps['sbg:revision']"
-                                          #revisionList
-                                          [beforeChange]="host.showModalIfAppIsDirtyBound"
-                                          [revisions]="host.dataModel.customProps['sbg:revisionsInfo']"
-                                          (select)="host.openRevision($event)">
-                        </ct-revision-list>
-                    </ng-template>
+                        (click)="host.unlockEditing()">
+                    <i class="fa fa-fw fa-pencil"></i>
                 </button>
 
             </ng-container>
 
             <ng-template #testControls>
-
-                <button type="button" class="btn control-button" ct-tooltip="Import Job" tooltipPlacement="bottom" (click)="host.importJob()">
-                    <i class="fa fa-fw fa-download"></i>
-                </button>
-                
-                <button type="button" class="btn control-button" ct-tooltip="Export Job" tooltipPlacement="bottom" (click)="host.exportJob()">
-                    <i class="fa fa-fw fa-upload"></i>
-                </button>
 
                 <!--Run-->
                 <button type="button" class="btn btn-primary"
@@ -124,27 +94,45 @@ import {Component, Input} from "@angular/core";
                     <i class="fa fa-fw fa-square"></i> Stop
                 </button>
 
-
             </ng-template>
 
+            <ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>
+                <button class="btn control-button"
+                        *ngIf="host.appIsRunnable()"
+                        ct-tooltip="See More Actions"
+                        tooltipPlacement="bottom"
+                        (click)="moreActionsDropdown.show()">
+                    <i class="fa fa-fw fa-ellipsis-h"></i>
+                </button>
+            </ct-generic-dropdown-menu>
 
-            <!--<ct-generic-dropdown-menu [ct-menu]="moreActionsMenu" menuAlign="left" #moreActionsDropdown>-->
-            <!--<button class="btn control-button"-->
-            <!--*ngIf="host.appIsRunnable()"-->
-            <!--ct-tooltip="See More Actions"-->
-            <!--tooltipPlacement="bottom"-->
-            <!--(click)="moreActionsDropdown.show()">-->
-            <!--<i class="fa fa-fw fa-ellipsis-v"></i>-->
-            <!--</button>-->
-            <!--</ct-generic-dropdown-menu>-->
+            <ng-template #moreActionsMenu class="mr-1">
+                <ul class="list-unstyled dropdown-list">
 
-            <!--<ng-template #moreActionsMenu class="mr-1">-->
-            <!--<ul class="list-unstyled dropdown-list">-->
-            <!--<li class="list-item" (click)="moreActionsDropdown.hide(); host.editRunConfiguration()">-->
-            <!--Edit Run Configuration-->
-            <!--</li>-->
-            <!--</ul>-->
-            <!--</ng-template>-->
+                    <ng-container *ngIf="host.viewMode !== 'test'; else testItems">
+                        <li class="list-item" (click)="host.exportAppInFormat('json');moreActionsDropdown.hide();">
+                            Export into JSON format
+                        </li>
+                        <li class="list-item" (click)="host.exportAppInFormat('yaml');moreActionsDropdown.hide();">
+                            Export into YAML format
+                        </li>
+                        <li *ngIf="host.tabData.dataSource === 'local' && host.viewMode === 'code'" class="list-item"
+                            (click)="moreActionsDropdown.hide(); host.resolveCurrentContent()">
+                            Resolve
+                        </li>
+                    </ng-container>
+
+                    <ng-template #testItems>
+                        <li class="list-item" (click)="host.exportJob();moreActionsDropdown.hide();">
+                            Export Job
+                        </li>
+                        <li class="list-item" (click)="host.importJob();moreActionsDropdown.hide();">
+                            Import Job
+                        </li>
+                    </ng-template>
+
+                </ul>
+            </ng-template>
 
         </div>
     `,
