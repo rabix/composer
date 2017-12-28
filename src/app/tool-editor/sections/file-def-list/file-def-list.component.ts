@@ -28,7 +28,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         
                         <!--In case that tool is not draft2 then show dropdown for adding items-->
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
-                            <button class="btn btn-primary" type="button" (click)="addItemDropDown.toggleMenu()">
+                            <button class="btn btn-primary" data-test="file-requirement-add-button" type="button" (click)="addItemDropDown.toggleMenu()">
                                 Add
                             </button>
                         </ct-generic-dropdown-menu>
@@ -36,11 +36,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <!--Template for add item dropdown -->
                         <ng-template #menu class="mr-1">
                             <ul class="list-unstyled" (click)="addItemDropDown.hide()">
-                                <li (click)="addDirent()">
+                                <li data-test="file-option" (click)="addDirent()">
                                     File
                                 </li>
 
-                                <li (click)="addExpression()">
+                                <li data-test="expression-option" (click)="addExpression()">
                                     Expression
                                 </li>
                             </ul>
@@ -74,6 +74,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                             <!--List item-->
                             <div class="editor-list-item clickable form-control"
+                                 data-test="file-def"
                                  [ct-validation-class]="entry"
                                  [ct-editor-inspector]="inspector"
                                  [ct-editor-inspector-target]="entry.loc">
@@ -98,6 +99,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <div *ngIf="!readonly" class="remove-icon">
                             <i [ct-tooltip]="'Delete'"
                                class="fa fa-trash clickable"
+                               data-test="remove-file-def-button"
                                (click)="removeEntry(entry, i)"></i>
                         </div>
 
@@ -132,7 +134,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--If not draft2 show dropdown for adding items-->
                     <ng-template #v1Template>
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
-                            <button type="button" (click)="addItemDropDown.toggleMenu()"
+                            <button type="button" 
+                                    (click)="addItemDropDown.toggleMenu()"
+                                    data-test="tool-add-file-button-small"
                                     class="btn pl-0 btn-link no-outline no-underline-hover">
                                 <i class="fa fa-plus"></i> Add
                             </button>

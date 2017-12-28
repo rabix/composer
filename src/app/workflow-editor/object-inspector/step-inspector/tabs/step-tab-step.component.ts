@@ -27,6 +27,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">ID</label>
             <input type="text"
                    class="form-control"
+                   data-test="id-field"
                    [formControl]="form.controls['id']">
             <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                 {{form.controls['id'].errors['error']}}
@@ -38,6 +39,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Label</label>
             <input type="text"
                    class="form-control"
+                   data-test="label-field"
                    [formControl]="form.controls['label']">
         </div>
 
@@ -45,6 +47,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         <div *ngIf="step.hasScatterMethod" class="form-group">
             <label class="form-control-label">Scatter Method</label>
             <select class="form-control"
+                    data-test="scatter-method-select"
                     [formControl]="form.controls['scatterMethod']">
                 <option value=""
                         [disabled]="readonly">-- none --</option>
@@ -64,6 +67,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <!--Single Scatter-->
             <select *ngIf="!step.hasMultipleScatter"
                     class="form-control"
+                    data-test="scatter-select"
                     [formControl]="form.controls['scatter']">
                 <option value=""
                         [disabled]="readonly">-- none --</option>
@@ -78,6 +82,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <select *ngIf="step.hasMultipleScatter"
                     class="form-control"
                     multiple
+                    data-test="scatter-select"
                     [formControl]="form.controls['scatter']">
                 <option *ngFor="let opt of step.in"
                         [disabled]="readonly"
@@ -93,11 +98,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <label class="form-control-label">Description</label>
             <textarea class="form-control"
                       rows="4"
+                      data-test="desc-field"
                       [formControl]="form.controls['description']"></textarea>
         </div>
 
         <!--Set Hints-->
-        <button type="button" class="btn btn-secondary" (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
+        <button type="button" class="btn btn-secondary" data-test="set-hints-button" (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
 
     `
 })
