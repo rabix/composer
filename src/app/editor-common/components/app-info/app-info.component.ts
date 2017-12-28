@@ -10,7 +10,9 @@ import {SystemService} from "../../../platform-providers/system.service";
 
             <!--Header section-->
             <div class="info-section">
-                <ct-inline-editor [value]="model.label" type="text"
+                <ct-inline-editor [value]="model.label" 
+                                  data-test="app-label"
+                                  type="text"
                                   [disabled]="readonly"
                                   (saveData)="updateLabel($event)">
 
@@ -23,7 +25,8 @@ import {SystemService} from "../../../platform-providers/system.service";
             <!--Description section-->
             <div class="info-section">
                 <div class="text-title">Description:</div>
-                <ct-inline-editor [value]="model.description"
+                <ct-inline-editor data-test="app-desc"
+                                  [value]="model.description"
                                   [disabled]="readonly"
                                   type="textarea"
                                   (saveData)="updateDescription($event)">
@@ -41,13 +44,16 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item" *ngIf="isToolkit()">
                         <div class="text-title">Toolkit:</div>
                         <div>
-                            <ct-inline-editor [disabled]="readonly" class="toolkit"
+                            <ct-inline-editor [disabled]="readonly" 
+                                              data-test="app-toolkit"
+                                              class="toolkit"
                                               [value]="model.customProps['sbg:toolkit']"
                                               type="text"
                                               (saveData)="updateCustomProp('sbg:toolkit', $event)">
                                 {{model.customProps['sbg:toolkit']}}
                             </ct-inline-editor>
                             <ct-inline-editor class="toolkit"
+                                              data-test="app-toolkit-version"
                                               [disabled]="readonly"
                                               [value]="model.customProps['sbg:toolkitVersion']"
                                               type="text"
@@ -61,6 +67,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">{{isToolkit() ? "Toolkit" : "Workflow"}} Author:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:toolAuthor']"
+                                          data-test="app-author"
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:toolAuthor', $event)">
@@ -72,17 +79,18 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">{{isToolkit() ? "Toolkit" : "Workflow"}} License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:license']"
+                                          data-test="app-license"
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:license', $event)">
-                            <div>{{model.customProps['sbg:license']}}</div>
+                            {{model.customProps['sbg:license']}}
                         </ct-inline-editor>
                     </div>
 
                     <!--Contributors-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Contributors:</div>
-                        {{(model.customProps['sbg:contributors'] || []).join(", ")}}
+                        <div data-test="contributors-content">{{(model.customProps['sbg:contributors'] || []).join(", ")}}</div>
                     </div>
 
 
@@ -90,10 +98,11 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Wrapper Author:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:wrapperAuthor']"
+                                          data-test="app-wrapper-author"
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:wrapperAuthor', $event)">
-                            <div>{{model.customProps['sbg:wrapperAuthor']}}</div>
+                            {{model.customProps['sbg:wrapperAuthor']}}
                         </ct-inline-editor>
                     </div>
 
@@ -101,10 +110,11 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Wrapper License:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:wrapperLicense']"
+                                          data-test="app-wrapper-license"
                                           [disabled]="readonly"
                                           type="text"
                                           (saveData)="updateCustomProp('sbg:wrapperLicense', $event)">
-                            <div>{{model.customProps['sbg:wrapperLicense']}}</div>
+                            {{model.customProps['sbg:wrapperLicense']}}
                         </ct-inline-editor>
                     </div>
 
@@ -112,6 +122,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Categories:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:categories']"
+                                          data-test="app-categories"
                                           type="tags"
                                           [disabled]="readonly"
                                           [options]="categories"
@@ -123,13 +134,14 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <!--CWL version-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">CWL Version:</div>
-                        {{model['cwlVersion']}}
+                        <div data-test="cwl-version-content">{{model['cwlVersion']}}</div>
                     </div>
 
                     <!--Links-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">Links:</div>
                         <ct-inline-editor [value]="model.customProps['sbg:links']"
+                                          data-test="app-links"
                                           keyLabel="URL"
                                           valueLabel="Label"
                                           [disabled]="readonly"
@@ -138,6 +150,7 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                             <span *ngFor="let link of model.customProps['sbg:links']" class="links">
                                     <a href=""
+                                       data-test="app-link"
                                        (click)="$event.preventDefault();
                                        $event.stopPropagation();
                                        openWebPage(link.id)">{{link.label}}</a>
@@ -149,7 +162,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <!--ID-->
                     <div class="col-lg-4 col-sm-6 app-info-meta-item">
                         <div class="text-title">ID</div>
-                        {{model.customProps['sbg:id']}}
+                        <div data-test="id-content">{{model.customProps['sbg:id']}}</div>
                     </div>
                 </div>
 
@@ -167,9 +180,9 @@ import {SystemService} from "../../../platform-providers/system.service";
                     <div class="info-section">
 
                         <ct-tab-selector distribute="auto" [active]="viewMode" (activeChange)="switchTab($event)">
-                            <ct-tab-selector-entry tabName="inputs">Inputs</ct-tab-selector-entry>
-                            <ct-tab-selector-entry tabName="appSettings">App Settings</ct-tab-selector-entry>
-                            <ct-tab-selector-entry tabName="outputs">Outputs</ct-tab-selector-entry>
+                            <ct-tab-selector-entry tabName="inputs" data-test="inputs-tab">Inputs</ct-tab-selector-entry>
+                            <ct-tab-selector-entry tabName="appSettings" data-test="settings-tab">App Settings</ct-tab-selector-entry>
+                            <ct-tab-selector-entry tabName="outputs" data-test="outputs-tab">Outputs</ct-tab-selector-entry>
                         </ct-tab-selector>
 
                         <!--Inputs-->
@@ -187,12 +200,12 @@ import {SystemService} from "../../../platform-providers/system.service";
                                     <th>Format</th>
                                 </tr>
                                 <tr *ngFor="let input of inputs">
-                                    <td>{{input.id}}</td>
-                                    <td>{{input.label}}</td>
-                                    <td>{{input.type | commandParameterType}}</td>
-                                    <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                                    <td>{{input.inputBinding?.prefix || "-" }}</td>
-                                    <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
+                                    <td data-test="id-column">{{input.id}}</td>
+                                    <td data-test="label-column">{{input.label}}</td>
+                                    <td data-test="type-column">{{input.type | commandParameterType}}</td>
+                                    <td data-test="required-column">{{input.type.isNullable ? 'False' : 'True'}}</td>
+                                    <td data-test="prefix-column">{{input.inputBinding?.prefix || "-" }}</td>
+                                    <td data-test="format-column">{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -213,12 +226,12 @@ import {SystemService} from "../../../platform-providers/system.service";
                                     <th>Format</th>
                                 </tr>
                                 <tr *ngFor="let input of appSettings">
-                                    <td>{{input.id}}</td>
-                                    <td>{{input.label}}</td>
-                                    <td>{{input.type | commandParameterType}}</td>
-                                    <td>{{input.type.isNullable ? 'False' : 'True'}}</td>
-                                    <td>{{input.inputBinding?.prefix || "-" }}</td>
-                                    <td>{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
+                                    <td data-test="id-column">{{input.id}}</td>
+                                    <td data-test="label-column">{{input.label}}</td>
+                                    <td data-test="type-column">{{input.type | commandParameterType}}</td>
+                                    <td data-test="required-column">{{input.type.isNullable ? 'False' : 'True'}}</td>
+                                    <td data-test="prefix-column">{{input.inputBinding?.prefix || "-" }}</td>
+                                    <td data-test="format-column">{{input.fileTypes ? input.fileTypes.join(', ') : '-'}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -237,10 +250,10 @@ import {SystemService} from "../../../platform-providers/system.service";
                                     <th>Format</th>
                                 </tr>
                                 <tr *ngFor="let output of model.outputs">
-                                    <td>{{output.id}}</td>
-                                    <td>{{output.label}}</td>
-                                    <td>{{output.type | commandParameterType}}</td>
-                                    <td>{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
+                                    <td data-test="id-column">{{output.id}}</td>
+                                    <td data-test="label-column">{{output.label}}</td>
+                                    <td data-test="type-column">{{output.type | commandParameterType}}</td>
+                                    <td data-test="format-column">{{output.fileTypes ? output.fileTypes.join(', ') : '-'}}</td>
                                 </tr>
                             </table>
                         </div>

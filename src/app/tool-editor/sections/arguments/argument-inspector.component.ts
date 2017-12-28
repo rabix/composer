@@ -14,7 +14,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
             <div class="form-group">
                 <label>Use command line binding</label>
                 <span class="pull-right">
-                    <ct-toggle-slider #useCommandLineBinding [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
+                    <ct-toggle-slider data-test="cmd-line-toggle" #useCommandLineBinding [formControl]="form.controls['hasBinding']"></ct-toggle-slider>
                 </span>
             </div>
 
@@ -24,6 +24,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <label class="form-control-label">Prefix</label>
                     <input type="text"
                            class="form-control"
+                           data-test="prefix-field"
                            [formControl]="form.controls['prefix']">
                 </div>
 
@@ -40,7 +41,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                 <div class="form-group">
                     <label>Separate value and prefix</label>
                     <span class="pull-right">
-                        <ct-toggle-slider [formControl]="form.controls['separate']"></ct-toggle-slider>
+                        <ct-toggle-slider data-test="separate-value-prefix-toggle" [formControl]="form.controls['separate']"></ct-toggle-slider>
                     </span>
                 </div>
 
@@ -49,13 +50,14 @@ import {ModalService} from "../../../ui/modal/modal.service";
                     <label class="form-control-label">Position</label>
                     <input type="number"
                            class="form-control"
+                           data-test="position-field"
                            [formControl]="form.controls['position']">
                 </div>
 
                 <div class="form-group" *ngIf="argument.hasShellQuote">
                     <label>shellQuote</label>
                     <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                    <ct-toggle-slider data-test="shell-quote-toggle" [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
                 </span>
                 </div>
             </div>

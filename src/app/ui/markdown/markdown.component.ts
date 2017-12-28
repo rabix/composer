@@ -7,7 +7,7 @@ import {SystemService} from "../../platform-providers/system.service";
 @Component({
     selector: "ct-markdown",
     template: `
-        <div (click)="handleClick($event)" [innerHtml]="value">
+        <div (click)="handleClick($event)" data-test="markdown-val" [innerHtml]="value">
         </div>
     `,
 })

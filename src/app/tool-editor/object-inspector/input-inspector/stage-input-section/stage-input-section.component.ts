@@ -25,6 +25,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <div class="form-group" *ngIf="form.controls['stageInput']">
                     <label>Stage Input</label>
                     <select class="form-control"
+                            data-test="stage-input-select"
                             [formControl]="form.controls['stageInput']">
 
                         <option *ngFor="let item of stageInputOptions"

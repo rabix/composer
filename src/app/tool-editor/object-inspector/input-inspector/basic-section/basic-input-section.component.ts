@@ -28,7 +28,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
             <div class="form-group flex-container">
                 <label>Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']">
+                        <ct-toggle-slider date-test="required-toggle" [formControl]="form.controls['isRequired']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -38,6 +38,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
+                       data-test="id-field"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -51,7 +52,8 @@ import {ModalService} from "../../../../ui/modal/modal.service";
             <div class="form-group"
                  *ngIf="isType('enum')">
                 <label>Symbols</label>
-                <ct-auto-complete [create]="true"
+                <ct-auto-complete data-test="symbols-field"
+                                  [create]="true"
                                   [formControl]="form.controls['symbols']"></ct-auto-complete>
             </div>
 
@@ -60,7 +62,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isBound']" #includeInCommandLine>
+                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']" #includeInCommandLine>
                         </ct-toggle-slider>
                     </span>
             </div>
