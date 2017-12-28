@@ -13,6 +13,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group">
             <label class="form-control-label">Type</label>
             <select class="form-control"
+                    data-test="type-select"
                     [formControl]="form.controls['type']">
                 <option *ngFor="let type of types" 
                         [disabled]="readonly"
@@ -25,7 +26,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="form-group" *ngIf="paramType.type !== 'array'">
             <label>Allow array as well as single item</label>
             <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
+                    <ct-toggle-slider data-test="allow-array-toggle" [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>
         </div>
 
@@ -33,6 +34,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div [class.hidden]="paramType?.type !== 'array'">
                 <label class="form-control-label">Items Type</label>
                 <select class="form-control"
+                        data-test="items-type-select"
                         [formControl]="form.controls['items']">
                     <option *ngFor="let item of itemTypes"
                             [disabled]="readonly"

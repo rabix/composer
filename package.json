@@ -19,7 +19,7 @@
         "build": "./node_modules/.bin/rimraf dist ng-dist && yarn run compile:electron && yarn run compile:angular && yarn run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "compile:angular": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build -prod -aot",
-        "compile:electron": "./node_modules/.bin/tsc -p electron && node build-scripts/splash-copy.js",
+        "compile:electron": "./node_modules/.bin/rimraf electron/dist electron/ng-dist && ./node_modules/.bin/tsc -p electron && node build-scripts/splash-copy.js",
         "compile:electron:watch": "./node_modules/.bin/tsc -p electron --watch",
         "debug:electron": "./node_modules/.bin/electron ./electron --inspect-brk --dev-mode",
         "lint": "./node_modules/@angular/cli/bin/ng lint",
@@ -62,6 +62,7 @@
         "ngx-pipes": "2.0.1",
         "rxjs": "^5.5.0",
         "selectize": "^0.12.4",
+        "unidecode": "^0.1.8",
         "zone.js": "^0.8.17"
     },
     "devDependencies": {

@@ -15,7 +15,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-body">
                 <form [formGroup]="form">
                     <label class="form-control-label">Memory (min)</label>
-                    <ct-quick-pick [suggestions]="memSuggest"
+                    <ct-quick-pick data-test="resource-memory"
+                                   [suggestions]="memSuggest"
                                    [formControl]="form.controls['mem']"
                                    [context]="context"
                                    [type]="'number'"
@@ -23,7 +24,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     </ct-quick-pick>
 
                     <label class="form-control-label">CPU (min)</label>
-                    <ct-quick-pick [suggestions]="cpuSuggest"
+                    <ct-quick-pick data-test="resource-cpu"
+                                   [suggestions]="cpuSuggest"
                                    [formControl]="form.controls['cores']"
                                    [context]="context"
                                    [type]="'number'"

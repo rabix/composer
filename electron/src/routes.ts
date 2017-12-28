@@ -11,6 +11,7 @@ import {ExecutorDefaultPathLoader} from "./storage/hooks/executor-config-hook";
 import {AppMetaEntry} from "./storage/types/app-meta";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
+import {heal} from "./storage/repository-healer";
 
 
 const userDataPath   = require("electron").app.getPath("userData");
@@ -57,7 +58,16 @@ export function loadDataRepository() {
                 return reject(err);
             }
 
-            return resolve(1);
+            heal(repository.local).then(isModified => {
+                if (isModified) {
+                    repository.updateLocal(repository.local, () => {
+                        resolve(1);
+                    });
+                }
+
+                resolve(1);
+            });
+
         });
     }).catch(err => void 0);
 }
@@ -599,10 +609,11 @@ export function executeApp(data: {
     content: string,
     appSource: "local" | "user",
     options: Object
+    config: Object
 }, callback, emitter) {
 
     repositoryLoad.then(() => {
-        const {appID, content, appSource, options} = data;
+        const {appID, content, appSource, options, config} = data;
 
         const execConf = repository.local.executorConfig;
 
@@ -615,7 +626,7 @@ export function executeApp(data: {
             userID = repository.local.activeCredentials.id;
         }
 
-        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(appID, userID);
+        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
 
         let appJob = {};
 

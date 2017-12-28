@@ -30,8 +30,7 @@ import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 
             <!--Execution Button-->
             <!--Same for T/W-->
-            <button *ngIf="host.showExecutionReportPanel"
-                    (click)="host.toggleReport('execution')"
+            <button (click)="host.toggleReport('execution')"
                     [class.active]="host.reportPanel === 'execution'"
                     class="btn">
                 <ct-circular-loader *ngIf="host.isExecuting" class="loader-25 execution-loader"></ct-circular-loader>
