@@ -176,14 +176,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
         this.searchResultComponents.changes.subscribeTracked(this, list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
         });
-
-        // this.tree.contextMenu.filter(data => data.node.type === "app").subscribeTracked(this, (data) => {
-        //     const contextMenu = [
-        //         this.service.makeCopyAppToLocalMenuItem(data.node),
-        //     ];
-        //
-        //     this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
-        // });
     }
 
     switchGrouping(type: "toolkit" | "category" | "none") {
