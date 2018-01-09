@@ -113,9 +113,16 @@ import {Component, Input} from "@angular/core";
                         <li class="list-item" (click)="host.exportAppInFormat('json');moreActionsDropdown.hide();">
                             Export into JSON format
                         </li>
+
                         <li class="list-item" (click)="host.exportAppInFormat('yaml');moreActionsDropdown.hide();">
                             Export into YAML format
                         </li>
+
+                        <li *ngIf="host.isWorkflowModel()" class="list-item"
+                            (click)="host.setHints(); moreActionsDropdown.hide();">
+                            Set Hints
+                        </li>
+
                         <li *ngIf="host.tabData.dataSource === 'local' && host.viewMode === 'code'" class="list-item"
                             (click)="moreActionsDropdown.hide(); host.resolveCurrentContent()">
                             Resolve

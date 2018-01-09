@@ -36,7 +36,9 @@ export class UpdatePlugin extends PluginBase {
 
     afterModelChange() {
         this.cleanUp();
+    }
 
+    afterRender() {
         if (this.workflow.editingEnabled) {
             this.localRepository.getActiveCredentials().take(1).subscribe(creds => {
                 if (creds) {

@@ -45,4 +45,4 @@ yarn test
 
 ## Documentation
 
-Now you can read the [Rabix Composer documentation](https://github.com/rabix/composer/wiki) to learn more about Rabix Composer.
+Now you can read the [Rabix Composer documentation](http://docs.rabix.io/) to learn more about Rabix Composer.

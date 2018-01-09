@@ -926,4 +926,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.exportApp.chooseExportFile(this.tabData.id, serialized, format);
     }
+
+    isWorkflowModel() {
+        if (this.dataModel) {
+            return this.dataModel instanceof WorkflowModel;
+        }
+    }
 }
