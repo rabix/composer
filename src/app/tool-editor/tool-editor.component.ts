@@ -6,7 +6,6 @@ import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {Subscription} from "rxjs/Subscription";
 import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
@@ -29,6 +28,8 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
+import {Subscription} from "rxjs/Subscription";
+import {ExportAppService} from "../services/export-app/export-app.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -100,6 +101,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 localRepository: LocalRepositoryService,
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
+                exportApp: ExportAppService,
                 executor: ExecutorService) {
 
         super(
@@ -116,6 +118,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             localRepository,
             fileRepository,
             workbox,
+            exportApp,
             executor,
         );
     }

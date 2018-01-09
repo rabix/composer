@@ -52,6 +52,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                         [disabled]="readonly"
                                         on="Show"
                                         off="Hide"
+                                        [attr.data-input]="input.id"
                                         [value]="input.isVisible">
                                     </ct-toggle-slider>
 
@@ -62,7 +63,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                     <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
                                                               #portChangeDropDown>
-                                        <button type="button" [disabled]="readonly" class="btn btn-unstyled" 
+                                        <button type="button" 
+                                                [disabled]="readonly" 
+                                                class="btn btn-unstyled"
+                                                data-test="port-options-button"
                                                 (click)="portChangeDropDown.toggleMenu()">
                                             <span>
                                                 {{ input.status }} <i
@@ -77,11 +81,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                             <li *ngFor="let c of dropDownPortOptions"
                                                 [class.active]="input.status === c.value"
                                                 (click)="onPortOptionChange(input, c.value)"
+                                                [attr.data-value]="c.value"
                                                 class="dropdown-port-option">
                                                 <span>
                                                     {{ c.caption }}
                                                 </span>
-                                                <span class="text-muted d-block">{{ c.description }}</span>
+                                                <span class="text-muted d-block small">{{ c.description }}</span>
                                             </li>
                                         </ul>
                                     </ng-template>

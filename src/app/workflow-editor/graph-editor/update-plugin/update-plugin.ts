@@ -7,6 +7,7 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {Subscription} from "rxjs/Subscription";
 import {StepModel} from "cwlts/models";
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
 
 export class UpdatePlugin extends PluginBase {
 
@@ -22,6 +23,7 @@ export class UpdatePlugin extends PluginBase {
     private updateStatusProcess;
 
     constructor(private statusBar: StatusBarService,
+                private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
                 private notificationBar: NotificationBarService) {
         super();
@@ -34,9 +36,15 @@ export class UpdatePlugin extends PluginBase {
 
     afterModelChange() {
         this.cleanUp();
+    }
 
+    afterRender() {
         if (this.workflow.editingEnabled) {
-            this.getStepUpdates();
+            this.localRepository.getActiveCredentials().take(1).subscribe(creds => {
+                if (creds) {
+                    this.getStepUpdates();
+                }
+            });
         }
     }
 
@@ -131,7 +139,10 @@ export class UpdatePlugin extends PluginBase {
                 });
 
             }, err => {
-                this.notificationBar.showNotification("Cannot get app updates. " + new ErrorWrapper(err));
+                const errWrapper = new ErrorWrapper(err);
+                if (!errWrapper.isOffline()) {
+                    this.notificationBar.showNotification("Cannot get app updates. " + errWrapper);
+                }
                 this.cleanUp();
             });
     }

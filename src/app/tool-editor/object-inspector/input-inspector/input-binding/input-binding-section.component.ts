@@ -32,12 +32,14 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
                 <label class="form-control-label">Position</label>
                 <input class="form-control"
                        type="number"
+                       data-test="position-field"
                        [formControl]="form.controls['position']"/>
             </div>
 
             <div class="form-group">
                 <label class="form-control-label">Prefix</label>
                 <input class="form-control"
+                       data-test="prefix-field"
                        [ct-disabled]="isType('record') || readonly"
                        [formControl]="form.controls['prefix']"/>
             </div>
@@ -46,6 +48,7 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
                 <label>Separate value and prefix</label>
                 <span class="pull-right">
                     <ct-toggle-slider
+                            data-test="separate-value-prefix-toggle"
                             [ct-disabled]="isType('record') || readonly"
                             [formControl]="form.controls['separate']"
                             [readonly]="readonly"></ct-toggle-slider>
@@ -55,6 +58,7 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
             <div class="form-group" *ngIf="propertyType === 'array'">
                 <label class="form-control-label">Item Separator</label>
                 <select class="form-control"
+                        data-test="item-separator-select"
                         [ct-disabled]="isType('record')"
                         [formControl]="form.controls['itemSeparator']">
                     <option *ngFor="let itemSeparator of itemSeparators"
@@ -68,7 +72,7 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
             <div class="form-group" *ngIf="input.inputBinding.hasShellQuote">
                 <label>shellQuote</label>
                 <span class="pull-right">
-                    <ct-toggle-slider [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
+                    <ct-toggle-slider data-test="shell-quote-toggle" [formControl]="form.controls['shellQuote']"></ct-toggle-slider>
                 </span>
             </div>
 

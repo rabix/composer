@@ -609,10 +609,11 @@ export function executeApp(data: {
     content: string,
     appSource: "local" | "user",
     options: Object
+    config: Object
 }, callback, emitter) {
 
     repositoryLoad.then(() => {
-        const {appID, content, appSource, options} = data;
+        const {appID, content, appSource, options, config} = data;
 
         const execConf = repository.local.executorConfig;
 
@@ -625,7 +626,7 @@ export function executeApp(data: {
             userID = repository.local.activeCredentials.id;
         }
 
-        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(appID, userID);
+        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
 
         let appJob = {};
 

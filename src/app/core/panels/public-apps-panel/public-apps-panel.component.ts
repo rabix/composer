@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 
@@ -176,14 +175,6 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
         this.searchResultComponents.changes.subscribeTracked(this, list => {
             list.forEach((el, idx) => setTimeout(() => el.nativeElement.classList.add("shown"), idx * 20));
-        });
-
-        this.tree.contextMenu.filter(data => data.node.type === "app").subscribeTracked(this, (data) => {
-            const contextMenu = [
-                this.service.makeCopyAppToLocalMenuItem(data.node),
-            ];
-
-            this.context.showAt(data.node.getViewContainer(), contextMenu, data.coordinates);
         });
     }
 
