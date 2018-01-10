@@ -1,8 +1,7 @@
-@import "~cwl-svg/src/assets/styles/variables";
-@import "~cwl-svg/src/assets/styles/style";
-@import "~cwl-svg/src/plugins/port-drag/port-drag";
+@import "~cwl-svg/src/assets/styles/themes/rabix-dark/theme";
+@import "~cwl-svg/src/plugins/port-drag/theme.dark";
+@import "~cwl-svg/src/plugins/selection/theme.dark";
 @import "~cwl-svg/src/plugins/validate/validate";
-@import "~cwl-svg/src/plugins/selection/selection";
 @import "../update-plugin/update-plugin";
 
 
