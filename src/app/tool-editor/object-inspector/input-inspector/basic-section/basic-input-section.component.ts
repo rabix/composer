@@ -1,8 +1,13 @@
-import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
+import {Observable} from "rxjs/Observable";
+import {
+    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChild, ViewChildren, ViewEncapsulation
+} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.component";
+import {ModalService} from "../../../../ui/modal/modal.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -23,7 +28,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group flex-container">
                 <label>Required</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isRequired']">
+                        <ct-toggle-slider date-test="required-toggle" [formControl]="form.controls['isRequired']">
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -33,6 +38,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                 <label class="form-control-label">ID</label>
                 <input type="text"
                        class="form-control"
+                       data-test="id-field"
                        [formControl]="form.controls['id']">
                 <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
                     {{form.controls['id'].errors['error']}}
@@ -46,7 +52,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="form-group"
                  *ngIf="isType('enum')">
                 <label>Symbols</label>
-                <ct-auto-complete [create]="true"
+                <ct-auto-complete data-test="symbols-field"
+                                  [create]="true"
                                   [formControl]="form.controls['symbols']"></ct-auto-complete>
             </div>
 
@@ -55,7 +62,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider [formControl]="form.controls['isBound']">
+                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']" #includeInCommandLine>
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -78,7 +85,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </form>
     `
 })
-export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
+export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 
     @Input()
     context: { $job?: any, $self?: any } = {};
@@ -89,6 +96,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     @Input()
     model: CommandLineToolModel;
 
+    @ViewChildren("includeInCommandLine")
+    private includeInCommandLine: QueryList<ToggleSliderComponent>;
+
     /** The currently displayed property */
     input: CommandInputParameterModel;
 
@@ -98,7 +108,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    constructor(private formBuilder: FormBuilder) {
+    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
         super();
     }
 
@@ -206,5 +216,39 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             isDisabled ? control.disable({onlySelf: true, emitEvent: false})
                 : control.enable({onlySelf: true, emitEvent: false});
         });
+    }
+
+    addIncludeInCommandLineToggleDecorator(): void {
+
+        const toggleSlider = this.includeInCommandLine.first;
+
+        const baseToggleFnc = toggleSlider.toggleCheck.bind(toggleSlider);
+
+        const toggleFunctionDecorator = (event) => {
+
+            // Show modal only in case when switching from on to off
+            if (this.input.isBound) {
+                event.preventDefault();
+
+                this.modal.confirm({
+                    content: `If you turn the "Include in command line" option off, you might loose some input values.\nDo you want to proceed ?`
+                }).then(() => {
+                    baseToggleFnc(event);
+                }, () => {
+                });
+            } else {
+                baseToggleFnc(event);
+            }
+        };
+
+        toggleSlider.toggleCheck = toggleFunctionDecorator.bind(this);
+    }
+
+    ngAfterViewInit() {
+        Observable.merge(Observable.of(this.includeInCommandLine.length), this.includeInCommandLine.changes.map(l => l.length))
+            .distinctUntilChanged().filter(a => !!a)
+            .subscribeTracked(this, () => {
+                this.addIncludeInCommandLineToggleDecorator();
+            });
     }
 }

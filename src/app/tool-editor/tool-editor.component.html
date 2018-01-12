@@ -37,6 +37,7 @@
     <ct-tool-visual-editor *ngIf="viewMode === 'gui' && !isLoading && dataModel"
                            class="flex-col"
                            (change)="dumpSwap()"
+                           (dirty)="dirty.emit($event)"
                            [readonly]="isReadonly"
                            [formGroup]="toolGroup"
                            [model]="dataModel"></ct-tool-visual-editor>

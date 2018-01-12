@@ -4,6 +4,7 @@ import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {AppHelper} from "../../helpers/AppHelper";
@@ -20,9 +21,10 @@ export class PublicAppsPanelService extends AppsPanelService {
                 notificationBar: NotificationBarService,
                 workbox: WorkboxService,
                 cdr: ChangeDetectorRef,
-                statusBar: StatusBarService) {
+                statusBar: StatusBarService,
+                native: NativeSystemService) {
 
-        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr);
+        super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr, native);
 
         this.apps = platformRepository.getPublicApps().map(apps => {
             return (apps || []);

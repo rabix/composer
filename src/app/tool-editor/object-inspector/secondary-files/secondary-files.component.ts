@@ -31,6 +31,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
                             class="removable-form-control">
 
                             <ct-expression-input
+                                    data-test="secondary-file"
                                     [context]="context"
                                     [formControl]="control"
                                     [readonly]="readonly">
@@ -39,12 +40,14 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
                             <div *ngIf="!readonly" class="remove-icon"
                                  [ct-tooltip]="'Delete'"
                                  (click)="removeFile(i)">
-                                <i class="fa fa-trash clickable"></i>
+                                <i class="fa fa-trash clickable" data-test="remove-secondary-file"></i>
                             </div>
                         </li>
                     </ol>
 
-                    <button type="button" *ngIf="secondaryFiles.length > 0 && !readonly"
+                    <button type="button" 
+                            data-test="add-secondary-file-button"
+                            *ngIf="secondaryFiles.length > 0 && !readonly"
                             class="btn btn-link add-btn-link no-underline-hover"
                             (click)="addFile()">
                         <i class="fa fa-plus"></i> Add secondary file

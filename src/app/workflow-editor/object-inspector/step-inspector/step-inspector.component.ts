@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, Input, Output} from "@angular/core";
 import {Workflow} from "cwl-svg";
 import {StepModel, WorkflowModel} from "cwlts/models";
 import {RawApp} from "../../../../../electron/src/sbg-api-client/interfaces/raw-app";
@@ -50,6 +50,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         <!--Inputs-->
         <ct-step-inputs-inspector *ngIf="viewMode === tabs.Inputs"
                                   [step]="step"
+                                  [stepIsUpdatedReference]="stepIsUpdatedReference"
                                   (change)="change.emit()"
                                   [workflowModel]="workflowModel"
                                   [readonly]="readonly">
@@ -61,7 +62,7 @@ import {UpdateStepModalComponent} from "../../update-step-modal/update-step-moda
         </ct-workflow-step-inspector-info>
 
         <!--Step-->
-        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"
+        <ct-workflow-step-inspector-step *ngIf="viewMode === tabs.Step"                                        
                                          [step]="step"
                                          [graph]="graph"
                                          [workflowModel]="workflowModel"
@@ -90,6 +91,9 @@ export class StepInspectorComponent extends DirectiveBase {
     @Output()
     change = new EventEmitter();
 
+    /** Changing this reference will notify StepInputsInspectorComponent to update its inputs when step is updated */
+    stepIsUpdatedReference = {};
+
     tabs = {
         Inputs: "inputs",
         Info: "info",
@@ -101,7 +105,8 @@ export class StepInspectorComponent extends DirectiveBase {
     constructor(private modal: ModalService,
                 private platformRepository: PlatformRepositoryService,
                 private notificationBar: NotificationBarService,
-                private statusBar: StatusBarService) {
+                private statusBar: StatusBarService,
+                private cdr: ChangeDetectorRef) {
         super();
     }
 
@@ -122,6 +127,10 @@ export class StepInspectorComponent extends DirectiveBase {
             modal.onSubmit   = () => {
                 this.step.setRunProcess(app as any);
                 this.graph.getPlugin(UpdatePlugin).updateStep(this.step);
+                // Change reference in order to call ngOnChanges in StepInputsInspectorComponent to recreate inputs
+                this.stepIsUpdatedReference = {};
+                this.cdr.detectChanges();
+                this.cdr.markForCheck();
                 modal.closeModal();
             };
         }).catch(err => {

@@ -26,6 +26,7 @@ import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {AppUpdateService} from "./editor-common/services/app-update/app-updating.service";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
+import {ExportAppService} from "./services/export-app/export-app.service";
 
 
 @NgModule({
@@ -37,6 +38,7 @@ import {OpenExternalFileService} from "./core/open-external-file/open-external-f
         AuthService,
         DataGatewayService,
         DomEventService,
+        ExportAppService,
         FileRepositoryService,
         FormBuilder,
         GlobalService,

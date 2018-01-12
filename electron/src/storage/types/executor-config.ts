@@ -1,6 +1,7 @@
 export interface ExecutorConfig {
     path: string;
     choice: string | "bundled" | "custom";
+    outDir: string;
 }
 
 export interface AppExecutionContext {
@@ -13,7 +14,7 @@ export interface ExecutorParamsConfig {
     configurationDir: string;
     cacheDir: string;
     noContainer: boolean;
-    outDir: string;
     quiet: boolean;
     verbose: boolean;
+    outDir: string;
 }

@@ -44,8 +44,8 @@ import {WorkflowEditorComponent} from "../../workflow-editor.component";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
-
-const {dialog} = window["require"]("electron").remote;
+import {LocalRepositoryService} from "../../../repository/local-repository.service";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 
 @Component({
     selector: "ct-workflow-graph-editor",
@@ -107,9 +107,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private statusBar: StatusBarService,
                 private notificationBar: NotificationBarService,
                 private appValidator: AppValidatorService,
+                private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
                 private fileRepository: FileRepositoryService,
-                private workflowEditorService: WorkflowEditorService) {
+                private workflowEditorService: WorkflowEditorService,
+                private native: NativeSystemService) {
         super();
     }
 
@@ -145,7 +147,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SelectionPlugin(),
                 new ZoomPlugin(),
                 new DeletionPlugin(),
-                new UpdatePlugin(this.statusBar, this.platformRepository, this.notificationBar)
+                new UpdatePlugin(this.statusBar, this.localRepository, this.platformRepository, this.notificationBar)
             ],
             editingEnabled: !this.readonly
         });
@@ -273,7 +275,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     detachModelEventListeners() {
         this.modelEventListeners.forEach(handler => {
             handler.dispose();
-        })
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -510,12 +512,12 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         const content = new SvgDumper(this.canvas.nativeElement).dump();
 
-        dialog.showSaveDialog({
+        this.native.createFileChoiceDialog({
             buttonLabel: "Save",
             defaultPath: `${this.data.id}.svg`,
             title: "Export Workflow SVG",
 
-        }, (path) => {
+        }).then((path) => {
 
             if (!path) {
                 return;
@@ -530,7 +532,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             }, err => {
                 this.notificationBar.showNotification("Could not save SVG: " + err, {timeout: 50000});
             });
-        });
+        }, () => {});
 
     }
 
