@@ -131,7 +131,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.toolGroup = new FormGroup({});
 
         this.dirty.subscribeTracked(this, () => {
-            this.syncModelAndCode(false);
+            this.resolveAfterModelAndCodeSync();
         });
     }
 

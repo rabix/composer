@@ -95,7 +95,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             fileRepository,
             workbox,
             executorService,
-            updateService
+            updateService,
             exportApp
         );
 

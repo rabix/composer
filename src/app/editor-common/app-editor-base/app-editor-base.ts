@@ -154,9 +154,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected localRepository: LocalRepositoryService,
                 protected fileRepository: FileRepositoryService,
                 protected workbox: WorkboxService,
+                public executor: ExecutorService,
                 protected updateService: AppUpdateService,
-                protected exportApp: ExportAppService,
-                public executor: ExecutorService) {
+                protected exportApp: ExportAppService) {
 
         super();
 
@@ -332,7 +332,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         if (this.tabData.dataSource !== "local") {
             this.updateService.update
                 .filter(data => AppHelper.getRevisionlessID(data.id || "") === this.tabData.id)
-                .subscribeTracked(this, data => this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"]);
+                .subscribeTracked(this, data => {
+                    this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"];
+                    // this.dumpSwap();
+                    this.resolveAfterModelAndCodeSync();
+                });
         }
     }
 
@@ -406,7 +410,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const tab = this.workbox.getOrCreateAppTab({
                 id: AppHelper.getRevisionlessID(obj.id),
                 type: this.dataModel.class,
-                label: modal.inputForm.get("name").value,
+                label: modal.inputForm.get("id").value,
                 isWritable: true,
                 language: "json"
 
