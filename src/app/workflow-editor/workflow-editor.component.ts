@@ -23,6 +23,8 @@ import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
+import {ExportAppService} from "../services/export-app/export-app.service";
+import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -73,6 +75,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 localRepository: LocalRepositoryService,
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
+                exportApp: ExportAppService,
                 executorService: ExecutorService) {
         super(
             statusBar,
@@ -88,6 +91,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             localRepository,
             fileRepository,
             workbox,
+            exportApp,
             executorService
         );
 
@@ -159,4 +163,14 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         }
     }
 
+    setHints() {
+        const hints = this.modal.fromComponent(HintsModalComponent, {
+            title: "Set Hints",
+            backdrop: true,
+            closeOnEscape: true
+        });
+
+        hints.model = this.dataModel;
+        hints.readonly = this.isReadonly;
+    }
 }
