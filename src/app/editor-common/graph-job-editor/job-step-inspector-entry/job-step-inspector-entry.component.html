@@ -88,6 +88,8 @@
 
                 {{entry?.label || entry.id}}
 
+                <span class="text-muted">({{entry.type.type}})</span>
+
                 <i *ngIf="entry.description"
                    class="fa fa-info-circle text-muted"
                    [ct-tooltip]="ctt"
@@ -115,29 +117,62 @@
 
         <div *ngFor="let ctrl of control.controls; let idx = index;" class="array-row">
 
-            <ct-job-step-inspector-entry #arrayItem
-                                         [inputType]="inputArrayItemsType"
-                                         [inputEnumSymbols]="inputEnumSymbols"
-                                         [inputRecordFields]="inputRecordFields"
-                                         [readonly]="readonly"
-                                         [formControl]="ctrl">
-            </ct-job-step-inspector-entry>
+            <!--Delete button if array of maps-->
+            <div *ngIf="inputArrayItemsType === 'map'" class="pb-1">
+                <span class="text-muted">
+                     [{{idx}}]
+                </span>
 
-            <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
-            <span class="delete-btn-group">
-                <button type="button" class="btn array-remove-btn btn-unstyled" (click)="deleteFromArray(idx)"
-                        [disabled]="readonly">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </span>
+                <span *ngIf="!readonly"
+                      class="remove-icon pull-right"
+                      ct-tooltip="Delete map array"
+                      (click)="deleteFromArray(idx)">
+                    <i class="fa fa-trash clickable"></i>
+                </span>
+            </div>
+
+            <div class="array-entry">
+                <ct-job-step-inspector-entry #arrayItem
+                                             [inputType]="inputArrayItemsType"
+                                             [inputEnumSymbols]="inputEnumSymbols"
+                                             [inputRecordFields]="inputRecordFields"
+                                             [readonly]="readonly"
+                                             [formControl]="ctrl">
+                </ct-job-step-inspector-entry>
+
+                <!--Delete button if not array of maps-->
+                <span *ngIf="inputArrayItemsType !== 'map' && !readonly"
+                      class="remove-icon pull-right"
+                      ct-tooltip="Delete"
+                      (click)="deleteFromArray(idx)">
+                    <i class="fa fa-trash clickable"></i>
+                </span>
+            </div>
         </div>
 
+        <ng-container *ngIf="control.enabled">
 
-        <button *ngIf="control.enabled" (click)="addArrayEntry()" type="button"
-                class="btn pl-0 btn-link no-outline no-underline-hover"
-                [disabled]="readonly">
-            <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
-        </button>
+            <!--Add array item button in case that element is not File or Directory-->
+            <ng-container
+                *ngIf="inputArrayItemsType !== 'File' && inputArrayItemsType !== 'Directory'; else arrayFileOrDirectory">
+                <button *ngIf="!readonly"
+                        (click)="addArrayEntry()" type="button"
+                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                    <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
+                </button>
+            </ng-container>
+
+            <!--Add array item button in case that element is File or Directory-->
+            <ng-template #arrayFileOrDirectory>
+                <button *ngIf="!readonly"
+                        (click)="addArrayFileOrDirectory()" type="button"
+                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                    <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
+                </button>
+            </ng-template>
+
+        </ng-container>
+
     </ng-template>
 
     <!--Unknown-->
