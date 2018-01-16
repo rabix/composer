@@ -131,12 +131,11 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             }
         }
 
-        editor.action.first().subscribe(action => {
-            if (action === "save") {
-                // save string
-                this.model.setValue(editor.content.value, "string");
-                this.onChange(this.model);
-            }
+        editor.submit.first().subscribe(() => {
+            // save string
+            this.model.setValue(editor.content.value, "string");
+            this.onChange(this.model);
+
             this.modal.close();
         });
     }
@@ -172,16 +171,16 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
             editor.model   = this.model.clone();
             editor.context = this.context;
-            editor.action.first().subscribe(action => {
-                if (action === "save") {
-                    const val = editor.model.serialize();
+            editor.submit.first().subscribe(() => {
 
-                    if (!val) {
-                        editor.model.setValue("", "string");
-                    }
+                const val = editor.model.serialize();
 
-                    this.model.cloneStatus(editor.model);
+                if (!val) {
+                    editor.model.setValue("", "string");
                 }
+
+                this.model.cloneStatus(editor.model);
+
                 this.modal.close();
             });
         }
