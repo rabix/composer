@@ -11,6 +11,11 @@
 @import "~selectize/dist/css/selectize.default.css";
 @import "./theme";
 
+@import "~cwl-svg/src/assets/styles/themes/rabix-dark/theme";
+@import "~cwl-svg/src/plugins/port-drag/theme.dark";
+@import "~cwl-svg/src/plugins/selection/theme.dark";
+@import "~cwl-svg/src/plugins/validate/validate";
+
 html, body {
     width: 100%;
     height: 100%;

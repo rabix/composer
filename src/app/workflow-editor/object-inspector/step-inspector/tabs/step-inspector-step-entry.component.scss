@@ -6,6 +6,10 @@
         display: flex;
         flex-direction: column;
 
+        ct-job-step-inspector-entry {
+            display: flex;
+        }
+
         .array-entry {
             display: flex;
         }
@@ -15,17 +19,9 @@
             padding-left: .5em;
             padding-top: .1em;
         }
-
-        ct-job-step-inspector-entry {
-            flex: 1;
-        }
-
     }
 
-    .file-meta-edit-btn {
-        border: none;
-        padding: 0;
-        line-height: 2em;
+    .single-input {
+        display: flex;
     }
-
 }

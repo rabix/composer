@@ -9,6 +9,7 @@ import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 
 @Component({
     selector: "ct-job-step-inspector-entry",
@@ -59,6 +60,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     constructor(private cdr: ChangeDetectorRef,
                 private modal: ModalService,
                 private injector: Injector,
+                private native: NativeSystemService,
                 @Inject(APP_MODEL) private appModel) {
         super();
 
@@ -77,8 +79,15 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         switch (this.inputType) {
 
             case "record":
-
                 update = value instanceof Object ? value : {} as InputParameterModel;
+                const group = this.control as FormGroup;
+                if (!value) {
+                    for (const key in group.controls) {
+                        group.controls[key].setValue(null, updateOptions);
+                    }
+                    break;
+                }
+
                 this.control.patchValue(update, updateOptions);
                 break;
 
@@ -105,6 +114,13 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 break;
 
             case "Directory":
+                update = value || {};
+                this.control.setValue({
+                    class: this.inputType,
+                    path: update.path || ""
+                }, updateOptions);
+                this.recalculateSecondaryFilesAndMetadataCounts();
+                break;
             case "File":
 
                 update = value || {};
@@ -342,4 +358,26 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         this.metadataKeysCount   = Object.prototype.isPrototypeOf(metadata) ? Object.keys(metadata).length : 0;
 
     }
+
+    addArrayFileOrDirectory() {
+
+        const properties = ["multiSelections"] as any;
+        properties.push(this.inputArrayItemsType === "File" ? "openFile" : "openDirectory");
+
+
+        this.native.openFileChoiceDialog({properties}).then(filePaths => {
+            const items = filePaths.map(p => ({class: this.inputArrayItemsType, path: p}));
+
+            items.forEach((c) => {
+                (this.control as FormArray).push(new FormControl(c));
+            });
+
+            this.cdr.markForCheck();
+
+        }, err => {
+
+        });
+
+    }
 }
+

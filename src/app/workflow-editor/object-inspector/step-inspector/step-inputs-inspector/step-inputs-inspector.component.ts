@@ -7,7 +7,6 @@ import {
     OnInit,
     Output
 } from "@angular/core";
-import {Subject} from "rxjs/Subject";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
@@ -39,7 +38,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                        *ngIf="hasMetadata(input)"
                                        [ct-tooltip]="ctt"
                                        [tooltipPlacement]="'bottom'"></i>
+                                    
                                     {{ input.label || input.id }}
+                                    <span class="text-muted">({{input.type.type}})</span>
 
                                 </label>
 
