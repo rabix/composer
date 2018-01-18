@@ -18,8 +18,8 @@ import {SystemService} from "../../../platform-providers/system.service";
 
                     <h1 class="h3" data-test="app-info-title">{{model.label}}</h1>
                 </ct-inline-editor>
-                <div *ngIf="createdBy">Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
-                <div *ngIf="revisionNote">Revision note: “<em>{{revisionNote}}</em>”</div>
+                <div data-test="created-by" *ngIf="createdBy">Created by {{createdBy}} on {{createdOn | date}}. Last edited by {{editedBy}} on {{editedOn | date}}</div>
+                <div data-test="revision-note" *ngIf="revisionNote">Revision note: “<em>{{revisionNote}}</em>”</div>
             </div>
 
             <!--Description section-->
