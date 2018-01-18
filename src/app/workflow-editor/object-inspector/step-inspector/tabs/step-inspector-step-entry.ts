@@ -1,15 +1,13 @@
 import {
-    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
-    ViewEncapsulation
+    ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 } from "@angular/core";
 import {WorkflowStepInputModel} from "cwlts/models";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ObjectHelper} from "../../../../helpers/object.helper";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-workflow-step-inspector-entry",
+    styleUrls: ["./step-inspector-step-entry.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="form-control-label" *ngIf="warning">        
@@ -19,12 +17,25 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
             </span>
         </div>
 
+        <div *ngIf="index !== -1 && input.type.type === 'map'" class="pb-1">
+             <span class="text-muted">
+              [{{index}}]
+            </span>
+
+            <!--Delete button for array item if its a map-->
+            <span class="remove-icon pull-right"
+                  ct-tooltip="Delete map array"
+                  (click)="deleteFromArray()">
+                <i *ngIf="!readonly" class="fa fa-trash clickable"></i>
+            </span>
+        </div>
+
         <div [ngSwitch]="inputType" class="form-group">
 
             <!--Each leaf field will be wrapped as an input group-->
             <!--Nested fields below should not be wrapped into other container elements-->
             <!--because it will break size and positioning-->
-            <div class="input-group">
+            <div class="input-group single-input">
 
                 <!--Enums-->
                 <ng-template ngSwitchCase="enum">
@@ -79,7 +90,7 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                     <ct-map-list class="form-group"
                                  [attr.prefix]="prefix"
                                  [attr.fieldType]="inputType"
-                                 (change)="updateMap($event)"
+                                 (valueChange)="updateMap($event)"
                                  [ngModel]="value"></ct-map-list>
                 </ng-template>
 
@@ -97,15 +108,13 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
                     </span>
                 </ng-template>
 
-                <!--Every element that's a part of the array can be deleted, so we add a deletion button to it-->
-                <span class="input-group-btn" *ngIf="index !== -1">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            (click)="deleteFromArray()"
-                            [disabled]="readonly">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </span>
+                <!--Delete button for array item if its not a map-->
+                <span class="remove-icon pull-right"
+                      *ngIf="index !== -1 && input.type.type !== 'map' && !readonly"
+                      ct-tooltip="Delete"
+                      (click)="deleteFromArray()">
+                <i class="fa fa-trash clickable"></i>
+            </span>
 
             </div>
 
@@ -113,10 +122,15 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
             <ng-template ngSwitchCase="record">
 
                 <div *ngFor="let entry of input.type.fields" class="ml-1">
-                    <label>{{entry?.label || entry.id}} <i class="fa fa-info-circle text-muted"
-                                                           *ngIf="entry.description"
-                                                           [ct-tooltip]="ctt"
-                                                           [tooltipPlacement]="'top'"></i></label>
+                    <label>
+                        {{entry?.label || entry.id}}
+                        <span class="text-muted">({{entry.type.type}})</span>
+                        
+                        <i class="fa fa-info-circle text-muted"
+                           *ngIf="entry.description"
+                           [ct-tooltip]="ctt"
+                           [tooltipPlacement]="'top'"></i>
+                    </label>
                     <ct-workflow-step-inspector-entry [prefix]="prefix + '.' + entry.id"
                                                       [input]="entry"
                                                       [type]="input.type"
@@ -133,14 +147,21 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 
             <!--Arrays-->
             <ng-template ngSwitchCase="array">
-                <ct-workflow-step-inspector-entry *ngFor="let entry of value; let i = index"
-                                                  [prefix]="prefix + '.[' + i +']'"
-                                                  [index]="i"
-                                                  [type]="input.type"
-                                                  [input]="arrayModifiedInput"
-                                                  (update)="updateArray(i, $event)"
-                                                  [value]="entry"
-                                                  [readonly]="readonly"></ct-workflow-step-inspector-entry>
+                <div *ngFor="let entry of value; let i = index;" class="array-row">
+                    <div class="array-entry">
+
+                        <ct-workflow-step-inspector-entry [prefix]="prefix + '.[' + i +']'"
+                                                          [index]="i"
+                                                          [type]="input.type"
+                                                          [input]="arrayModifiedInput"
+                                                          (update)="updateArray(i, $event)"
+                                                          [value]="entry"
+                                                          [readonly]="readonly">
+
+                        </ct-workflow-step-inspector-entry>
+                        
+                    </div>
+                </div>
 
                 <button (click)="addArrayEntry(input)"
                         type="button"

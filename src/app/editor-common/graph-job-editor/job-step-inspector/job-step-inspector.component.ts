@@ -2,10 +2,15 @@ import {
     AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output,
     SimpleChanges
 } from "@angular/core";
-import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {
+    AbstractControl, ControlValueAccessor, FormControl, FormGroup,
+    NG_VALUE_ACCESSOR
+} from "@angular/forms";
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
+import {NativeSystemService} from "../../../native/system/native-system.service";
 
 @Component({
     selector: "ct-job-step-inspector",
@@ -40,6 +45,10 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     private propagateChange: any;
 
     private jobValue: Object;
+
+    constructor(private native: NativeSystemService) {
+        super();
+    }
 
     writeValue(jobValue: any): void {
 
@@ -171,8 +180,8 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     clear(inputControl: AbstractControl) {
-        // inputControl.setValue(null);
         inputControl.disable();
+        inputControl.setValue(null);
     }
 
     private recreateForms(): void {
@@ -243,5 +252,58 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
         return true;
 
+    }
+
+    enableEditing(input: InputParameterModel): void {
+
+        const inputFormField = this.jobGroup.get(input.id);
+        inputFormField.enable({onlySelf: true});
+
+
+        let value;
+
+        const isArray = input.type.type === "array";
+        const type = input.type.items || input.type.type;
+
+        switch (type) {
+            case "record":
+                value = {};
+                break;
+            case "string":
+                value = "";
+                break;
+            case "int":
+            case "float":
+                value = 0;
+                break;
+            case "boolean":
+                value = false;
+                break;
+            case "File":
+            case "Directory":
+
+                const properties = [] as any;
+                properties.push(type === "File" ? "openFile" : "openDirectory");
+
+                if (isArray) {
+                    properties.push("multiSelections");
+                }
+
+                this.native.openFileChoiceDialog({properties}).then(filePaths => {
+                    const fileValues = filePaths.map(p => ({class: type, path: p}));
+
+                    const value = !(isArray) ? fileValues[0] : fileValues;
+                    inputFormField.setValue(value);
+
+                }, err => {
+                });
+
+                return;
+            default:
+                value = null;
+                break;
+        }
+
+        inputFormField.setValue(input.type.type === "array" ? [value] : value);
     }
 }

@@ -26,6 +26,8 @@
 
                                 {{ input.label || input.id }}
 
+                                <span class="text-muted">({{input.type.type}})</span>
+
                             </label>
 
                             <div>
@@ -49,7 +51,8 @@
                         </div>
 
                         <!--Input-->
-                        <ct-job-step-inspector-entry [formControl]="jobGroup.get(input.id)"
+                        <ct-job-step-inspector-entry *ngIf="jobGroup.get(input.id).enabled"
+                                                     [formControl]="jobGroup.get(input.id)"
                                                      [inputType]="input.type.type"
                                                      [inputArrayItemsType]="input.type.items"
                                                      [inputEnumSymbols]="input.type.symbols"
@@ -57,10 +60,10 @@
                                                      class="mb-0">
                         </ct-job-step-inspector-entry>
 
-                        <div *ngIf="jobGroup.get(input.id).disabled">
-                            Value of this input is set to <i>null</i>.
-                            <button class="btn btn-inline-link text-primary" type="button" (click)="jobGroup.get(input.id).enable({onlySelf: true})">
-                                Enable
+                        <div *ngIf="jobGroup.get(input.id).disabled" class="text-xl-center mb-1">
+                            <p class="text-muted">This input does not have any values</p>
+                            <button class="btn btn-primary" type="button" (click)="enableEditing(input)">
+                                Set Value
                             </button>
                         </div>
 
