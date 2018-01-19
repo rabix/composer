@@ -201,7 +201,6 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
         this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
             this.step.label = label;
-            this.graph.draw();
         });
 
         this.tracked = this.form.controls["scatter"].valueChanges.subscribe((scatter) => {
