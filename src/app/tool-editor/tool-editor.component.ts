@@ -6,6 +6,7 @@ import {CommandLinePart} from "cwlts/models/helpers/CommandLinePart";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
+import {Subscription} from "rxjs/Subscription";
 import {AppMetaManager} from "../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
@@ -27,8 +28,8 @@ import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
+import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
-import {Subscription} from "rxjs/Subscription";
 import {ExportAppService} from "../services/export-app/export-app.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
@@ -101,8 +102,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 localRepository: LocalRepositoryService,
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
-                exportApp: ExportAppService,
-                executor: ExecutorService) {
+                executor: ExecutorService,
+                updateService: AppUpdateService,
+                exportApp: ExportAppService) {
 
         super(
             statusBar,
@@ -118,8 +120,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             localRepository,
             fileRepository,
             workbox,
-            exportApp,
             executor,
+            updateService,
+            exportApp
         );
     }
 
@@ -128,7 +131,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.toolGroup = new FormGroup({});
 
         this.dirty.subscribeTracked(this, () => {
-            this.syncModelAndCode(false);
+            this.resolveAfterModelAndCodeSync();
         });
     }
 

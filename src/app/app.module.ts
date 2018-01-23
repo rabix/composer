@@ -24,6 +24,7 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {AppUpdateService} from "./editor-common/services/app-update/app-updating.service";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
 
@@ -48,6 +49,7 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         ModalService,
         PlatformConnectionService,
         PlatformRepositoryService,
+        AppUpdateService,
         SettingsService,
         StatusBarService
     ],

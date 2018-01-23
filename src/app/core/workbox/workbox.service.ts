@@ -10,6 +10,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
+import {CodeSwapService} from "../code-content-service/code-content.service";
+import {IpcService} from "../../services/ipc.service";
 
 
 @Injectable()
@@ -30,6 +32,7 @@ export class WorkboxService {
     private priorityTabUpdate = new Subject();
 
     constructor(private auth: AuthService,
+                private ipc: IpcService,
                 private dataGateway: DataGatewayService,
                 private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
@@ -112,7 +115,9 @@ export class WorkboxService {
 
         if (foundTab) {
             if (replaceExistingIfExists) {
-                this.dataGateway.updateSwap(foundTab.data.id, null);
+                const codeSwapService = new CodeSwapService(this.ipc, this.platformRepository, this.localRepository);
+                codeSwapService.appID = foundTab.data.id;
+                codeSwapService.discardSwapContent();
                 tabs.splice(foundTabIndex, 1, tab);
                 this.tabs.next(tabs);
             } else {
@@ -176,7 +181,9 @@ export class WorkboxService {
         }
 
         if (tab && tab.data && tab.data.id) {
-            this.dataGateway.updateSwap(tab.data.id, null);
+            const codeSwapService = new CodeSwapService(this.ipc, this.platformRepository, this.localRepository);
+            codeSwapService.appID = tab.id;
+            codeSwapService.discardSwapContent();
         }
 
         const currentlyOpenTabs = this.tabs.getValue();

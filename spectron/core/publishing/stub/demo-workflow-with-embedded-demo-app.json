@@ -1,0 +1,107 @@
+{
+    "sbg:project": "test-user/test-project",
+    "sbg:revisionNotes": "",
+    "outputs": [],
+    "sbg:validationErrors": [],
+    "sbg:modifiedOn": 1507827341,
+    "sbg:id": "test-user/test-project/demo-workflow-with-embedded-demo-app/0",
+    "steps": [
+        {
+            "id": "demo_app_with_revision_1",
+            "in": [],
+            "run": {
+                "sbg:id": "test-user/test-project/test-app-update/1",
+                "outputs": [],
+                "sbg:modifiedOn": 1507825920,
+                "sbg:project": "test-user/test-project",
+                "sbg:job": {
+                    "runtime": {
+                        "ram": 1000,
+                        "cores": 1
+                    },
+                    "inputs": {
+                        "message": "message-string-value"
+                    }
+                },
+                "sbg:revision": 0,
+                "sbg:projectName": "test project",
+                "sbg:sbgMaintained": false,
+                "inputs": [
+                    {
+                        "id": "message",
+                        "inputBinding": {
+                            "position": 1
+                        },
+                        "type": "string"
+                    }
+                ],
+                "cwlVersion": "v1.0",
+                "sbg:revisionsInfo": [
+                    {
+                        "sbg:modifiedOn": 1507825920,
+                        "sbg:modifiedBy": "test-user",
+                        "sbg:revisionNotes": null,
+                        "sbg:revision": 0
+                    },
+                    {
+                        "sbg:modifiedOn": 1507826689,
+                        "sbg:modifiedBy": "test-user",
+                        "sbg:revisionNotes": null,
+                        "sbg:revision": 1
+                    }
+                ],
+                "class": "CommandLineTool",
+                "sbg:latestRevision": 1,
+                "baseCommand": [
+                    "cat"
+                ],
+                "label": "My Published App",
+                "sbg:appVersion": [
+                    "v1.0"
+                ],
+                "sbg:modifiedBy": "test-user",
+                "id": "test-user/test-project/test-app-update/1",
+                "sbg:createdBy": "test-user",
+                "sbg:validationErrors": [],
+                "sbg:contributors": [
+                    "test-user"
+                ],
+                "sbg:createdOn": 1507825920,
+                "sbg:publisher": "sbg",
+                "sbg:image_url": null
+            },
+            "sbg:y": -63.5,
+            "out": [],
+            "label": "My Published App",
+            "sbg:x": -25.78887939453125
+        }
+    ],
+    "inputs": [],
+    "class": "Workflow",
+    "sbg:sbgMaintained": false,
+    "sbg:revision": 0,
+    "sbg:revisionsInfo": [
+        {
+            "sbg:modifiedOn": 1507826364,
+            "sbg:modifiedBy": "test-user",
+            "sbg:revisionNotes": null,
+            "sbg:revision": 0
+        }
+    ],
+    "sbg:projectName": "test project",
+    "sbg:latestRevision": 0,
+    "label": "demo-workflow-with-embedded-demo-app",
+    "sbg:appVersion": [
+        "v1.0"
+    ],
+    "sbg:modifiedBy": "test-user",
+    "id": "https://api.sbgenomics.com/v2/apps/test-user/test-project/demo-workflow-with-embedded-demo-app/0/raw/",
+    "sbg:createdBy": "test-user",
+    "cwlVersion": "v1.0",
+    "sbg:contributors": [
+        "test-user"
+    ],
+    "sbg:createdOn": 1507826364,
+    "sbg:publisher": "sbg",
+    "sbg:image_url": null
+}

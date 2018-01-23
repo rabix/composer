@@ -30,12 +30,14 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
+import {AppExportModalComponent} from "../app-export-modal/app-export-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {GraphJobEditorComponent} from "../graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
+import {AppUpdateService} from "../services/app-update/app-updating.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 import {FileRepositoryService} from "../../file-repository/file-repository.service";
@@ -83,6 +85,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     priorityCodeUpdates = new Subject<string>();
 
+    resolveDocumentChanges = new Subject<string>();
+
     isReadonly = false;
 
     savingDisabled = true;
@@ -94,6 +98,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     executionQueue = new Subject<any>();
 
     executionJob: Object;
+
+    /**
+     * Used to keep track of invalid steps (in local workflows only). App validation will not show errors
+     * for (not embedded) invalid steps, so we need this list to know whether or not to call resolve after validation.
+     * Steps can become invalid if the app behind the step is saved while invalid.
+     */
+    invalidSteps = [];
 
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
@@ -148,8 +159,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected localRepository: LocalRepositoryService,
                 protected fileRepository: FileRepositoryService,
                 protected workbox: WorkboxService,
-                protected exportApp: ExportAppService,
-                public executor: ExecutorService) {
+                public executor: ExecutorService,
+                protected updateService: AppUpdateService,
+                protected exportApp: ExportAppService) {
 
         super();
 
@@ -175,21 +187,22 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** Changes to the code that did not come from user's typing. */
         Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
-        /** On user interactions (changes) set app state to Dirty */
+        /**
+         * On user interactions (changes) set app state to Dirty - skip the first validation, which is called
+         *  after resolving on document load.
+         */
         this.codeEditorContent.valueChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
             this.setAppDirtyState(true);
         }, (err) => {
             console.warn("Error on dirty checking stream", err);
         });
 
-        /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
-
-        /** Observe all code changes */
-        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
+        /** We skip validation for first code changes in local apps because initial resolve will call validation */
+        const codeChangesToValidate = Observable.merge(this.resolveDocumentChanges,
+            this.codeEditorContent.valueChanges.debounceTime(300).skip(this.tabData.dataSource === "local" ? 1 : 0).distinctUntilChanged());
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
-        const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
+        const schemaValidation = this.appValidator.createValidator(codeChangesToValidate).map((state: AppValidityState) => {
             if (state.isValidCWL && this.dataModel) {
                 state.errors = state.errors.concat(this.dataModel.errors);
                 state.warnings = state.warnings.concat(this.dataModel.warnings);
@@ -210,6 +223,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         externalCodeChanges.subscribeTracked(this, (code: string) => {
             // Exteral code changes should update the internal state as well
             this.codeEditorContent.setValue(code);
+            this.resolveCurrentContent();
 
         }, (err) => {
             this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
@@ -254,14 +268,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.isLoading = false;
 
             if (!validation.isValidCWL) {
+                this.viewMode = "code";
                 return;
             }
 
-            const continuation: Promise<any> = (
-                this.viewMode === "code"
-                || !this.dataModel
-                || this.revisionChangingInProgress
-            ) ? this.resolveToModel(code) : Promise.resolve();
+            const continuation: Promise<any> = this.tabData.dataSource === "local" && this.invalidSteps.length ?
+                this.resolveToModel(code) : Promise.resolve();
 
             continuation.then(() => {
                 /**
@@ -273,7 +285,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 // copyOf property really matters only if we are working with the latest revision
                 // otherwise, apps detached from copy state at some revision will still show locked state
                 // and notification when switched to an older revision
-                const props = this.dataModel.customProps || {};
+                const props             = (this.dataModel && this.dataModel.customProps) || {};
                 const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
                 if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
@@ -292,14 +304,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
                     this.toggleLock(true);
                 }
-            }, err => console.warn);
+            }, () => console.warn);
         }, (err) => {
             console.warn("Error on validation state changes", err);
         });
 
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
-            this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
+            if (this.tabData.dataSource === "local") {
+                this.viewMode = state.isValidCWL && !this.invalidSteps.length ? this.getPreferredTab() : "code";
+            } else {
+                this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
+            }
             this.reportPanel = state.isValidCWL ? this.getPreferredReportPanel() : this.reportPanel;
         }, (err) => {
             console.warn("Error on first validation end", err);
@@ -313,6 +329,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.platformRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
                 this.isDirty = !!isModified;
             });
+        }
+
+        if (this.tabData.dataSource !== "local") {
+            this.updateService.update
+                .filter(data => AppHelper.getRevisionlessID(data.id || "") === this.tabData.id)
+                .subscribeTracked(this, data => {
+                    this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"];
+                    this.resolveAfterModelAndCodeSync();
+                });
         }
     }
 
@@ -335,15 +360,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.appSavingService
             .save(this.tabData.id, text)
             .then(update => {
-                /**
-                 * FIXME: Reorganize how priority code updates should sync with the model, this is a quick fix
-                 * without this, when publishing a new revision from the graph view, priority code update would sync model->code,
-                 * but the code is actually up to date and the model isn't.
 
-                 */
+                this.codeEditorContent.setValue(update);
 
                 if (this.tabData.dataSource !== "local") {
                     this.revisionChangingInProgress = true;
+                    this.resolveToModel(update);
                 }
 
                 this.priorityCodeUpdates.next(update);
@@ -352,6 +374,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 this.setAppDirtyState(false);
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
+
+                if (this.validationState.isValidCWL) {
+                    const app = Yaml.safeLoad(update, {json: true} as LoadOptions);
+                    const id = this.tabData.dataSource === "local" ? this.tabData.id : app["sbg:id"];
+                    this.updateService.updateApps({id: id, app: app});
+                } else {
+                    this.updateService.updateApps({id: this.tabData.id, app: null});
+                }
+
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
@@ -370,26 +401,23 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return;
         }
 
-        this.syncModelAndCode(true).then(() => {
-            const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
-            modal.appID      = this.dataModel.id;
-            modal.appContent = this.getModelText(true);
+        const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
+        modal.appID          = this.dataModel.id;
+        modal.appContent     = this.getModelText(true, true);
 
-            modal.published.take(1).subscribeTracked(this, (appID) => {
+        modal.published.take(1).subscribeTracked(this, obj => {
+            this.updateService.updateApps({ id: obj.app["sbg:id"], app: obj.app });
 
-                const tab = this.workbox.getOrCreateAppTab({
-                    id: AppHelper.getRevisionlessID(appID),
-                    type: this.dataModel.class,
-                    label: modal.inputForm.get("id").value,
-                    isWritable: true,
-                    language: "json"
+            const tab = this.workbox.getOrCreateAppTab({
+                id: AppHelper.getRevisionlessID(obj.id),
+                type: this.dataModel.class,
+                label: modal.inputForm.get("id").value,
+                isWritable: true,
+                language: "json"
 
-                });
-
-                this.workbox.openTab(tab);
             });
-
-        }, err => console.warn);
+            this.workbox.openTab(tab);
+        });
     }
 
     provideStatusControls(): TemplateRef<any> {
@@ -422,7 +450,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * Tells whether GUI tabs are enabled
      */
     tabsUnlocked(): boolean {
-        const codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent && !this.isValidatingCWL;
+        let codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent &&
+            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? !this.invalidSteps.length : true);
         if (this.viewMode === "code") {
             return codeCondition;
         }
@@ -440,8 +469,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     appIsResolvable(): boolean {
-        /** Bound to lock state by accident, not intention */
-        return this.tabsUnlocked();
+        return this.validationState && this.validationState.isValidCWL &&
+            !this.isResolvingContent && !this.isValidatingCWL;
     }
 
     appIsPublishable(): boolean {
@@ -563,47 +592,37 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * the text has been formatted by the GUI editor.
      *
      */
-    protected getModelText(embed?: boolean): string {
+    protected getModelText(forceJSON = false, embed?: boolean): string {
 
         const modelObject = this.dataModel.serialize();
 
-        if (this.tabData.language === "json" || this.tabData.dataSource === "app") {
+        if (this.tabData.language === "json" || this.tabData.dataSource === "app" || forceJSON) {
             return JSON.stringify(modelObject, null, 4);
         }
 
         return Yaml.dump(modelObject);
     }
 
-    protected syncModelAndCode(resolveRDF = true): Promise<any> {
+    protected dumpSwap(): void {
+        if (this.viewMode !== "code") {
+            this.codeEditorContent.setValue(this.getModelText());
+        }
+
+        const modelStateString = this.codeEditorContent.value;
+        this.codeSwapService.codeContent.next(modelStateString);
+    }
+
+    protected resolveAfterModelAndCodeSync(): Promise<any> {
 
         if (this.viewMode === "code") {
             const codeVal = this.codeEditorContent.value;
 
-            if (resolveRDF) {
-                return this.resolveToModel(codeVal);
-            }
-
-            try {
-                const json = Yaml.safeLoad(codeVal, {json: true} as LoadOptions);
-                this.recreateModel(json);
-                this.afterModelCreated(!this.modelCreated);
-                this.modelCreated = true;
-
-                return Promise.resolve();
-            } catch (err) {
-                return Promise.reject(err);
-            }
+            return this.resolveToModel(codeVal);
         }
 
-        if (!resolveRDF) {
-            this.codeEditorContent.setValue(this.getModelText());
-            return Promise.resolve();
-        }
-
-        const modelText = JSON.stringify(this.dataModel.serialize());
-
-        return this.resolveContent(modelText).then((data: Object) => {
-            const serialized = JSON.stringify(data, null, 4);
+        return this.resolveContent(this.getModelText()).then((data: Object) => {
+            const serialized = this.tabData.language === "json" || this.tabData.dataSource === "app" ?
+                JSON.stringify(data, null, 4) : Yaml.dump(data);
             this.codeEditorContent.setValue(serialized);
             return data;
         }, console.warn);
@@ -666,17 +685,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }).then(result => {
             return result;
         }, err => {
-
-            this.notificationBar.showNotification(err.message || "An error has occurred");
-
-            this.validationState.isValidCWL = false;
-            this.validationState.errors = [{
-                loc: "document",
-                type: "error",
-                message: err.message
-            }];
-
-            this.viewMode = "code";
             throw err;
         });
     }
@@ -724,10 +732,33 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected resolveContent(content: string): Promise<Object> {
         this.isResolvingContent = true;
         return this.tabData.resolve(content).toPromise().then(resolved => {
+            this.resolveDocumentChanges.next(JSON.stringify(resolved));
             this.isResolvingContent = false;
             return resolved;
         }, err => {
             this.isResolvingContent = false;
+
+            this.notificationBar.showNotification(err.message || "An error has occurred");
+
+            if (!this.validationState) {
+                this.validationState = {
+                    isPending: false,
+                    errors: [],
+                    warnings: []
+                } as AppValidityState;
+
+                this.isLoading = false;
+            }
+
+            this.validationState.isValidCWL = false;
+            this.validationState.errors     = [{
+                loc: "document",
+                type: "error",
+                message: err.message
+            }];
+            this.validationState.warnings   = [];
+
+            this.viewMode = "code";
             throw err;
         });
     }
@@ -874,7 +905,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             });
 
             modal.confirmationLabel = "Save";
-            modal.discardLabel = "Change without saving";
+            modal.discardLabel      = "Change without saving";
 
             modal.decision.take(1).subscribe((result) => {
 
@@ -894,9 +925,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     importJob() {
         const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
-        const comp = this.modal.fromComponent(JobImportExportComponent, "Import Job");
-        comp.appID = this.tabData.id;
-        comp.action = "import";
+        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
+        comp.appID        = this.tabData.id;
+        comp.action       = "import";
 
         comp.import.take(1).subscribeTracked(this, (jobObject) => {
             metaManager.patchAppMeta("job", jobObject);
@@ -913,10 +944,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
 
         metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
-            const comp = this.modal.fromComponent(JobImportExportComponent, "Export Job");
+            const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
             comp.action = "export";
-            comp.appID = this.tabData.id;
-            comp.job = Object.prototype.isPrototypeOf(job) ? job : {};
+            comp.appID  = this.tabData.id;
+            comp.job    = Object.prototype.isPrototypeOf(job) ? job : {};
         });
     }
 
