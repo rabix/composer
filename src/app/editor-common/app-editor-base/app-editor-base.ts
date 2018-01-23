@@ -87,8 +87,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     resolveDocumentChanges = new Subject<string>();
 
-    isResolved = false;
-
     isReadonly = false;
 
     savingDisabled = true;
@@ -100,6 +98,13 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     executionQueue = new Subject<any>();
 
     executionJob: Object;
+
+    /**
+     * Used to keep track of invalid steps (in local workflows only). App validation will not show errors
+     * for (not embedded) invalid steps, so we need this list to know whether or not to call resolve after validation.
+     * Steps can become invalid if the app behind the step is saved while invalid.
+     */
+    invalidSteps = [];
 
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
@@ -267,42 +272,39 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return;
             }
 
-            if (this.tabData.dataSource === "local" && !this.isResolved) {
-                this.validationState.warnings = this.validationState.warnings.concat({
-                    loc: "document",
-                    type: "error",
-                    message: "No JSON schema issues. Resolve to enable other editor tabs."
-                });
-            }
+            const continuation: Promise<any> = this.tabData.dataSource === "local" && this.invalidSteps.length ?
+                this.resolveToModel(code) : Promise.resolve();
 
-            /**
-             * @name revisionHackFlagSwitchOff
-             * @see revisionChangingInProgress
-             * */
-            this.revisionChangingInProgress = false;
+            continuation.then(() => {
+                /**
+                 * @name revisionHackFlagSwitchOff
+                 * @see revisionChangingInProgress
+                 * */
+                this.revisionChangingInProgress = false;
 
-            // copyOf property really matters only if we are working with the latest revision
-            // otherwise, apps detached from copy state at some revision will still show locked state
-            // and notification when switched to an older revision
-            const props             = (this.dataModel && this.dataModel.customProps) || {};
-            const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
+                // copyOf property really matters only if we are working with the latest revision
+                // otherwise, apps detached from copy state at some revision will still show locked state
+                // and notification when switched to an older revision
+                const props             = (this.dataModel && this.dataModel.customProps) || {};
+                const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
 
-            if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
-                this.isUnlockable = false;
-            } else if (hasCopyOfProperty && !unlocked) {
+                if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
+                    this.isUnlockable = false;
+                } else if (hasCopyOfProperty && !unlocked) {
 
-                const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
-                    type: "info"
-                });
-                this.isUnlockable = true;
-            }
+                    const originalApp = this.dataModel.customProps["sbg:copyOf"];
+                    this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                        type: "info"
+                    });
+                    this.isUnlockable = true;
+                }
 
-            const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
+                const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
 
-            if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
-                this.toggleLock(true);
-            }
+                if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
+                    this.toggleLock(true);
+                }
+            }, () => console.warn);
         }, (err) => {
             console.warn("Error on validation state changes", err);
         });
@@ -310,7 +312,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             if (this.tabData.dataSource === "local") {
-                this.viewMode = state.isValidCWL && this.isResolved ? this.getPreferredTab() : "code";
+                this.viewMode = state.isValidCWL && !this.invalidSteps.length ? this.getPreferredTab() : "code";
             } else {
                 this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
             }
@@ -334,7 +336,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 .filter(data => AppHelper.getRevisionlessID(data.id || "") === this.tabData.id)
                 .subscribeTracked(this, data => {
                     this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"];
-                    // this.dumpSwap();
                     this.resolveAfterModelAndCodeSync();
                 });
         }
@@ -450,7 +451,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     tabsUnlocked(): boolean {
         let codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent &&
-            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? this.isResolved : true);
+            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? !this.invalidSteps.length : true);
         if (this.viewMode === "code") {
             return codeCondition;
         }
@@ -733,11 +734,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabData.resolve(content).toPromise().then(resolved => {
             this.resolveDocumentChanges.next(JSON.stringify(resolved));
             this.isResolvingContent = false;
-            this.isResolved = true;
             return resolved;
         }, err => {
             this.isResolvingContent = false;
-            this.isResolved = false;
 
             this.notificationBar.showNotification(err.message || "An error has occurred");
 

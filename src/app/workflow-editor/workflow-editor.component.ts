@@ -137,7 +137,14 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
                 if (this.tabData.dataSource === "local") {
                     let steps;
+                    const invalidStepIndex = this.invalidSteps.indexOf(data.id);
                     if (data.app) {
+
+                        // If step-to-be-updated is a valid app, remove it from the list of invalid steps (if included)
+                        if (~invalidStepIndex) {
+                            this.invalidSteps.splice(invalidStepIndex, 1);
+                        }
+
                         steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
                         steps.forEach(step => step.setRunProcess(data.app));
 
@@ -147,6 +154,12 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                             if (inspectedStep) {
                                 this.graphEditor.openNodeInInspectorById(this.graphEditor.inspectedNode.id, true);
                             }
+                        }
+                    } else {
+
+                        // Add step to list of invalid steps (if not already included)
+                        if (!~invalidStepIndex) {
+                            this.invalidSteps.push(data.id);
                         }
                     }
                 } else {
