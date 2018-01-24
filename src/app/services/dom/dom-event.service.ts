@@ -162,4 +162,16 @@ export class DomEventService {
             element.dispatchEvent(event);
         });
     }
+
+    public preventDropEventOnDocument() {
+        document.addEventListener("dragover", function (event) {
+            event.preventDefault();
+            return false;
+        });
+
+        document.addEventListener("drop", function (event) {
+            event.preventDefault();
+            return false;
+        });
+    }
 }

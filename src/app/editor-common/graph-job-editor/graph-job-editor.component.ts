@@ -49,16 +49,32 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         super();
     }
 
-    onDrop(event, data: { name: string, type: "cwl" | "file" | "directory" }) {
+    onNativeBrowserDrop(event) {
+
+        for (let i = 0; i < event.dataTransfer.files.length; i++) {
+
+            // This is only supported in Chrome, Firefox and Microsoft Edge
+            if (event.dataTransfer.items && typeof event.dataTransfer.items[0].webkitGetAsEntry) {
+                const path = event.dataTransfer.files[i].path;
+                const type = event.dataTransfer.items[0].webkitGetAsEntry().isDirectory ? "directory" : "file";
+
+                this.onDrop(event.target, {
+                    name: path,
+                    type
+                });
+            }
+        }
+    }
+
+    onDrop(element, data: { name: string, type: "cwl" | "file" | "directory" }) {
 
         if (!AppHelper.isLocal(data.name)) {
             return;
         }
 
-        let type = data.type === "directory" ? "Directory" : "File";
+        const type = data.type === "directory" ? "Directory" : "File";
 
-        const dropElement = event.ctData.preHoveredElement;
-        const inputEl     = this.findParentInputOfType(dropElement, type);
+        const inputEl = this.findParentInputOfType(element, type);
 
         if (inputEl) {
 
