@@ -3,7 +3,8 @@
      [ct-drop-enabled]="true"
      [ct-drag-over]="true"
      [ct-drop-zones]="['job-editor']"
-     (onDropSuccess)="onDrop($event.detail.data.event, $event.detail.data.transfer_data)"
+     (drop)="onNativeBrowserDrop($event)"
+     (onDropSuccess)="onDrop($event.detail.data.event.ctData.preHoveredElement, $event.detail.data.transfer_data)"
 ></svg>
 
 <ng-template #inspector>

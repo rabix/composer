@@ -68,11 +68,6 @@ function start(config: { devTools: boolean, url: string }) {
         win = null;
     });
 
-    win.webContents.on("will-navigate", event => {
-        event.preventDefault();
-    });
-
-
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
             label: "Application",
