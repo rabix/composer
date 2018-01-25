@@ -131,11 +131,12 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
             }
         }
 
-        editor.submit.first().subscribe(() => {
-            // save string
-            this.model.setValue(editor.content.value, "string");
-            this.onChange(this.model);
-
+        editor.action.first().subscribe(action => {
+            if (action === "save") {
+                // save string
+                this.model.setValue(editor.content.value, "string");
+                this.onChange(this.model);
+            }
             this.modal.close();
         });
     }
