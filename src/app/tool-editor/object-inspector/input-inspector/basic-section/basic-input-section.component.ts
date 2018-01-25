@@ -62,7 +62,8 @@ import {ModalService} from "../../../../ui/modal/modal.service";
                  *ngIf="!isType('map') && !!form.controls['isBound']">
                 <label>Include in command line</label>
                 <span class="align-right">
-                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']" #includeInCommandLine>
+                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']"
+                                          #includeInCommandLine>
                         </ct-toggle-slider>
                     </span>
             </div>
@@ -76,6 +77,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
 
 
             <ct-secondary-file *ngIf="isType('File') && showSecondaryFiles()"
+                               [formControl]="form.controls['secondaryFiles']"
                                [readonly]="readonly"
                                [context]="context"
                                [port]="input"
@@ -119,64 +121,74 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             id: [{value: this.input.id, disabled: this.readonly}],
             type: [{value: this.input.type, disabled: this.readonly}, [Validators.required]],
             isBound: [{value: this.input.isBound, disabled: this.readonly}],
-            isRequired: [{value: !this.input.type.isNullable,  disabled: this.readonly}],
+            isRequired: [{value: !this.input.type.isNullable, disabled: this.readonly}],
             inputBinding: [{value: this.input, disabled: this.readonly}],
-            symbols: [{value: this.input.type.symbols ? this.input.type.symbols : [], disabled: this.readonly}]
+            symbols: [{value: this.input.type.symbols ? this.input.type.symbols : [], disabled: this.readonly}],
+            secondaryFiles: [{value: this.input.secondaryFiles, disabled: this.readonly}]
         });
 
         // track separately because it causes changes to the rest of the form
         this.listenToIsBoundChanges();
 
-        this.tracked = this.form.valueChanges.subscribe(value => {
-            // nullable changes
-            if (value.isRequired !== undefined) {
-                this.input.type.isNullable = !value.isRequired;
-            }
+        this.form.controls["isRequired"].valueChanges.subscribeTracked(this, (value) => {
 
-            // symbols changes
-            if (value.symbols && this.isType("enum")) {
-                this.input.type.symbols = value.symbols;
-            }
+            this.input.type.isNullable = !value;
 
-            // id changes
-            if (value.id !== undefined && this.input.id !== value.id) {
+        });
+
+        this.form.controls["symbols"].valueChanges.subscribeTracked(this, (value) => {
+
+            this.input.type.symbols = value;
+
+        });
+
+        this.form.controls["id"].valueChanges.subscribeTracked(this, (value) => {
+
+            if (this.input.id !== value) {
                 try {
-                    this.model.changeIOId(this.input, value.id);
+                    this.model.changeIOId(this.input, value);
 
                     if (this.isType("enum") || this.isType("record")) {
-                        this.input.type.name = value.id;
+                        this.input.type.name = value;
                     }
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
             }
 
-            // type changes
-            if (value.type) {
+        });
 
-                if (!this.isType("File")) {
-                    this.input.updateSecondaryFiles([]);
-                    delete this.input.customProps["sbg:stageInput"];
-                    if (this.input.inputBinding) {
-                        this.input.inputBinding.loadContents = false;
-                    }
+        this.form.controls["type"].valueChanges.subscribeTracked(this, (value) => {
+
+            if (!this.isType("File")) {
+                this.input.updateSecondaryFiles([]);
+                this.form.controls["secondaryFiles"].setValue([], {onlySelf: true, emitEvent: false});
+                this.form.controls["secondaryFiles"].disable({onlySelf: true, emitEvent: false});
+                delete this.input.customProps["sbg:stageInput"];
+                if (this.input.inputBinding) {
+                    this.input.inputBinding.loadContents = false;
                 }
-
-                if (value.type.type !== "array" && this.input.isBound) {
-                    this.input.inputBinding.itemSeparator = undefined;
-                }
-
-                if (this.isType("map") && this.input.isBound) {
-
-                    this.input.removeInputBinding();
-                    this.form.controls["isBound"].setValue(this.input.isBound);
-                }
-
-                if (this.isType("enum") || this.isType("record")) {
-                    this.input.type.name = this.input.id;
-                }
+            } else {
+                this.form.controls["secondaryFiles"].enable({onlySelf: true, emitEvent: false});
             }
 
+            if (value.type !== "array" && this.input.isBound) {
+                this.input.inputBinding.itemSeparator = undefined;
+            }
+
+            if (this.isType("map") && this.input.isBound) {
+
+                this.input.removeInputBinding();
+                this.form.controls["isBound"].setValue(this.input.isBound);
+            }
+
+            if (this.isType("enum") || this.isType("record")) {
+                this.input.type.name = this.input.id;
+            }
+
+        });
+
+        this.tracked = this.form.valueChanges.subscribe(() => {
             this.propagateChange(this.input);
         });
     }

@@ -10,6 +10,7 @@ import {JavascriptEvalService} from "../../services/javascript-eval/javascript-e
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {UrlValidator} from "../../validators/url.validator";
+import {DomEventService} from "../../services/dom/dom-event.service";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -31,6 +32,7 @@ export class MainComponent {
     public runnix: Observable<boolean>;
 
     constructor(modal: ModalService,
+                domService: DomEventService,
                 system: SystemService,
                 vcRef: ViewContainerRef,
                 auth: AuthService,
@@ -42,6 +44,9 @@ export class MainComponent {
                 js: JavascriptEvalService) {
 
         system.boot();
+
+        // Prevent dropping files on document to avoid window navigation
+        domService.preventDropEventOnDocument();
 
         openExternalFileService.watchDeepLinks();
 
