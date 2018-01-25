@@ -27,4 +27,9 @@
     /deep/ .text-error {
         color: $brand-danger;
     }
+
+    .status {
+        width: 100%;
+        overflow: auto;
+    }
 }

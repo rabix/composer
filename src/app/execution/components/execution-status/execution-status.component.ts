@@ -45,15 +45,15 @@ import {WorkboxService} from "../../../core/workbox/workbox.service";
 
         </div>
 
-        <div *ngIf="!stepStates" #output class="p-1">
+        <div *ngIf="!stepStates" #output class="p-1 status">
             Before executing an analysis, make sure that Docker is running and that you have Java Runtime
             Environment version 8+ installed.<br/>
             Check here for the progress of your execution.
         </div>
 
-        <div *ngIf="errorMessage" class="p-1">{{ errorMessage }}</div>
+        <div *ngIf="errorMessage" class="p-1 status">{{ errorMessage }}</div>
 
-        <div *ngIf="stepStates && !errorMessage" class="p-1">
+        <div *ngIf="stepStates && !errorMessage" class="p-1 status">
             <div *ngFor="let step of stepStates"
                  [class.text-muted]="step.state === 'pending' || step.state === 'cancelled'"
                  [class.text-error]="step.state === 'failed'"
