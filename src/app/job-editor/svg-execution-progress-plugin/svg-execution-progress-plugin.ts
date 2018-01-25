@@ -59,11 +59,6 @@ export class SVGExecutionProgressPlugin extends PluginBase {
     setState(stepID: string, state: NodeProgressState) {
         // console.log("Setting state of", stepID, "to", state);
 
-        if (state === "completed") {
-            this.reset();
-            return;
-        }
-
         const node = this.svg.querySelector(`.node[data-id="${stepID}"] .core`);
         if (!node) {
             return;
@@ -101,7 +96,6 @@ export class SVGExecutionProgressPlugin extends PluginBase {
     }
 
     fail() {
-        console.log("Failing current");
         const pulsingNode = this.svg.querySelector(".execution-progress-pulse");
         if (pulsingNode) {
             const state = pulsingNode.getAttribute("data-state");
