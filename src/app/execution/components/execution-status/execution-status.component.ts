@@ -129,7 +129,7 @@ export class ExecutionStatusComponent extends DirectiveBase {
             language
         });
 
-        this.workbox.openTab(tab, true, true, true);
+        this.workbox.openTab(tab, false, true, true);
     }
 
     ngOnInit() {

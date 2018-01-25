@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
@@ -103,6 +103,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
+                private cdr: ChangeDetectorRef,
                 private platformRepository: PlatformRepositoryService,
                 private slugify: SlugifyPipe) {
 
@@ -120,9 +121,13 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
+                this.cdr.markForCheck();
+                this.cdr.detectChanges();
                 return Promise.resolve(null);
             }, () => {
                 this.revision = 0;
+                this.cdr.markForCheck();
+                this.cdr.detectChanges();
                 return Promise.resolve(null);
             });
 
