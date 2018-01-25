@@ -102,23 +102,6 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         this.inspectorService = inspector;
 
         this.updateService.update
-            .do((data: {id: string, app: any}) => {
-
-                if (this.tabData.dataSource === "local") {
-                    /**
-                     * Updating app may have been invalid before, in which case this workflow's dataModel
-                     * will have removed the app as a step. Therefore, we need to resolve to make sure
-                     * the updating app will show up as a step
-                     */
-                    if (data.app) {
-                        this.resolveAfterModelAndCodeSync().then(() => {}, err => console.warn);;
-                    } else if (this.viewMode === "code") {
-                        this.resolveToModel(this.codeEditorContent.value).then(() => {}, err => console.warn);
-                    } else {
-                        this.resolveContent(this.getModelText()).then(() => {}, err => console.warn);
-                    }
-                }
-            })
             .filter((data: {id: string, app: any}) => {
 
                 /**
@@ -155,11 +138,14 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                                 this.graphEditor.openNodeInInspectorById(this.graphEditor.inspectedNode.id, true);
                             }
                         }
+
+                        this.resolveAfterModelAndCodeSync().then(() => {}, err => console.warn);
                     } else {
 
                         // Add step to list of invalid steps (if not already included)
                         if (!~invalidStepIndex) {
                             this.invalidSteps.push(data.id);
+                            this.resolveContent(this.getModelText()).then(() => {}, err => console.warn);
                         }
                     }
                 } else {
@@ -188,6 +174,13 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     /** Model that's recreated on document change */
     dataModel: WorkflowModel;
+
+    /**
+     * Used to keep track of invalid steps (in local workflows only). App validation will not show errors
+     * for (not embedded) invalid steps, so we need this list to know whether or not to call resolve after validation.
+     * Steps can become invalid if the app behind the step is saved while invalid.
+     */
+    invalidSteps = [];
 
     @ViewChild(WorkflowGraphEditorComponent)
     graphEditor: WorkflowGraphEditorComponent;

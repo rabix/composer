@@ -42,6 +42,7 @@ import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interf
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 import {FileRepositoryService} from "../../file-repository/file-repository.service";
 import {ExportAppService} from "../../services/export-app/export-app.service";
+import {WorkflowEditorComponent} from "../../workflow-editor/workflow-editor.component";
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -89,6 +90,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     isReadonly = false;
 
+    isResolved = false;
+
     savingDisabled = true;
 
     isUnlockable = null;
@@ -98,13 +101,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     executionQueue = new Subject<any>();
 
     executionJob: Object;
-
-    /**
-     * Used to keep track of invalid steps (in local workflows only). App validation will not show errors
-     * for (not embedded) invalid steps, so we need this list to know whether or not to call resolve after validation.
-     * Steps can become invalid if the app behind the step is saved while invalid.
-     */
-    invalidSteps = [];
 
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
@@ -191,7 +187,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * On user interactions (changes) set app state to Dirty - skip the first validation, which is called
          *  after resolving on document load.
          */
-        this.codeEditorContent.valueChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
+        this.codeEditorContent.valueChanges.distinctUntilChanged().skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
             this.setAppDirtyState(true);
         }, (err) => {
             console.warn("Error on dirty checking stream", err);
@@ -272,7 +268,19 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return;
             }
 
-            const continuation: Promise<any> = this.tabData.dataSource === "local" && this.invalidSteps.length ?
+            // If app is not initially resolvable and user proceeds to edit, we have to inform the user to
+            // manually click resolve to fix issues after validation has been passed
+            if (this.tabData.dataSource === "local" && !this.dataModel) {
+                this.validationState.warnings = this.validationState.warnings.concat({
+                    loc: "document",
+                    type: "error",
+                    message: "No JSON schema issues. Resolve to enable other editor tabs."
+                });
+            }
+
+            // We have to resolve after validation if app is a workflow with invalid steps
+            const isWorkflowWithInvalidSteps = this instanceof WorkflowEditorComponent && (<WorkflowEditorComponent>this).invalidSteps.length;
+            const continuation: Promise<any> = this.tabData.dataSource === "local" && isWorkflowWithInvalidSteps ?
                 this.resolveToModel(code) : Promise.resolve();
 
             continuation.then(() => {
@@ -312,7 +320,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             if (this.tabData.dataSource === "local") {
-                this.viewMode = state.isValidCWL && !this.invalidSteps.length ? this.getPreferredTab() : "code";
+                this.viewMode = state.isValidCWL && this.isResolved ? this.getPreferredTab() : "code";
             } else {
                 this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
             }
@@ -336,7 +344,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 .filter(data => AppHelper.getRevisionlessID(data.id || "") === this.tabData.id)
                 .subscribeTracked(this, data => {
                     this.dataModel.customProps["sbg:revisionsInfo"] = data.app["sbg:revisionsInfo"];
-                    this.resolveAfterModelAndCodeSync();
+                    this.resolveAfterModelAndCodeSync().then(() => {
+                        this.setAppDirtyState(false);
+                    }, err => console.warn);
                 });
         }
     }
@@ -400,23 +410,24 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             this.notificationBar.showNotification(`Cannot push this app because because it's doesn't match the proper JSON schema`);
             return;
         }
+        this.resolveAfterModelAndCodeSync().then(() => {
+            const modal = this.modal.fromComponent(PublishModalComponent, "Push an App");
+            modal.appID = this.dataModel.id;
+            modal.appContent = this.getModelText(true, true);
 
-        const modal          = this.modal.fromComponent(PublishModalComponent, "Push an App");
-        modal.appID          = this.dataModel.id;
-        modal.appContent     = this.getModelText(true, true);
+            modal.published.take(1).subscribeTracked(this, obj => {
+                this.updateService.updateApps({id: obj.app["sbg:id"], app: obj.app});
 
-        modal.published.take(1).subscribeTracked(this, obj => {
-            this.updateService.updateApps({ id: obj.app["sbg:id"], app: obj.app });
+                const tab = this.workbox.getOrCreateAppTab({
+                    id: AppHelper.getRevisionlessID(obj.id),
+                    type: this.dataModel.class,
+                    label: modal.inputForm.get("id").value,
+                    isWritable: true,
+                    language: "json"
 
-            const tab = this.workbox.getOrCreateAppTab({
-                id: AppHelper.getRevisionlessID(obj.id),
-                type: this.dataModel.class,
-                label: modal.inputForm.get("id").value,
-                isWritable: true,
-                language: "json"
-
+                });
+                this.workbox.openTab(tab);
             });
-            this.workbox.openTab(tab);
         });
     }
 
@@ -451,7 +462,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     tabsUnlocked(): boolean {
         let codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent &&
-            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? !this.invalidSteps.length : true);
+            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? this.isResolved : true);
         if (this.viewMode === "code") {
             return codeCondition;
         }
@@ -734,9 +745,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabData.resolve(content).toPromise().then(resolved => {
             this.resolveDocumentChanges.next(JSON.stringify(resolved));
             this.isResolvingContent = false;
+            this.isResolved = true;
             return resolved;
         }, err => {
             this.isResolvingContent = false;
+            this.isResolved = false;
 
             this.notificationBar.showNotification(err.message || "An error has occurred");
 
