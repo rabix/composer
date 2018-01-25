@@ -12,11 +12,25 @@ import {
     ExecutionRequirementError
 } from "../actions/execution.actions";
 import {State, StepState, StepStateType, AppExecutionState} from "./index";
+import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
 
 
 export function reducer(state: State = {}, action: { type: string }): State {
 
     switch (action.type) {
+
+        case TAB_CLOSE: {
+            const {tabID} = action as TabCloseAction;
+
+            if (!state[tabID]) {
+                return state;
+            }
+
+            const stateUpdate = {...state};
+            delete stateUpdate[tabID];
+
+            return stateUpdate;
+        }
 
         /**
          * On start, set all steps to pending state

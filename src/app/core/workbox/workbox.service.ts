@@ -10,6 +10,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
+import {Store} from "@ngrx/store";
+import {TabCloseAction} from "../actions/core.actions";
 
 
 @Injectable()
@@ -33,6 +35,7 @@ export class WorkboxService {
                 private dataGateway: DataGatewayService,
                 private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
+                private store: Store<any>,
                 private platformRepository: PlatformRepositoryService) {
 
         // Whenever a user gets changed, we should restore their tabs
@@ -177,6 +180,7 @@ export class WorkboxService {
 
         if (tab && tab.data && tab.data.id) {
             this.dataGateway.updateSwap(tab.data.id, null);
+            this.store.dispatch(new TabCloseAction(tab.data.id));
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
