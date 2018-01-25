@@ -2,7 +2,7 @@ import {Observable} from "rxjs/Observable";
 import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
-import {ExecutorService} from "../../../executor/executor.service";
+import {ExecutorService} from "../../../executor-service/executor.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";

@@ -1,6 +1,5 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
@@ -26,7 +25,7 @@ import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
-
+import {StoreModule} from "@ngrx/store";
 
 @NgModule({
     providers: [
@@ -57,7 +56,6 @@ import {ExportAppService} from "./services/export-app/export-app.service";
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
         CoreModule,
         ReactiveFormsModule,
         UIModule,
@@ -66,6 +64,9 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         ToolEditorModule,
         WorkflowEditorModule,
         NativeModule,
+        StoreModule.forRoot({
+            foo: "bar"
+        })
     ],
     bootstrap: [MainComponent]
 })

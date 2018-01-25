@@ -4,7 +4,7 @@ import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.component";
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
-import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execution-preview.component";
+import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -17,11 +17,12 @@ import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execut
         </div>
 
         <!--Common Execution Preview-->
-        <ct-app-execution-preview [hidden]="host.reportPanel !== 'execution'" #executionPreview
-                                  (stopExecution)="host.stopExecution()"
-                                  [job]="host.executionJob"
-                                  [isRunning]="host.isExecuting">
-        </ct-app-execution-preview>
+        <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
+                             [appID]="host.tabData.id"
+                             (stopExecution)="host.stopExecution()"
+                             [job]="host.executionJob"
+                             [isRunning]="host.isExecuting">
+        </ct-execution-status>
 
         <!--Common Validation Report-->
         <ct-validation-report *ngIf="host.reportPanel === 'validation'"
@@ -47,8 +48,8 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
 
     appType: string;
 
-    @ViewChild("executionPreview", {read: AppExecutionPreviewComponent})
-    private appExecutionPreview: AppExecutionPreviewComponent;
+    @ViewChild("executionPreview", {read: ExecutionStatusComponent})
+    private appExecutionPreview: ExecutionStatusComponent;
 
     constructor(private domEvents: DomEventService, private element: ElementRef) {
         super();
@@ -61,7 +62,7 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
 
     }
 
-    getAppExecutionPreview(): AppExecutionPreviewComponent {
+    getAppExecutionPreview(): ExecutionStatusComponent {
         return this.appExecutionPreview;
     }
 

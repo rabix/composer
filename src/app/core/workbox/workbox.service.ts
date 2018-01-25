@@ -101,7 +101,7 @@ export class WorkboxService {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
+    openTab(tab: TabData<any>, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
 
         const {tabs} = this.extractValues();
 

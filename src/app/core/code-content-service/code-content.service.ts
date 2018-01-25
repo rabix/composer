@@ -24,11 +24,11 @@ export class CodeSwapService {
     }
 
     discardSwapContent() {
-        this.patchSwap(null);
+        return this.patchSwap(null);
     }
 
-    private patchSwap(content): void {
-        this.ipc.request("patchSwap", {
+    private patchSwap(content) {
+        return this.ipc.request("patchSwap", {
             local: AppHelper.isLocal(this.appID),
             swapID: this.appID,
             swapContent: content

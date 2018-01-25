@@ -13,6 +13,7 @@
 
     /deep/ {
         @import "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+        @import "../svg-execution-progress-plugin/svg-execution-progress-plugin";
         @import "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
     }
 
