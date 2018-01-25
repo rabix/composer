@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
-import {FormArray, FormControl, FormGroup} from "@angular/forms";
+import {ChangeDetectorRef, Component,  forwardRef, Input} from "@angular/core";
+import {ControlValueAccessor, FormArray, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandInputParameterModel, CommandOutputParameterModel, ExpressionModel} from "cwlts/models";
-import {Subscription} from "rxjs/Subscription";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ErrorCode} from "cwlts/models/helpers/validation";
@@ -9,25 +8,28 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
 @Component({
     styleUrls: ["./secondary-files.component.scss"],
     selector: "ct-secondary-file",
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => SecondaryFilesComponent),
+        multi: true
+    }],
     template: `
         <ct-form-panel class="borderless" [collapsed]="true">
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
-                <form [formGroup]="form">
-                    <ct-blank-state *ngIf="!readonly && !secondaryFiles.length"
-                                    [hasAction]="true"
-                                    [buttonText]="'Add secondary file'"
-                                    [description]="'No Secondary Files defined.'"
+                    <ct-blank-state *ngIf="formControl.enabled && formControl.length === 0"
+                                    [hasAction]="true"                                   
                                     (buttonClick)="addFile()">
+                        <section tc-button-text>Add secondary file</section>
                     </ct-blank-state>
 
-                    <div *ngIf="readonly && !secondaryFiles.length" class="text-xs-center">
+                    <div *ngIf="formControl.length === 0" class="text-xs-center">
                         No Secondary Files defined.
                     </div>
 
-                    <ol *ngIf="secondaryFiles.length > 0" class="list-unstyled">
+                    <ol *ngIf="formControl.length > 0" class="list-unstyled">
 
-                        <li *ngFor="let control of form.get('list').controls; let i = index"
+                        <li *ngFor="let control of formControl.controls; let i = index"
                             class="removable-form-control">
 
                             <ct-expression-input
@@ -37,7 +39,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
                                     [readonly]="readonly">
                             </ct-expression-input>
 
-                            <div *ngIf="!readonly" class="remove-icon"
+                            <div *ngIf="formControl.enabled && !readonly" class="remove-icon"
                                  [ct-tooltip]="'Delete'"
                                  (click)="removeFile(i)">
                                 <i class="fa fa-trash clickable" data-test="remove-secondary-file"></i>
@@ -47,19 +49,17 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
 
                     <button type="button" 
                             data-test="add-secondary-file-button"
-                            *ngIf="secondaryFiles.length > 0 && !readonly"
+                            *ngIf="!readonly && formControl.enabled && formControl.length > 0"
                             class="btn btn-link add-btn-link no-underline-hover"
                             (click)="addFile()">
                         <i class="fa fa-plus"></i> Add secondary file
                     </button>
-                </form>
-
             </div>
         </ct-form-panel>
     `
 })
 
-export class SecondaryFilesComponent extends DirectiveBase implements OnChanges, OnInit {
+export class SecondaryFilesComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     public readonly = false;
@@ -74,24 +74,49 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
     @Input()
     bindingName: string;
 
-    secondaryFiles: ExpressionModel[] = [];
+    formControl: FormArray;
 
-    @Output()
-    update = new EventEmitter<ExpressionModel[]>();
+    private propagateChange = (commands: Array<ExpressionModel>) => void 0;
 
-    form = new FormGroup({list: new FormArray([])});
+    private propagateTouch = () => void 0;
 
-    private subscription: Subscription;
-
-    constructor(private modal: ModalService) {
+    constructor(private modal: ModalService, private cdr: ChangeDetectorRef) {
         super();
     }
 
-    removeFile(i) {
+    writeValue(expressions: ExpressionModel[]): void {
+        if (!expressions) {
+            return;
+        }
+
+        const arrayControls = expressions.map(expr => new FormControl(expr));
+
+        this.formControl = new FormArray(arrayControls);
+
+        this.formControl.valueChanges.subscribeTracked(this, v => {
+            this.propagateChange(this.formControl.value || []);
+        });
+    }
+
+    registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    registerOnTouched(fn: any): void {
+        this.propagateTouch = fn;
+    }
+
+    removeFile(index: number) {
         this.modal.delete("secondary file").then(() => {
-            // reset the expression's validity
-            this.secondaryFiles[i].clearIssue(ErrorCode.EXPR_ALL);
-            (this.form.get("list") as FormArray).removeAt(i);
+            // Reset the expression's validity
+            const entryAtIndex = this.formControl.at(index).value;
+
+            if (entryAtIndex) {
+                entryAtIndex.clearIssue(ErrorCode.EXPR_ALL);
+            }
+
+            this.formControl.removeAt(index);
+            this.cdr.markForCheck();
         }, err => {
             console.warn(err);
         });
@@ -99,51 +124,10 @@ export class SecondaryFilesComponent extends DirectiveBase implements OnChanges,
 
     addFile() {
         const cmd = this.port.addSecondaryFile(null);
-        (this.form.get("list") as FormArray).push(new FormControl(cmd));
+        this.formControl.push(new FormControl(cmd));
     }
 
-    ngOnInit() {
-        if (this.port) {
-            this.updateFormArray();
-        }
-    }
-
-    ngOnChanges() {
-        if (this.port) {
-            this.updateFormArray();
-        }
-    }
-
-    private updateFileList() {
-        this.secondaryFiles = this.port.secondaryFiles;
-    }
-
-    private updateFormArray() {
-        // cancel previous subscription so recreation of form doesn't trigger an update
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
-
-        this.updateFileList();
-
-        const formList = [];
-
-        // create formControls from each secondaryFile
-        for (let i = 0; i < this.secondaryFiles.length; i++) {
-            formList.push(new FormControl(this.secondaryFiles[i]));
-        }
-
-        this.form.setControl("list", new FormArray(formList));
-
-        // re-subscribe update output to form changes
-        this.subscription = this.form.valueChanges.map(form => (form.list)).subscribe((list) => {
-            if (list) {
-                this.port.updateSecondaryFiles(list);
-                this.updateFileList();
-                this.updateFormArray();
-                this.update.emit(list);
-            }
-        });
+    setDisabledState(isDisabled: boolean): void {
+        isDisabled ? this.formControl.disable({emitEvent: false}) : this.formControl.enable({emitEvent: false});
     }
 }

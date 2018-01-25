@@ -24,6 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-output-eval>
 
             <ct-secondary-file *ngIf="showSecondaryFiles()"
+                               [formControl]="form.controls['secondaryFiles']"
                                [context]="context"
                                [port]="output"
                                [readonly]="readonly"
@@ -95,7 +96,8 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
         this.form = this.formBuilder.group({
             basicOutputSection: [{value: this.output, disabled: this.readonly}],
             description: [{value: this.output, disabled: this.readonly}],
-            outputEval: [{value: this.output, disabled: this.readonly}]
+            outputEval: [{value: this.output, disabled: this.readonly}],
+            secondaryFiles: [{value: this.output.secondaryFiles, disabled: this.readonly}]
         });
 
         if (this.output.outputBinding.hasMetadata || this.output.outputBinding.hasInheritMetadata) {
