@@ -117,17 +117,13 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
             const {id, project} = group.getRawValue();
 
-            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`;
+            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/0`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
                 return Promise.resolve(null);
             }, () => {
                 this.revision = 0;
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
                 return Promise.resolve(null);
             });
 
