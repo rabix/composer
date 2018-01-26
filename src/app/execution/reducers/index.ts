@@ -9,6 +9,8 @@ export interface State {
 export interface AppExecutionState {
     errorMessage?: string,
     outDirPath: string,
+    state: "started" | "completed" | "failed" | "stopped",
+    exitCode?: number
     stepProgress: StepState[]
 }
 

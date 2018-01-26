@@ -61,6 +61,8 @@ export function reducer(state: State = {}, action: { type: string }): State {
             }));
 
             const appState = {
+                state: "started",
+                exitCode: undefined,
                 outDirPath,
                 stepProgress
             } as AppExecutionState;
@@ -79,14 +81,14 @@ export function reducer(state: State = {}, action: { type: string }): State {
             stepProgress     = stepProgress.map(stepState => ({...stepState, state: "completed" as StepStateType}));
             stepProgress     = endUnfinishedStepTimes(stepProgress);
 
-            const appUpdate = {...state[appID], stepProgress};
+            const appUpdate = {...state[appID], stepProgress, state: "completed"} as AppExecutionState;
 
             return {...state, [appID]: appUpdate};
         }
 
         case EXECUTION_ERROR: {
 
-            const {appID}     = action as ExecutionError;
+            const {appID, exitCode}     = action as ExecutionError;
             const transitions = new Map<StepStateType, StepStateType>([
                 ["pending", "cancelled"],
                 ["started", "terminated"]
@@ -101,7 +103,7 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
             stepProgress = endUnfinishedStepTimes(stepProgress);
 
-            const appUpdate = {...state[appID], stepProgress};
+            const appUpdate = {...state[appID], stepProgress, state: "failed", exitCode} as AppExecutionState;
 
             return {...state, [appID]: appUpdate};
         }
@@ -110,9 +112,10 @@ export function reducer(state: State = {}, action: { type: string }): State {
             const {appID, message} = action as ExecutionRequirementError;
             const appUpdate        = {
                 ...state[appID],
+                state: "failed",
                 errorMessage: message,
                 stepProgress: endUnfinishedStepTimes(state[appID].stepProgress)
-            };
+            } as AppExecutionState;
             return {...state, [appID]: appUpdate};
         }
 
@@ -125,7 +128,8 @@ export function reducer(state: State = {}, action: { type: string }): State {
             stepProgress     = endUnfinishedStepTimes(stepProgress);
 
 
-            const appUpdate = {...state[appID], stepProgress};
+            const appUpdate = {...state[appID], stepProgress, state: "stopped"} as AppExecutionState;
+
             return {...state, [appID]: appUpdate};
         }
 
@@ -139,7 +143,6 @@ export function reducer(state: State = {}, action: { type: string }): State {
             const {appID, message} = action as ExecutorOutput;
 
             const stepProgress = state[appID].stepProgress.slice() as StepState[];
-
 
             const stateUpdates = mapOutputToStepStates(message);
 
@@ -187,6 +190,9 @@ export function reducer(state: State = {}, action: { type: string }): State {
             }
 
             const appUpdate = {...state[appID], stepProgress};
+
+            // Check if last line is a failure
+            const lines = message.split("\n");
 
             return {...state, [appID]: appUpdate};
         }

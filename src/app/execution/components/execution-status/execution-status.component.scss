@@ -32,4 +32,10 @@
         width: 100%;
         overflow: auto;
     }
+
+    .execution-failure {
+        background: #4f2929;
+        color: white;
+        padding: .5em;
+    }
 }

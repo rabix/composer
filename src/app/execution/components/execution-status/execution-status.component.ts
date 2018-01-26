@@ -56,26 +56,30 @@ import * as moment from "moment";
 
         <div *ngIf="errorMessage" class="p-1 status">{{ errorMessage }}</div>
 
-        <div *ngIf="stepStates && !errorMessage" class="p-1 status">
-            <div *ngFor="let step of stepStates"
-                 [class.text-error]="step.state === 'failed'"
-                 [class.text-info]="step.state === 'started'"
-                 [class.text-success]="step.state === 'completed'"
-                 [class.text-warning]="step.state === 'terminated'"
-            >
 
-                <i class="fa fa-fw"
-                   [class.fa-clock-o]="!step.state"
-                   [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
-                   [class.fa-ban]="step.state === 'terminated'"
+        <div class="status">
+            <div *ngIf="exitCode && exitCode > 0" class="execution-failure">Execution failed with exit code {{ exitCode }}</div>
+            
+            <div *ngIf="stepStates && !errorMessage" class="p-1">
+                <div *ngFor="let step of stepStates"
+                     [class.text-error]="step.state === 'failed'"
+                     [class.text-info]="step.state === 'started'"
+                     [class.text-success]="step.state === 'completed'"
+                     [class.text-warning]="step.state === 'terminated'"
+                >
 
-                   [class.fa-circle-o-notch]="step.state === 'pending' || step.state === 'started'"
-                   [class.fa-circle-thin]="step.state === 'cancelled'"
-                   [class.fa-times-circle]="step.state === 'failed'"
-                   [class.fa-check-circle]="step.state === 'completed'"
-                ></i>{{ step?.label || step.id }}
+                    <i class="fa fa-fw"
+                       [class.fa-clock-o]="!step.state"
+                       [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
+                       [class.fa-ban]="step.state === 'terminated'"
 
-                <span class="text-muted">
+                       [class.fa-circle-o-notch]="step.state === 'pending' || step.state === 'started'"
+                       [class.fa-circle-thin]="step.state === 'cancelled'"
+                       [class.fa-times-circle]="step.state === 'failed'"
+                       [class.fa-check-circle]="step.state === 'completed'"
+                    ></i>{{ step?.label || step.id }}
+
+                    <span class="text-muted">
                     {{ step.state }}
                     
                     <ng-container *ngIf="step.state === 'started' && step.startTime">
@@ -87,8 +91,10 @@ import * as moment from "moment";
                         after {{ getDuration(step.endTime - step.startTime) }}
                     </ng-container>   
                 </span>
+                </div>
             </div>
         </div>
+
     `
 })
 
@@ -120,6 +126,9 @@ export class ExecutionStatusComponent extends DirectiveBase {
 
     @Input()
     errorMessage: string;
+
+    @Input()
+    exitCode: number;
 
     completionState: string;
 
@@ -180,8 +189,7 @@ export class ExecutionStatusComponent extends DirectiveBase {
                 this.jobFilePath  = this.outDirPath ? this.outDirPath + "/job.json" : undefined;
                 this.errorLogPath = this.outDirPath ? this.outDirPath + "/stderr.log" : undefined;
                 this.errorMessage = state.errorMessage;
-
-                console.log("Step states", this.stepStates);
+                this.exitCode     = state.exitCode;
 
                 this.completionState = undefined;
                 if (this.stepStates) {
