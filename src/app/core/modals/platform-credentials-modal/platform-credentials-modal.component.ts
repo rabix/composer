@@ -220,12 +220,21 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 url: new FormControl(this.platform, [
                     Validators.required,
                     (ctrl: AbstractControl) => {
-                        const val = ctrl.value || "";
+                        const val = ctrl.value;
                         if (this.platformList.map(e => e.value).indexOf(val) === -1) {
-                            return {name: true};
+                            try {
+                                const url = new URL(val);
+                                if(url.hostname.endsWith("-vayu.sbgenomics.com")){
+                                    return null;
+                                } else {
+                                    return {name: true};
+                                }
+                            } catch(ex){
+                                return {name: true}
+                            }
+                        } else {
+                            return null;
                         }
-
-                        return null;
                     }
                 ]),
                 token: new FormControl(this.token, [
