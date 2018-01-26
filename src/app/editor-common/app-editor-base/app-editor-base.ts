@@ -7,7 +7,6 @@ import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
@@ -790,19 +789,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     .takeUntil(this.executionStop)
 
                     // When done, turn off the UI flag
-                    .finally(() => this.isExecuting = false)
+                    .finally(() => {
+                        this.isExecuting = false;
+                    })
 
                     // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
                     .catch(err => {
                         return Observable.empty();
                     });
             })
-            .subscribeTracked(this, (output: ExecutorOutput) => {
-
-                // Update output folder in the tree
-                if (output.type === "OUTDIR") {
-                    this.fileRepository.reloadPath(output.message);
-                }
+            .subscribeTracked(this, () => {
             });
 
         // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
@@ -837,9 +833,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
 
             const executor = this.injector.get(ExecutorService2);
-            const outDir   = executor.makeOutputDirectoryName(executorConfig.outDir, appID, user);
 
-            return executor.execute(appID, this.dataModel, job, executorPath, {outDir});
+            const appIsLocal = AppHelper.isLocal(appID);
+
+            const outDir = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
+
+            return executor.execute(appID, this.dataModel, job, executorPath, {outDir}).finally(() => {
+                this.fileRepository.reloadPath(outDir);
+            });
         });
 
     }

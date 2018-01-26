@@ -4,8 +4,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Store} from "@ngrx/store";
 import {StepState, AppExecutionState} from "../../reducers";
 import {WorkboxService} from "../../../core/workbox/workbox.service";
-import * as mom from "moment";
-import moment = require("moment");
+import * as moment from "moment";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -129,8 +128,6 @@ export class ExecutionStatusComponent extends DirectiveBase {
                 private workbox: WorkboxService,
                 private store: Store<any>) {
         super();
-        window["mom"] = mom;
-
     }
 
     getDuration(d: number) {

@@ -24,9 +24,9 @@ export class ExecutorService2 {
 
     }
 
-    makeOutputDirectoryName(outputDir, appID, user = "local", time = new Date()) {
+    makeOutputDirectoryName(rootDir, appID, user = "local", time = new Date()) {
 
-        const base = outputDir + path.sep + "execution-results";
+        const base = rootDir;
 
         let projectSlug;
         let appSlug;
