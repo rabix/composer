@@ -47,7 +47,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
             case "cavatica-api":
                 return "CAVATICA";
             default:
-                return subdomain.indexOf("vayu.sbgenomics.com") === -1 ? subdomain : subdomain.split(".")[0];
+                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
         }
     }
 
@@ -63,7 +63,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
             case "cavatica-api":
                 return "Cavatica";
             default:
-                return subdomain.indexOf("vayu.sbgenomics.com") === -1 ? subdomain : subdomain.split(".")[0];
+                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
         }
     }
 
