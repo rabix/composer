@@ -7,9 +7,8 @@ export interface State {
 }
 
 export interface AppExecutionState {
-    errorMessage: string,
+    errorMessage?: string,
     outDirPath: string,
-    commandLine: string,
     stepProgress: StepState[]
 }
 
@@ -18,6 +17,8 @@ export interface StepState {
     id: string;
     label?: string;
     state: StepStateType;
+    startTime?: number;
+    endTime?: number;
 }
 
 export type StepStateType = "pending" | "started" | "failed" | "completed" | "terminated" | "cancelled";

@@ -4,6 +4,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {Store} from "@ngrx/store";
 import {StepState, AppExecutionState} from "../../reducers";
 import {WorkboxService} from "../../../core/workbox/workbox.service";
+import * as mom from "moment";
+import moment = require("moment");
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,6 +31,7 @@ import {WorkboxService} from "../../../core/workbox/workbox.service";
 
             <!--Open Outdir Button-->
             <button type="button" class="btn btn-secondary" ct-tooltip="Open Output Directory"
+                    [class.text-info]="completionState === 'completed'"
                     [disabled]="!outDirPath || errorMessage"
                     (click)="openDirectory(outDirPath)">
                 <i class="fa fa-folder-open fa-fw"></i>
@@ -37,7 +40,8 @@ import {WorkboxService} from "../../../core/workbox/workbox.service";
 
             <!--Open Error Log Button-->
             <button type="button" class="btn btn-secondary" ct-tooltip="Open Error Log"
-                    (click)="openFile(errorLogPath, 'text')"
+                    [class.text-warning]="completionState === 'failed'"
+                    (click)="openFile(errorLogPath, 'ace/mode/apache_conf')"
                     [disabled]="!errorLogPath || errorMessage">
                 <i class="fa fa-exclamation-circle fa-fw"></i>
             </button>
@@ -55,7 +59,6 @@ import {WorkboxService} from "../../../core/workbox/workbox.service";
 
         <div *ngIf="stepStates && !errorMessage" class="p-1 status">
             <div *ngFor="let step of stepStates"
-                 [class.text-muted]="step.state === 'pending' || step.state === 'cancelled'"
                  [class.text-error]="step.state === 'failed'"
                  [class.text-info]="step.state === 'started'"
                  [class.text-success]="step.state === 'completed'"
@@ -64,15 +67,27 @@ import {WorkboxService} from "../../../core/workbox/workbox.service";
 
                 <i class="fa fa-fw"
                    [class.fa-clock-o]="!step.state"
-                   [class.fa-cog]="step.state === 'started'"
                    [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
                    [class.fa-ban]="step.state === 'terminated'"
 
-                   [class.fa-circle-o-notch]="step.state === 'pending'"
+                   [class.fa-circle-o-notch]="step.state === 'pending' || step.state === 'started'"
                    [class.fa-circle-thin]="step.state === 'cancelled'"
                    [class.fa-times-circle]="step.state === 'failed'"
                    [class.fa-check-circle]="step.state === 'completed'"
                 ></i>{{ step?.label || step.id }}
+
+                <span class="text-muted">
+                    {{ step.state }}
+                    
+                    <ng-container *ngIf="step.state === 'started' && step.startTime">
+                        {{ step.startTime | amTimeAgo:false }}
+                    </ng-container>   
+                    
+                                        
+                    <ng-container *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
+                        after {{ getDuration(step.endTime - step.startTime) }}
+                    </ng-container>   
+                </span>
             </div>
         </div>
     `
@@ -107,12 +122,36 @@ export class ExecutionStatusComponent extends DirectiveBase {
     @Input()
     errorMessage: string;
 
+    completionState: string;
+
     constructor(private native: NativeSystemService,
                 private cdr: ChangeDetectorRef,
                 private workbox: WorkboxService,
                 private store: Store<any>) {
         super();
+        window["mom"] = mom;
 
+    }
+
+    getDuration(d: number) {
+        const m     = moment.duration(d, "milliseconds");
+        const order = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"];
+        const short = ["y", "m", "d", "h", "min", "s", "ms"];
+
+        const pair = [];
+        for (let i = 0; i < order.length; i++) {
+            const amount = m.get(order[i] as any);
+
+            if (amount > 0) {
+                pair.push(amount + short[i]);
+            }
+
+            if (pair.length >= 2) {
+                break;
+            }
+        }
+
+        return pair.join(" ");
     }
 
     openDirectory(dir: string): void {
@@ -138,11 +177,39 @@ export class ExecutionStatusComponent extends DirectiveBase {
             .distinctUntilChanged()
             .subscribeTracked(this, (state: Partial<AppExecutionState> = {}) => {
 
+
                 this.stepStates   = state.stepProgress;
                 this.outDirPath   = state.outDirPath;
-                this.jobFilePath  = this.outDirPath + "/job.json";
-                this.errorLogPath = this.outDirPath + "/stderr.log";
+                this.jobFilePath  = this.outDirPath ? this.outDirPath + "/job.json" : undefined;
+                this.errorLogPath = this.outDirPath ? this.outDirPath + "/stderr.log" : undefined;
                 this.errorMessage = state.errorMessage;
+
+                console.log("Step states", this.stepStates);
+
+                this.completionState = undefined;
+                if (this.stepStates) {
+                    let allCompleted = true;
+                    let hasFailed    = false;
+
+                    for (let i = 0; i < this.stepStates.length; i++) {
+                        const step = this.stepStates[i];
+
+                        if (step.state !== "completed") {
+                            allCompleted = false;
+                        }
+
+                        if (step.state === "failed") {
+                            hasFailed = true;
+                        }
+                    }
+
+                    if (allCompleted) {
+                        this.completionState = "completed";
+                    } else if (hasFailed) {
+                        this.completionState = "failed";
+                    }
+                }
+
 
                 this.cdr.markForCheck();
                 this.cdr.detectChanges();

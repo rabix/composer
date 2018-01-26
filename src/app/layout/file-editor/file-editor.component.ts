@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, EventEmitter} from "@angular/core";
+import {Component, Input, OnInit, EventEmitter, AfterViewInit, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
@@ -9,6 +9,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "../status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
+import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 
 @Component({
     selector: "ct-file-editor",
@@ -45,13 +46,14 @@ import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 
             <ct-code-editor
                 *ngIf="!isLoading && !unavailableError"
+                [options]="{mode: tabData.language || null}"
                 [formControl]="fileContent"
                 [filePath]="tabData.id">
             </ct-code-editor>
         </div>
     `
 })
-export class FileEditorComponent extends DirectiveBase implements OnInit {
+export class FileEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
     @Input()
     tabData: AppTabData;
 
@@ -64,6 +66,10 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
 
     isDirty = false;
 
+    @ViewChild(CodeEditorComponent)
+    editor: CodeEditorComponent;
+
+
     private codeReload = new EventEmitter();
 
     constructor(private dataGateway: DataGatewayService,
@@ -75,6 +81,7 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
     }
 
     ngOnInit(): void {
+
 
         // Subscribe editor content to tabData code changes
         this.codeReload.startWith(1).switchMap(() => this.tabData.fileContent).subscribeTracked(this, (code: string) => {

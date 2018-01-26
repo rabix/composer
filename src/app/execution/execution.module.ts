@@ -5,11 +5,13 @@ import {reducers} from "./reducers";
 import {ExecutionStatusComponent} from "./components/execution-status/execution-status.component";
 import {UIModule} from "../ui/ui.module";
 import {ExecutorService2} from "./services/executor/executor.service";
+import {MomentModule} from "angular2-moment";
 
 @NgModule({
     imports: [
         CommonModule,
         UIModule,
+        MomentModule,
         StoreModule.forFeature("execution", reducers)
     ],
     declarations: [

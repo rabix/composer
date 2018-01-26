@@ -18,6 +18,7 @@ import "brace/ext/searchbox";
 import "brace/mode/c_cpp";
 import "brace/mode/html";
 
+import "brace/mode/apache_conf";
 import "brace/mode/java";
 import "brace/mode/javascript";
 import "brace/mode/json";
@@ -85,7 +86,7 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         this.editor.$blockScrolling = Infinity;
 
         // Automatically assign a mode if file path is given
-        if (this.filePath) {
+        if (!this.options.mode && this.filePath) {
             const mode = getModeForPath(this.filePath);
             this.editor.session.setMode(mode.mode);
         }

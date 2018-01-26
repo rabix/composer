@@ -15,6 +15,20 @@ import {State, StepState, StepStateType, AppExecutionState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
 
 
+function endUnfinishedStepTimes(stepStates: StepState[]): StepState[] {
+    return stepStates.map(state => {
+        if (!state.endTime) {
+            state.endTime = Date.now();
+        }
+
+        if (!state.startTime) {
+            state.startTime = Date.now();
+        }
+
+        return state;
+    })
+}
+
 export function reducer(state: State = {}, action: { type: string }): State {
 
     switch (action.type) {
@@ -41,7 +55,9 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
             const stepProgress = steps.map(step => ({
                 ...step,
-                state: "pending" as StepStateType
+                state: "pending" as StepStateType,
+                startTime: null,
+                endTime: null
             }));
 
             const appState = {
@@ -59,10 +75,9 @@ export function reducer(state: State = {}, action: { type: string }): State {
             const {appID} = action as ExecutionComplete;
 
 
-            const stepProgressCast = state[appID].stepProgress.slice() as StepState[];
-            const stepProgress     = stepProgressCast.map(stepState => {
-                return {...stepState, state: "completed" as StepStateType};
-            });
+            let stepProgress = state[appID].stepProgress.slice() as StepState[];
+            stepProgress     = stepProgress.map(stepState => ({...stepState, state: "completed" as StepStateType}));
+            stepProgress     = endUnfinishedStepTimes(stepProgress);
 
             const appUpdate = {...state[appID], stepProgress};
 
@@ -71,18 +86,20 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
         case EXECUTION_ERROR: {
 
-            const {appID}          = action as ExecutionError;
-            const stepProgressCast = state[appID].stepProgress.slice() as StepState[];
-            const stepProgress     = stepProgressCast.map(stepState => {
-                const transitions = new Map<StepStateType, StepStateType>([
-                    ["pending", "cancelled"],
-                    ["started", "terminated"]
-                ]);
+            const {appID}     = action as ExecutionError;
+            const transitions = new Map<StepStateType, StepStateType>([
+                ["pending", "cancelled"],
+                ["started", "terminated"]
+            ]);
+            let stepProgress  = state[appID].stepProgress.slice() as StepState[];
+
+            stepProgress = stepProgress.map(stepState => {
 
                 const state = transitions.get(stepState.state) || stepState.state;
-
                 return {...stepState, state};
             });
+
+            stepProgress = endUnfinishedStepTimes(stepProgress);
 
             const appUpdate = {...state[appID], stepProgress};
 
@@ -91,7 +108,11 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
         case EXECUTION_REQUIREMENT_ERROR: {
             const {appID, message} = action as ExecutionRequirementError;
-            const appUpdate        = {...state[appID], errorMessage: message};
+            const appUpdate        = {
+                ...state[appID],
+                errorMessage: message,
+                stepProgress: endUnfinishedStepTimes(state[appID].stepProgress)
+            };
             return {...state, [appID]: appUpdate};
         }
 
@@ -99,8 +120,9 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
             const {appID} = action as ExecutionError;
 
-            const stepProgressCast = state[appID].stepProgress.slice() as StepState[];
-            const stepProgress     = stepProgressCast.map(stepState => ({...stepState, state: "cancelled" as StepStateType}));
+            let stepProgress = state[appID].stepProgress.slice() as StepState[];
+            stepProgress     = stepProgress.map(stepState => ({...stepState, state: "cancelled" as StepStateType}));
+            stepProgress     = endUnfinishedStepTimes(stepProgress);
 
 
             const appUpdate = {...state[appID], stepProgress};
@@ -153,7 +175,15 @@ export function reducer(state: State = {}, action: { type: string }): State {
 
                 if (hasProgress && isDifferent) {
                     stepProgress[i] = {...stepState, state: stateUpdates[stepID]};
+                    const item      = stepProgress[i];
+
+                    if (item.state === "started") {
+                        item.startTime = Date.now();
+                    } else if (item.state === "completed" || item.state === "failed") {
+                        item.endTime = Date.now();
+                    }
                 }
+
             }
 
             const appUpdate = {...state[appID], stepProgress};
@@ -192,19 +222,26 @@ function parseExecutorOutput(content: string) {
     /**
      *               Has something that contains “Job root.
      *               |         then match the word after the dot, which is a step ID
-     *               |         |    capture whatever optionally follows, starting either a whitespace or a comma, discard that later
-     *               |         |    |         then match the state that the executor flushes
-     *               |         |    |         |
-     *               ↓         ↓    ↓         ↓
+     *               |         |    capture whatever optionally follows, starting either a whitespace, dot, or a comma, discard that later
+     *               |         |    |                then match the state that the executor flushes
+     *               |         |    |                |
+     *               ↓         ↓    ↓                ↓
      */
-    const matcher = /Job root\.(.*?)(\s|,.*?)?(has\scompleted|has\sstarted|failed)/i;
+    const matcher = /Job root\.(.*?)(\s|,.*?|\..*?)?(has\scompleted|has\sstarted|failed)/i;
     const match   = content.match(matcher);
 
     if (match) {
-        const [, stepID, , stateMatch] = match;
+        const [, stepID, rest, stateMatch] = match;
+
 
         let status = "failed";
         if (stateMatch === "has completed") {
+
+            // FIXME: Might match completion status for a sub-step, which we should ignore, needs better communication with bunny
+            if (rest.startsWith(".")) {
+                return;
+            }
+
             status = "completed";
         } else if (stateMatch === "has started") {
             status = "started";
