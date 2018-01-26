@@ -21,9 +21,14 @@ export class PlatformAppService {
                 return;
             }
 
-            let platformURL = "https://igor.sbgenomics.com";
-            if (credentials.url.indexOf("-api") !== -1) {
-                platformURL = credentials.url.replace("-api", "");
+            // Remove port from url
+            let platformURL = credentials.url.replace(/.com:[1-9]+/, ".com");
+
+            // If its not a vayu
+            if (!~platformURL.indexOf("-vayu")) {
+
+                platformURL = ~platformURL.indexOf("-api") ? platformURL.replace("-api", "") : "https://igor.sbgenomics.com";
+
             }
 
             // URL example: u/ivanbatic/test-project/apps/#ivanbatic/test-project/bamtools-index-2-4-0
