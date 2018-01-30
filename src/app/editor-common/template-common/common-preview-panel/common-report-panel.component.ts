@@ -5,6 +5,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.component";
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
+import {appSelector} from "../../../execution/reducers/selectors";
+import {map} from "rxjs/operators";
+import {AppExecution} from "../../../execution/models";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -16,13 +19,20 @@ import {ExecutionStatusComponent} from "../../../execution/components/execution-
             </span>
         </div>
 
+
         <!--Common Execution Preview-->
-        <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
-                             [appID]="host.tabData.id"
-                             (stopExecution)="host.stopExecution()"
-                             [job]="host.executionJob"
-                             [isRunning]="host.isExecuting">
-        </ct-execution-status>
+        <ng-template [ngIf]="appProgressSlice | async" let-state>
+            <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
+                                 [appID]="host.tabData.id"
+                                 (stopExecution)="host.stopExecution()"
+                                 [error]="state?.error"
+                                 [executionState]="state?.state"
+                                 [stepStates]="state?.stepExecution"
+                                 [outdir]="state?.outdir"
+                                 [isRunning]="host.isExecuting">
+            </ct-execution-status>
+        </ng-template>
+
 
         <!--Common Validation Report-->
         <ct-validation-report *ngIf="host.reportPanel === 'validation'"
@@ -51,6 +61,8 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
     @ViewChild("executionPreview", {read: ExecutionStatusComponent})
     private appExecutionPreview: ExecutionStatusComponent;
 
+    appProgressSlice: Observable<Partial<AppExecution>>;
+
     constructor(private domEvents: DomEventService, private element: ElementRef) {
         super();
     }
@@ -60,10 +72,11 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
             ? "Workflow"
             : "CommandLineTool";
 
-    }
+        this.appProgressSlice = this.host.store
+            .pipe(
+                map(appSelector(this.host.tabData.id))
+            );
 
-    getAppExecutionPreview(): ExecutionStatusComponent {
-        return this.appExecutionPreview;
     }
 
     ngAfterViewInit() {

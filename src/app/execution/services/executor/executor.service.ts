@@ -4,12 +4,12 @@ import {ExecutorParamsConfig} from "../../../../../electron/src/storage/types/ex
 import {Injectable} from "@angular/core";
 import {Store} from "@ngrx/store";
 import {
-    ExecutorOutput,
-    ExecutionStart,
-    ExecutionComplete,
-    ExecutionError,
-    ExecutionStop,
-    ExecutionRequirementError
+    ExecutorOutputAction,
+    ExecutionStartAction,
+    ExecutionCompleteAction,
+    ExecutionErrorAction,
+    ExecutionStopAction,
+    ExecutionRequirementErrorAction
 } from "../../actions/execution.actions";
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
@@ -92,18 +92,22 @@ export class ExecutorService2 {
             let execution;
             let isPrematureStop = true;
 
-            this.store.dispatch(new ExecutionStart(
+            this.store.dispatch(new ExecutionStartAction(
                 appID,
                 stepList,
                 executionParams.outDir
             ));
 
-            executor.execute(content, jobValue, executionParams).then(runner => {
+            const startRunner = executor.execute(content, jobValue, executionParams).catch(ex => {
+                isPrematureStop = false;
+                throw ex;
+            });
+
+            startRunner.then(runner => {
 
                 if (obs.closed) {
                     return;
                 }
-
 
                 execution = runner;
 
@@ -112,15 +116,19 @@ export class ExecutorService2 {
                 obs.next(execution.getCommandLineString());
 
                 process.on("exit", code => {
-                    console.log("stdout exit", code);
                     isPrematureStop = false;
 
+                    const ok      = 0;
+                    const sigterm = 143;
 
-                    if (code === 0) {
-                        this.store.dispatch(new ExecutionComplete(appID));
+                    if (code === ok) {
+                        this.store.dispatch(new ExecutionCompleteAction(appID));
+                        return obs.complete();
+                    } else if (code === sigterm) {
+                        // this.store.dispatch(new ExecutionStopAction(appID));
                         return obs.complete();
                     } else {
-                        this.store.dispatch(new ExecutionError(appID, code));
+                        this.store.dispatch(new ExecutionErrorAction(appID, code));
                     }
 
 
@@ -128,7 +136,6 @@ export class ExecutorService2 {
                 });
 
                 process.on("error", (err: any) => {
-                    console.log("process error", err);
                     if (err.code === "ENOENT" && err.path === "java") {
                         obs.error(new Error("Cannot run Java process. Please check if it is properly installed."));
                     }
@@ -136,25 +143,24 @@ export class ExecutorService2 {
 
                 process.stdout.on("data", data => {
 
-                    this.store.dispatch(new ExecutorOutput(appID, "stdout", data.toString()));
+                    this.store.dispatch(new ExecutorOutputAction(appID, "stdout", data.toString()));
 
                     obs.next(data.toString());
                 });
 
                 process.stderr.on("data", data => {
-                    this.store.dispatch(new ExecutorOutput(appID, "stderr", data.toString()));
-                    // console.log("stderr data", data.toString());
+                    this.store.dispatch(new ExecutorOutputAction(appID, "stderr", data.toString()));
                 });
 
             }, ex => {
-                this.store.dispatch(new ExecutionRequirementError(appID, ex.message));
+                this.store.dispatch(new ExecutionRequirementErrorAction(appID, ex.message));
                 obs.error(new Error(ex));
             });
 
             return () => {
 
                 if (isPrematureStop) {
-                    this.store.dispatch(new ExecutionStop(appID));
+                    this.store.dispatch(new ExecutionStopAction(appID));
                 }
 
                 if (execution) {

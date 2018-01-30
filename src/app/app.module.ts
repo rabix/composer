@@ -26,6 +26,11 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
 import {StoreModule} from "@ngrx/store";
+import {EffectsModule} from "@ngrx/effects";
+import {TabManagerToken, DirectoryExplorerToken} from "./execution/interfaces";
+import {NativeSystemService} from "./native/system/native-system.service";
+import {WorkboxService} from "./core/workbox/workbox.service";
+import {directoryExplorerFactory, tabManagerFactory} from "./factories/execution";
 
 @NgModule({
     providers: [
@@ -48,7 +53,17 @@ import {StoreModule} from "@ngrx/store";
         PlatformConnectionService,
         PlatformRepositoryService,
         SettingsService,
-        StatusBarService
+        StatusBarService,
+        {
+            provide: DirectoryExplorerToken,
+            useFactory: directoryExplorerFactory,
+            deps: [NativeSystemService]
+        },
+        {
+            provide: TabManagerToken,
+            useFactory: tabManagerFactory,
+            deps: [WorkboxService]
+        }
     ],
     declarations: [
         MainComponent,
@@ -64,9 +79,9 @@ import {StoreModule} from "@ngrx/store";
         ToolEditorModule,
         WorkflowEditorModule,
         NativeModule,
-        StoreModule.forRoot({
-            foo: "bar"
-        })
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot([])
+
     ],
     bootstrap: [MainComponent]
 })

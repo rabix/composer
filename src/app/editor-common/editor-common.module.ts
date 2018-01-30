@@ -41,6 +41,7 @@ import {CommonReportPanelComponent} from "./template-common/common-preview-panel
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 import {ExecutionModule} from "../execution/execution.module";
 
+
 @NgModule({
     declarations: [
         AppExecutionContextModalComponent,
@@ -122,7 +123,7 @@ import {ExecutionModule} from "../execution/execution.module";
     ],
     providers: [
         CwlSchemaValidationWorkerService,
-        AppValidatorService,
+        AppValidatorService
     ],
     imports: [
         BrowserModule,

@@ -150,7 +150,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected fileRepository: FileRepositoryService,
                 protected workbox: WorkboxService,
                 protected exportApp: ExportAppService,
-                protected store: Store<any>,
+                public store: Store<any>,
                 protected auth: AuthService,
                 public executor: ExecutorService) {
 

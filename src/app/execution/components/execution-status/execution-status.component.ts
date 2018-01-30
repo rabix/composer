@@ -1,13 +1,10 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ChangeDetectorRef} from "@angular/core";
-import {NativeSystemService} from "../../../native/system/native-system.service";
+import {Component, EventEmitter, Input, Output, SimpleChanges, Optional, Inject} from "@angular/core";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {Store} from "@ngrx/store";
-import {StepState, AppExecutionState} from "../../reducers";
-import {WorkboxService} from "../../../core/workbox/workbox.service";
 import * as moment from "moment";
+import {ExecutionError, ExecutionState, StepExecution} from "../../models";
+import {DirectoryExplorerToken, DirectoryExplorer, TabManagerToken, TabManager} from "../../interfaces";
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "ct-execution-status",
     styleUrls: ["./execution-status.component.scss"],
 
@@ -22,59 +19,58 @@ import * as moment from "moment";
             </button>
 
             <!--Show Job  Button -->
-            <button type="button" class="btn btn-secondary" ct-tooltip="Open Job File"
-                    (click)="openFile(jobFilePath, 'json')"
-                    [disabled]="!jobFilePath || errorMessage">
+            <button *ngIf="tabManager"
+                    type="button" class="btn btn-secondary" ct-tooltip="Open Job File"
+                    (click)="openFile(jobFilePath, 'ace/mode/json')"
+                    [disabled]="!jobFilePath || error?.type === 'requirement'">
                 <i class="fa fa-indent fa-fw"></i>
             </button>
 
             <!--Open Outdir Button-->
             <button type="button" class="btn btn-secondary" ct-tooltip="Open Output Directory"
-                    [class.text-info]="completionState === 'completed'"
-                    [disabled]="!outDirPath || errorMessage"
-                    (click)="openDirectory(outDirPath)">
+                    *ngIf="explorer"
+                    [class.text-info]="executionState === 'completed'"
+                    [disabled]="!outdir || error?.type === 'requirement'"
+                    (click)="explorer.explore(outdir)">
                 <i class="fa fa-folder-open fa-fw"></i>
             </button>
 
 
             <!--Open Error Log Button-->
-            <button type="button" class="btn btn-secondary" ct-tooltip="Open Error Log"
-                    [class.text-warning]="completionState === 'failed'"
+            <button *ngIf="tabManager"
+                    type="button" class="btn btn-secondary" ct-tooltip="Open Error Log"
+                    [class.text-warning]="executionState === 'failed'"
                     (click)="openFile(errorLogPath, 'ace/mode/apache_conf')"
-                    [disabled]="!errorLogPath || errorMessage">
+                    [disabled]="!errorLogPath || error?.type === 'requirement'">
                 <i class="fa fa-exclamation-circle fa-fw"></i>
             </button>
 
 
         </div>
 
-        <div *ngIf="!stepStates" #output class="p-1 status">
-            Before executing an analysis, make sure that Docker is running and that you have Java Runtime
-            Environment version 8+ installed.<br/>
-            Check here for the progress of your execution.
-        </div>
-
-        <div *ngIf="errorMessage" class="p-1 status">{{ errorMessage }}</div>
-
-
         <div class="status">
-            <div *ngIf="exitCode && exitCode > 0" class="execution-failure">Execution failed with exit code {{ exitCode }}</div>
-            
-            <div *ngIf="stepStates && !errorMessage" class="p-1">
+            <div *ngIf="!stepStates" #output class="p-1">
+                Before executing an analysis, make sure that Docker is running and that you have Java Runtime
+                Environment version 8+ installed.<br/>
+                Check here for the progress of your execution.
+            </div>
+
+
+            <div *ngIf="error" class="execution-failure">Execution failed with exit code {{ error.code }}</div>
+            <div *ngIf="error && error.message" class="p-1">{{ error.message }}</div>
+
+            <div *ngIf="stepStates && !error?.message" class="p-1">
                 <div *ngFor="let step of stepStates"
                      [class.text-error]="step.state === 'failed'"
                      [class.text-info]="step.state === 'started'"
                      [class.text-success]="step.state === 'completed'"
-                     [class.text-warning]="step.state === 'terminated'"
                 >
 
                     <i class="fa fa-fw"
-                       [class.fa-clock-o]="!step.state"
+                       [class.fa-clock-o]="!step.state || step.state === 'pending'"
                        [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
-                       [class.fa-ban]="step.state === 'terminated'"
-
-                       [class.fa-circle-o-notch]="step.state === 'pending' || step.state === 'started'"
-                       [class.fa-circle-thin]="step.state === 'cancelled'"
+                       [class.fa-circle-o-notch]="step.state === 'started'"
+                       [class.fa-circle-thin]="step.state === 'stopped'"
                        [class.fa-times-circle]="step.state === 'failed'"
                        [class.fa-check-circle]="step.state === 'completed'"
                     ></i>{{ step?.label || step.id }}
@@ -94,7 +90,6 @@ import * as moment from "moment";
                 </div>
             </div>
         </div>
-
     `
 })
 
@@ -107,16 +102,10 @@ export class ExecutionStatusComponent extends DirectiveBase {
     stopExecution = new EventEmitter<any>();
 
     @Input()
-    job = {};
-
-    @Input()
     appID: string;
 
     @Input()
-    stepStates: StepState[] = [];
-
-    @Input()
-    outDirPath: string;
+    outdir: string;
 
     @Input()
     jobFilePath: string;
@@ -125,28 +114,41 @@ export class ExecutionStatusComponent extends DirectiveBase {
     errorLogPath: string;
 
     @Input()
-    errorMessage: string;
+    executionState: ExecutionState;
 
     @Input()
-    exitCode: number;
+    stepStates: StepExecution[];
 
-    completionState: string;
+    @Input()
+    error: ExecutionError;
 
-    constructor(private native: NativeSystemService,
-                private cdr: ChangeDetectorRef,
-                private workbox: WorkboxService,
-                private store: Store<any>) {
+    constructor(@Optional() @Inject(DirectoryExplorerToken)
+                public explorer: DirectoryExplorer,
+                @Optional() @Inject(TabManagerToken)
+                public tabManager: TabManager) {
         super();
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+
+        if (changes["outdir"]) {
+            this.jobFilePath  = this.outdir ? this.outdir + "/job.json" : undefined;
+            this.errorLogPath = this.outdir ? this.outdir + "/stderr.log" : undefined;
+        }
+
+    }
+
+    /**
+     * Get a precise human-readable duration based on a number of ms
+     */
     getDuration(d: number) {
-        const m     = moment.duration(d, "milliseconds");
+        const time  = moment.duration(d, "milliseconds");
         const order = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"];
         const short = ["y", "m", "d", "h", "min", "s", "ms"];
 
         const pair = [];
         for (let i = 0; i < order.length; i++) {
-            const amount = m.get(order[i] as any);
+            const amount = time.get(order[i] as any);
 
             if (amount > 0) {
                 pair.push(amount + short[i]);
@@ -160,13 +162,13 @@ export class ExecutionStatusComponent extends DirectiveBase {
         return pair.join(" ");
     }
 
-    openDirectory(dir: string): void {
-        this.native.exploreFolder(dir);
-    }
-
     openFile(filePath: string, language: string): void {
 
-        const tab = this.workbox.getOrCreateAppTab({
+        if (!this.tabManager) {
+            return;
+        }
+
+        const tab = this.tabManager.getOrCreate({
             id: filePath,
             label: filePath,
             type: "Code",
@@ -174,51 +176,9 @@ export class ExecutionStatusComponent extends DirectiveBase {
             language
         });
 
-        this.workbox.openTab(tab, false, true, true);
+        this.tabManager.open(tab);
+
     }
 
-    ngOnInit() {
-
-        this.store.select("execution", "progress", this.appID)
-            .distinctUntilChanged()
-            .subscribeTracked(this, (state: Partial<AppExecutionState> = {}) => {
-
-
-                this.stepStates   = state.stepProgress;
-                this.outDirPath   = state.outDirPath;
-                this.jobFilePath  = this.outDirPath ? this.outDirPath + "/job.json" : undefined;
-                this.errorLogPath = this.outDirPath ? this.outDirPath + "/stderr.log" : undefined;
-                this.errorMessage = state.errorMessage;
-                this.exitCode     = state.exitCode;
-
-                this.completionState = undefined;
-                if (this.stepStates) {
-                    let allCompleted = true;
-                    let hasFailed    = false;
-
-                    for (let i = 0; i < this.stepStates.length; i++) {
-                        const step = this.stepStates[i];
-
-                        if (step.state !== "completed") {
-                            allCompleted = false;
-                        }
-
-                        if (step.state === "failed") {
-                            hasFailed = true;
-                        }
-                    }
-
-                    if (allCompleted) {
-                        this.completionState = "completed";
-                    } else if (hasFailed) {
-                        this.completionState = "failed";
-                    }
-                }
-
-
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
-            });
-    }
 
 }

@@ -15,7 +15,7 @@ import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-d
 import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {Store} from "@ngrx/store";
-import {StepState} from "../../execution/reducers";
+import {StepExecution} from "../../execution/models";
 
 @Component({
     selector: "ct-graph-job-editor",
@@ -161,8 +161,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
             this.updateJob(storedJob)
         });
 
-        this.store.select("jobEditor", "progress", this.appID, "stepProgress").distinctUntilChanged()
-            .subscribeTracked(this, (states: StepState[] = []) => {
+        this.store.select("jobEditor", "progress", this.appID, "stepExecution").distinctUntilChanged()
+            .subscribeTracked(this, (states: StepExecution[] = []) => {
                 const update = states.reduce((acc, step) => ({...acc, [step.id]: step.state}), {});
                 this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update)
             });

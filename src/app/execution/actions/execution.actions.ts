@@ -5,13 +5,10 @@ export const EXECUTION_ERROR             = "[App Execution] error";
 export const EXECUTION_REQUIREMENT_ERROR = "[App Execution] requirement error";
 export const EXECUTION_COMPLETE          = "[App Execution] complete";
 export const EXECUTION_STOP              = "[App Execution] stop";
-
-export const STEP_START    = "[App Execution] step start";
-export const STEP_ERROR    = "[App Execution] step error";
-export const STEP_COMPLETE = "[App Execution] step complete";
-
-export const EXECUTOR_STDOUT = "[App Execution] executor standard output";
-export const EXECUTOR_OUTPUT = "[App Execution] executor output";
+export const EXECUTOR_OUTPUT             = "[App Execution] executor output";
+export const EXECUTION_STEP_FAIL         = "[App Execution] step failProcess";
+export const EXECUTION_STEP_START        = "[App Execution] step start";
+export const EXECUTION_STEP_COMPLETE     = "[App Execution] step complete";
 
 export class ExecutionAction implements Action {
     readonly type: string;
@@ -20,15 +17,7 @@ export class ExecutionAction implements Action {
     }
 }
 
-export class StepExecutionAction extends ExecutionAction {
-    readonly type: string;
-
-    constructor(public appID: string, public stepID: string) {
-        super(appID);
-    }
-}
-
-export class ExecutionStart extends ExecutionAction {
+export class ExecutionStartAction extends ExecutionAction {
     readonly type = EXECUTION_START;
 
     constructor(public appID: string,
@@ -38,7 +27,7 @@ export class ExecutionStart extends ExecutionAction {
     }
 }
 
-export class ExecutionError extends ExecutionAction {
+export class ExecutionErrorAction extends ExecutionAction {
     readonly type = EXECUTION_ERROR;
 
 
@@ -47,7 +36,7 @@ export class ExecutionError extends ExecutionAction {
     }
 }
 
-export class ExecutionRequirementError extends ExecutionAction {
+export class ExecutionRequirementErrorAction extends ExecutionAction {
     readonly type = EXECUTION_REQUIREMENT_ERROR;
 
     constructor(public appID: string, public message: string) {
@@ -55,32 +44,39 @@ export class ExecutionRequirementError extends ExecutionAction {
     }
 }
 
-export class ExecutionComplete extends ExecutionAction {
+export class ExecutionCompleteAction extends ExecutionAction {
     readonly type = EXECUTION_COMPLETE;
 }
 
-export class ExecutionStop extends ExecutionAction {
+export class ExecutionStopAction extends ExecutionAction {
     readonly type = EXECUTION_STOP;
 }
 
-export class StepExecutionStart extends StepExecutionAction {
-    readonly type = STEP_START;
-}
-
-export class StepExecutionError extends StepExecutionAction {
-    readonly type = STEP_ERROR;
-}
-
-export class StepExecutionCompletion extends StepExecutionAction {
-    readonly type = STEP_COMPLETE;
-}
-
-export class ExecutorOutput {
+export class ExecutorOutputAction {
     readonly type = EXECUTOR_OUTPUT;
 
     constructor(public appID: string, public source: string, public message: string) {
 
     }
+}
 
+export abstract class ExecutionStepAction implements Action {
+    readonly type;
+
+    constructor(public appID: string, public stepID: string) {
+
+    }
+}
+
+export class ExecutionStepFailAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_FAIL;
+}
+
+export class ExecutionStepStartAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_START;
+}
+
+export class ExecutionStepCompleteAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_COMPLETE;
 }
 

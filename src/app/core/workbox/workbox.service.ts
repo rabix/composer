@@ -250,14 +250,7 @@ export class WorkboxService {
         this.activeTab.next(tab);
     }
 
-    getOrCreateAppTab<T>(data: {
-        id: string;
-        type: string;
-        label?: string;
-        isWritable?: boolean;
-        language?: string;
-
-    }, forceCreate = false, forceFetch = false): TabData<T> {
+    getOrCreateAppTab<T>(data: TabData<any>, forceCreate = false, forceFetch = false): TabData<T> {
 
         if (!forceCreate) {
             const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);

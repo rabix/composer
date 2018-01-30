@@ -1,40 +1,35 @@
 import {
-    EXECUTOR_OUTPUT,
     EXECUTION_START,
-    ExecutionStart,
-    ExecutorOutput,
+    ExecutionStartAction,
     EXECUTION_COMPLETE,
-    ExecutionComplete,
+    ExecutionCompleteAction,
     EXECUTION_ERROR,
-    ExecutionError,
+    ExecutionErrorAction,
     EXECUTION_STOP,
     EXECUTION_REQUIREMENT_ERROR,
-    ExecutionRequirementError
+    ExecutionRequirementErrorAction,
+    EXECUTION_STEP_START,
+    EXECUTION_STEP_FAIL,
+    EXECUTION_STEP_COMPLETE,
+    ExecutionStepFailAction
 } from "../actions/execution.actions";
-import {State, StepState, StepStateType, AppExecutionState} from "./index";
+import {ProgressState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
+import {AppExecution, ExecutionError, ExecutionState, StepExecution} from "../models";
 
 
-function endUnfinishedStepTimes(stepStates: StepState[]): StepState[] {
-    return stepStates.map(state => {
-        if (!state.endTime) {
-            state.endTime = Date.now();
-        }
-
-        if (!state.startTime) {
-            state.startTime = Date.now();
-        }
-
-        return state;
-    })
-}
-
-export function reducer(state: State = {}, action: { type: string }): State {
+export function reducer<T extends { type: string | any }>(state: ProgressState = {}, action: T): ProgressState {
 
     switch (action.type) {
 
+        /**
+         * When app tab is closed, execution state should be cleared so it doesn't show up again when the app is reopened
+         *
+         * @name progress.reducer.tabClose
+         * @see progress.reducer.tabCloseTest
+         */
         case TAB_CLOSE: {
-            const {tabID} = action as TabCloseAction;
+            const {tabID} = action as Partial<TabCloseAction>;
 
             if (!state[tabID]) {
                 return state;
@@ -46,213 +41,78 @@ export function reducer(state: State = {}, action: { type: string }): State {
             return stateUpdate;
         }
 
-        /**
-         * On start, set all steps to pending state
-         */
         case EXECUTION_START: {
 
-            const {steps, appID, outDirPath} = action as ExecutionStart;
+            const {steps, appID, outDirPath} = action as Partial<ExecutionStartAction>;
 
-            const stepProgress = steps.map(step => ({
-                ...step,
-                state: "pending" as StepStateType,
-                startTime: null,
-                endTime: null
-            }));
+            const stepExecution = steps.map(step => new StepExecution(step.id, step.label));
+            const app           = new AppExecution(outDirPath, stepExecution);
 
-            const appState = {
-                state: "started",
-                exitCode: undefined,
-                outDirPath,
-                stepProgress
-            } as AppExecutionState;
-
-            return {...state, [appID]: appState};
-
+            return {...state, [appID]: app};
         }
 
         case EXECUTION_COMPLETE: {
 
-
-            const {appID} = action as ExecutionComplete;
-
-
-            let stepProgress = state[appID].stepProgress.slice() as StepState[];
-            stepProgress     = stepProgress.map(stepState => ({...stepState, state: "completed" as StepStateType}));
-            stepProgress     = endUnfinishedStepTimes(stepProgress);
-
-            const appUpdate = {...state[appID], stepProgress, state: "completed"} as AppExecutionState;
-
-            return {...state, [appID]: appUpdate};
+            const {appID} = action as Partial<ExecutionCompleteAction>;
+            return {...state, [appID]: state[appID].complete()};
         }
 
         case EXECUTION_ERROR: {
 
-            const {appID, exitCode}     = action as ExecutionError;
-            const transitions = new Map<StepStateType, StepStateType>([
-                ["pending", "cancelled"],
-                ["started", "terminated"]
-            ]);
-            let stepProgress  = state[appID].stepProgress.slice() as StepState[];
+            const {appID, exitCode} = action as Partial<ExecutionErrorAction>;
 
-            stepProgress = stepProgress.map(stepState => {
-
-                const state = transitions.get(stepState.state) || stepState.state;
-                return {...stepState, state};
-            });
-
-            stepProgress = endUnfinishedStepTimes(stepProgress);
-
-            const appUpdate = {...state[appID], stepProgress, state: "failed", exitCode} as AppExecutionState;
-
-            return {...state, [appID]: appUpdate};
+            const app = state[appID].failProcess(new ExecutionError(exitCode, undefined, "execution"));
+            return {...state, [appID]: app};
         }
 
         case EXECUTION_REQUIREMENT_ERROR: {
-            const {appID, message} = action as ExecutionRequirementError;
-            const appUpdate        = {
-                ...state[appID],
-                state: "failed",
-                errorMessage: message,
-                stepProgress: endUnfinishedStepTimes(state[appID].stepProgress)
-            } as AppExecutionState;
-            return {...state, [appID]: appUpdate};
+            const {appID, message} = action as Partial<ExecutionRequirementErrorAction>;
+
+            const app = state[appID].failProcess(new ExecutionError(1, message, "requirement"));
+            return {...state, [appID]: app};
         }
 
         case EXECUTION_STOP: {
 
-            const {appID} = action as ExecutionError;
+            const {appID} = action as Partial<ExecutionErrorAction>;
 
-            let stepProgress = state[appID].stepProgress.slice() as StepState[];
-            stepProgress     = stepProgress.map(stepState => ({...stepState, state: "cancelled" as StepStateType}));
-            stepProgress     = endUnfinishedStepTimes(stepProgress);
-
-
-            const appUpdate = {...state[appID], stepProgress, state: "stopped"} as AppExecutionState;
-
-            return {...state, [appID]: appUpdate};
+            return {...state, [appID]: state[appID].stop()};
         }
 
-        /**
-         * On executor output, try to match output lines to progress states,
-         * then update steps
-         */
-        case EXECUTOR_OUTPUT: {
+        case EXECUTION_STEP_START:
+        case EXECUTION_STEP_FAIL:
+        case EXECUTION_STEP_COMPLETE: {
+            const {appID, stepID} = action as Partial<ExecutionStepFailAction>;
 
+            const app = state[appID];
 
-            const {appID, message} = action as ExecutorOutput;
+            const update = app.update({
+                stepExecution: app.stepExecution.map(step => {
+                    if (step.id === stepID) {
 
-            const stepProgress = state[appID].stepProgress.slice() as StepState[];
+                        let state: ExecutionState;
+                        if (action.type === EXECUTION_STEP_START) {
+                            state = "started";
+                        } else if (action.type === EXECUTION_STEP_COMPLETE) {
+                            state = "completed";
+                        } else if (action.type === EXECUTION_STEP_FAIL) {
+                            state = "failed";
+                        }
 
-            const stateUpdates = mapOutputToStepStates(message);
-
-            // If message parsing didn't find updates, just return original state without creating a new ref
-            if (Object.keys(stateUpdates).length === 0) {
-                return state;
-            }
-
-            const updatedStepIDs = Object.keys(stateUpdates);
-            const hasFailure     = ~updatedStepIDs.map(key => stateUpdates[key]).indexOf("failed");
-
-            for (let i = 0; i < stepProgress.length; i++) {
-
-                const stepState     = stepProgress[i];
-                const stepID        = stepState.id;
-                const thisOneFailed = stateUpdates[stepID] === "failed";
-
-                // Failure on any step terminates execution, so that should transition states of other steps
-                if (hasFailure && !thisOneFailed) {
-
-                    if (stepState.state === "started") {
-                        stepProgress[i] = {...stepState, state: "terminated"};
-                    } else if (stepState.state === "pending") {
-                        stepProgress[i] = {...stepState, state: "cancelled"};
+                        return step.transitionTo(state);
                     }
 
-                    continue;
-                }
+                    return step;
+                })
+            });
 
 
-                const hasProgress = stateUpdates.hasOwnProperty(stepID);
-                const isDifferent = stepState.state !== stateUpdates[stepID];
-
-                if (hasProgress && isDifferent) {
-                    stepProgress[i] = {...stepState, state: stateUpdates[stepID]};
-                    const item      = stepProgress[i];
-
-                    if (item.state === "started") {
-                        item.startTime = Date.now();
-                    } else if (item.state === "completed" || item.state === "failed") {
-                        item.endTime = Date.now();
-                    }
-                }
-
-            }
-
-            const appUpdate = {...state[appID], stepProgress};
-
-            // Check if last line is a failure
-            const lines = message.split("\n");
-
-            return {...state, [appID]: appUpdate};
-        }
-    }
-
-    return state;
-
-}
-
-function mapOutputToStepStates(text: string): { [stepID: string]: StepStateType } {
-
-    const lines = text.split("\n");
-    const state = {};
-
-    for (let i = 0; i < lines.length; i++) {
-        const line   = lines[i];
-        const parsed = parseExecutorOutput(line);
-
-        if (!parsed) {
-            continue;
+            return {...state, [appID]: update};
         }
 
-        const {stepID, status} = parsed;
-        state[stepID]          = status;
+
+        default:
+            return state;
     }
 
-    return state;
-
-}
-
-function parseExecutorOutput(content: string) {
-
-    /**
-     *               Has something that contains “Job root.
-     *               |         then match the word after the dot, which is a step ID
-     *               |         |    capture whatever optionally follows, starting either a whitespace, dot, or a comma, discard that later
-     *               |         |    |                then match the state that the executor flushes
-     *               |         |    |                |
-     *               ↓         ↓    ↓                ↓
-     */
-    const matcher = /Job root\.(.*?)(\s|,.*?|\..*?)?(has\scompleted|has\sstarted|failed)/i;
-    const match   = content.match(matcher);
-
-    if (match) {
-        const [, stepID, rest, stateMatch] = match;
-
-
-        let status = "failed";
-        if (stateMatch === "has completed") {
-
-            // FIXME: Might match completion status for a sub-step, which we should ignore, needs better communication with bunny
-            if (rest.startsWith(".")) {
-                return;
-            }
-
-            status = "completed";
-        } else if (stateMatch === "has started") {
-            status = "started";
-        }
-
-        return {stepID, status};
-    }
 }

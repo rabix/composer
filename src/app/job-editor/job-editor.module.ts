@@ -19,6 +19,7 @@ import {reducers} from "../execution/reducers";
         ReactiveFormsModule,
         UIModule,
         EditorCommonModule,
+        // FIXME: should not use reducers from other modules
         StoreModule.forFeature("jobEditor", reducers)
     ],
     declarations: [
