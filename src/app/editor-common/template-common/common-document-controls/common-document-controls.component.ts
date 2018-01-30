@@ -101,6 +101,7 @@ import {Component, Input} from "@angular/core";
                         *ngIf="host.appIsRunnable()"
                         ct-tooltip="See More Actions"
                         tooltipPlacement="bottom"
+                        data-test="more-actions-button"
                         (click)="moreActionsDropdown.show()">
                     <i class="fa fa-fw fa-ellipsis-h"></i>
                 </button>
