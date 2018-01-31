@@ -40,7 +40,7 @@ import {WorkboxService} from "./workbox.service";
                 <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
                 <li (click)="openDocumentation()" 
                     data-test="documentation-button" 
-                    data-url="http://docs.rabix.io/rabix-composer-home">
+                    [attr.data-url]="rabixDocLink">
                     
                     <i class="fa fa-question-circle fa-fw"></i> 
                     Documentation
@@ -62,6 +62,8 @@ import {WorkboxService} from "./workbox.service";
     `
 })
 export class SettingsMenuComponent extends DirectiveBase {
+
+    private rabixDocLink = "http://docs.rabix.io/rabix-composer-home";
 
     hasWarning = false;
 
@@ -97,7 +99,7 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     openDocumentation(): void {
-        this.system.openLink("http://docs.rabix.io/rabix-composer-home");
+        this.system.openLink(this.rabixDocLink);
     }
 
     openFeedback(): void {
