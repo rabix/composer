@@ -38,9 +38,17 @@ import {WorkboxService} from "./workbox.service";
                     <span class="text-muted text-nowrap d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
-                <li (click)="openDocumentation()" data-test="documentation-button"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
+                <li (click)="openDocumentation()" 
+                    data-test="documentation-button" 
+                    data-url="http://docs.rabix.io/rabix-composer-home">
+                    
+                    <i class="fa fa-question-circle fa-fw"></i> 
+                    Documentation
+                </li>
                 <li (click)="openFeedback()" data-test="send-feedback-button"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
+                <li (click)="checkForPlatformUpdates()" 
+                    *ngIf="global.platformIsOutdated" 
+                    class="outdated-update"
                     data-test="updates-available">
 
                     <i class="fa fa-refresh fa-fw "></i>
