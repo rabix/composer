@@ -3,21 +3,43 @@ import {action} from "@storybook/addon-actions";
 import {MomentModule} from "angular2-moment";
 import {ExecutionStatusComponent} from "./execution-status.component";
 import {ExecutionError} from "../../models";
+import {TabManagerToken, DirectoryExplorerToken} from "../../interfaces";
 
 const statusPanelDefualts = {
     component: ExecutionStatusComponent,
     moduleMetadata: {
-        imports: [MomentModule]
+        imports: [MomentModule],
     }
 };
 
 storiesOf("Execution Status Panel", module)
+
     .add("with pristine description", () => ({
         ...statusPanelDefualts,
         props: {
             appID: "test-app-id",
         } as Partial<ExecutionStatusComponent>
     }))
+    .add("can open directories and tabs", () => ({
+        component: ExecutionStatusComponent,
+        moduleMetadata: {
+            imports: [MomentModule],
+            providers: [
+                {
+                    provide: DirectoryExplorerToken, useValue: {
+                        explore: () => {
+                        }
+                    }
+                },
+                {
+                    provide: TabManagerToken, useValue: {}
+                }
+            ]
+
+        }
+
+    }))
+
     .add("step state overview", () => ({
         ...statusPanelDefualts,
         props: {
@@ -37,6 +59,7 @@ storiesOf("Execution Status Panel", module)
             ]
         } as Partial<ExecutionStatusComponent>
     }))
+
     .add("execution error", () => ({
         ...statusPanelDefualts,
         props: {
@@ -47,4 +70,16 @@ storiesOf("Execution Status Panel", module)
             ],
             error: new ExecutionError(127, "This is an error message")
         } as Partial<ExecutionStatusComponent>
+    }))
+
+    .add("step execution failed", () => ({
+        ...statusPanelDefualts,
+        props: {
+            isRunning: false,
+            stepStates: [
+                {id: "step_a", label: "Step A", state: "completed"},
+                {id: "step_b", label: "Step B", state: "failed"}
+            ],
+            error: new ExecutionError(1, "Some step failed", "execution")
+        }
     }));

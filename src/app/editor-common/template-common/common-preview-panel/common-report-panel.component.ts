@@ -6,8 +6,8 @@ import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
 import {appSelector} from "../../../execution/reducers/selectors";
-import {map} from "rxjs/operators";
 import {AppExecution} from "../../../execution/models";
+import {map} from "rxjs/operators";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -22,6 +22,7 @@ import {AppExecution} from "../../../execution/models";
 
         <!--Common Execution Preview-->
         <ng-template [ngIf]="appProgressSlice | async" let-state>
+            
             <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
                                  [appID]="host.tabData.id"
                                  (stopExecution)="host.stopExecution()"
@@ -31,6 +32,7 @@ import {AppExecution} from "../../../execution/models";
                                  [outdir]="state?.outdir"
                                  [isRunning]="host.isExecuting">
             </ct-execution-status>
+            
         </ng-template>
 
 
@@ -74,7 +76,7 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
 
         this.appProgressSlice = this.host.store
             .pipe(
-                map(appSelector(this.host.tabData.id))
+                map(appSelector(this.host.tabData.id)),
             );
 
     }

@@ -59,7 +59,7 @@ import {DirectoryExplorerToken, DirectoryExplorer, TabManagerToken, TabManager} 
             <div *ngIf="error" class="execution-failure">Execution failed with exit code {{ error.code }}</div>
             <div *ngIf="error && error.message" class="p-1">{{ error.message }}</div>
 
-            <div *ngIf="stepStates && !error?.message" class="p-1">
+            <div *ngIf="stepStates && (!error || error?.type === 'execution')" class="p-1">
                 <div *ngFor="let step of stepStates"
                      [class.text-error]="step.state === 'failed'"
                      [class.text-info]="step.state === 'started'"
@@ -124,6 +124,7 @@ export class ExecutionStatusComponent extends DirectiveBase {
 
     constructor(@Optional() @Inject(DirectoryExplorerToken)
                 public explorer: DirectoryExplorer,
+
                 @Optional() @Inject(TabManagerToken)
                 public tabManager: TabManager) {
         super();

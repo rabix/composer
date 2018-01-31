@@ -115,18 +115,33 @@ export class ExecutorService2 {
 
                 obs.next(execution.getCommandLineString());
 
-                process.on("exit", code => {
+                process.on("exit", (code, sig) => {
                     isPrematureStop = false;
 
-                    const ok      = 0;
-                    const sigterm = 143;
+                    /** Successful completion if exit code is 0 */
+                    const isCompleted = code === 0;
 
-                    if (code === ok) {
+                    /**
+                     * Killing a process manually will throw either exitCode 143, or
+                     * a SIGINT/SIGTERM/SIGKILL in different circumstances, so we check for both
+                     * */
+                    const isCancelled = code === 143 || sig;
+
+
+                    if (isCompleted) {
                         this.store.dispatch(new ExecutionCompleteAction(appID));
-                        return obs.complete();
-                    } else if (code === sigterm) {
-                        // this.store.dispatch(new ExecutionStopAction(appID));
-                        return obs.complete();
+                        obs.complete();
+                        return;
+
+                    } else if (isCancelled) {
+                        /**
+                         * Cancellation is initially triggered from unsubscribing from killing the process
+                         * when unsubscribing from the observable.
+                         * ExecutionStopAction is therefore dispatched from the original place.
+                         * @see executionUnsubscribe
+                         */
+                        obs.complete();
+                        return;
                     } else {
                         this.store.dispatch(new ExecutionErrorAction(appID, code));
                     }
@@ -157,6 +172,7 @@ export class ExecutorService2 {
                 obs.error(new Error(ex));
             });
 
+            /** @name executionUnsubscribe */
             return () => {
 
                 if (isPrematureStop) {

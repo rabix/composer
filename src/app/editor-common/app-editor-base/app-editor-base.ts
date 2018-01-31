@@ -774,8 +774,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private bindExecutionQueue() {
 
-        const appID = this.tabData.id;
-
         // When a new execution is in the line, run it
         this.executionQueue
 

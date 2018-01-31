@@ -20,7 +20,7 @@ describe("Execution module", () => {
                 const update       = reducer(initialState as any, new TabCloseAction("foo"));
 
                 expect(update.foo).toBeUndefined();
-                expect(update.bar).toBeFalsy();
+                expect(update.bar).toBeTruthy();
 
             });
 
@@ -41,7 +41,7 @@ describe("Execution module", () => {
                 expect(app).toEqual(objectContaining<AppExecution>({
                     outdir: action.outDirPath,
                     error: undefined,
-                    state: "started",
+                    state: "pending",
                 }));
 
 
