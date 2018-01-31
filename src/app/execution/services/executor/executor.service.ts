@@ -5,11 +5,12 @@ import {Injectable} from "@angular/core";
 import {Store} from "@ngrx/store";
 import {
     ExecutorOutputAction,
-    ExecutionStartAction,
     ExecutionCompleteAction,
     ExecutionErrorAction,
     ExecutionStopAction,
-    ExecutionRequirementErrorAction
+    ExecutionRequirementErrorAction,
+    ExecutionPrepareAction,
+    ExecutionStartAction
 } from "../../actions/execution.actions";
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
@@ -92,7 +93,7 @@ export class ExecutorService2 {
             let execution;
             let isPrematureStop = true;
 
-            this.store.dispatch(new ExecutionStartAction(
+            this.store.dispatch(new ExecutionPrepareAction(
                 appID,
                 stepList,
                 executionParams.outDir
@@ -108,6 +109,8 @@ export class ExecutorService2 {
                 if (obs.closed) {
                     return;
                 }
+
+                this.store.dispatch(new ExecutionStartAction(appID));
 
                 execution = runner;
 

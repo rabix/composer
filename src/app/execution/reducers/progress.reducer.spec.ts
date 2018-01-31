@@ -1,8 +1,16 @@
 import {reducer} from "./progress.reducer";
 import {TabCloseAction} from "../../core/actions/core.actions";
-import {ExecutionStartAction} from "../actions/execution.actions";
-import {AppExecution} from "../models";
-import {StepExecution} from "../models/step-progress";
+import {
+    ExecutionPrepareAction,
+    ExecutionCompleteAction,
+    ExecutionStartAction,
+    ExecutionErrorAction,
+    ExecutionStopAction,
+    ExecutionStepStartAction,
+    ExecutionStepCompleteAction,
+    ExecutionStepFailAction
+} from "../actions/execution.actions";
+import {AppExecution, StepExecution} from "../models";
 import objectContaining = jasmine.objectContaining;
 
 describe("Execution module", () => {
@@ -24,11 +32,11 @@ describe("Execution module", () => {
 
             });
 
-            it("should create an execution state object upon receiving an ExecutionStartAction event", () => {
+            it("should create an execution state object upon receiving a preparation event", () => {
 
-                const action = new ExecutionStartAction("myApp", [
+                const action = new ExecutionPrepareAction("myApp", [
                     {id: "step_a", label: "Step A"},
-                    {id: "step_b", label: "step_b"}
+                    {id: "step_b", label: "Step B"}
                 ], "/my/outdir");
 
                 const state = reducer({}, action);
@@ -64,6 +72,23 @@ describe("Execution module", () => {
 
             });
 
+            it("should not react to post-prepare events when execution is not running", () => {
+                const appID  = "test-app-id";
+                const stepID = "test-step-id";
+
+                const state = [
+                    new ExecutionStartAction(appID),
+                    new ExecutionStepStartAction(appID, stepID),
+                    new ExecutionStepCompleteAction(appID, stepID),
+                    new ExecutionStepFailAction(appID, stepID),
+                    new ExecutionCompleteAction(appID),
+                    new ExecutionErrorAction(appID, 1),
+                    new ExecutionStopAction(appID)
+                ].reduce(reducer, {});
+
+                expect(Object.getOwnPropertyNames(state).length).toBe(0);
+
+            });
         });
     })
 });

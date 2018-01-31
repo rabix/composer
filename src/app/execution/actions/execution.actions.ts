@@ -1,5 +1,6 @@
 import {Action} from "@ngrx/store";
 
+export const EXECUTION_PREPARE           = "[App Execution] prepare";
 export const EXECUTION_START             = "[App Execution] start";
 export const EXECUTION_ERROR             = "[App Execution] error";
 export const EXECUTION_REQUIREMENT_ERROR = "[App Execution] requirement error";
@@ -17,14 +18,18 @@ export class ExecutionAction implements Action {
     }
 }
 
-export class ExecutionStartAction extends ExecutionAction {
-    readonly type = EXECUTION_START;
+export class ExecutionPrepareAction extends ExecutionAction {
+    readonly type = EXECUTION_PREPARE;
 
     constructor(public appID: string,
                 public steps: { id: string, label?: string }[] = [],
                 public outDirPath: string) {
         super(appID);
     }
+}
+
+export class ExecutionStartAction extends ExecutionAction {
+    readonly type = EXECUTION_START;
 }
 
 export class ExecutionErrorAction extends ExecutionAction {

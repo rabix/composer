@@ -1,5 +1,4 @@
 import {
-    EXECUTION_START,
     ExecutionStartAction,
     EXECUTION_COMPLETE,
     ExecutionCompleteAction,
@@ -11,7 +10,10 @@ import {
     EXECUTION_STEP_START,
     EXECUTION_STEP_FAIL,
     EXECUTION_STEP_COMPLETE,
-    ExecutionStepFailAction
+    ExecutionStepFailAction,
+    EXECUTION_PREPARE,
+    ExecutionPrepareAction,
+    EXECUTION_START
 } from "../actions/execution.actions";
 import {ProgressState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
@@ -41,9 +43,9 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return stateUpdate;
         }
 
-        case EXECUTION_START: {
+        case EXECUTION_PREPARE: {
 
-            const {steps, appID, outDirPath} = action as Partial<ExecutionStartAction>;
+            const {steps, appID, outDirPath} = action as Partial<ExecutionPrepareAction>;
 
             const stepExecution = steps.map(step => new StepExecution(step.id, step.label));
             const app           = new AppExecution(outDirPath, stepExecution);
@@ -51,32 +53,62 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app};
         }
 
+        case EXECUTION_START: {
+
+            const {appID} = action as Partial<ExecutionStartAction>;
+            const app     = state[appID];
+
+            if (!app) {
+                return state;
+            }
+
+            return {...state, [appID]: app.start()};
+        }
+
         case EXECUTION_COMPLETE: {
 
             const {appID} = action as Partial<ExecutionCompleteAction>;
-            return {...state, [appID]: state[appID].complete()};
+            const app     = state[appID];
+            if (!app) {
+                return state;
+            }
+
+            return {...state, [appID]: app.complete()};
         }
 
         case EXECUTION_ERROR: {
 
             const {appID, exitCode} = action as Partial<ExecutionErrorAction>;
+            const app               = state[appID];
+            if (!app) {
+                return state;
+            }
 
-            const app = state[appID].failProcess(new ExecutionError(exitCode, undefined, "execution"));
-            return {...state, [appID]: app};
+            return {...state, [appID]: app.failProcess(new ExecutionError(exitCode, undefined, "execution"))};
         }
 
         case EXECUTION_REQUIREMENT_ERROR: {
             const {appID, message} = action as Partial<ExecutionRequirementErrorAction>;
 
-            const app = state[appID].failProcess(new ExecutionError(1, message, "requirement"));
-            return {...state, [appID]: app};
+            const app = state[appID];
+            if (!app) {
+                return state;
+            }
+
+            return {...state, [appID]: app.failProcess(new ExecutionError(1, message, "requirement"))};
         }
 
         case EXECUTION_STOP: {
 
             const {appID} = action as Partial<ExecutionErrorAction>;
 
-            return {...state, [appID]: state[appID].stop()};
+            const app = state[appID];
+
+            if (!app) {
+                return state;
+            }
+
+            return {...state, [appID]: app.stop()};
         }
 
         case EXECUTION_STEP_START:
@@ -85,6 +117,10 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             const {appID, stepID} = action as Partial<ExecutionStepFailAction>;
 
             const app = state[appID];
+
+            if (!app) {
+                return state;
+            }
 
             const update = app.update({
                 stepExecution: app.stepExecution.map(step => {
