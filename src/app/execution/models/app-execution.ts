@@ -40,7 +40,7 @@ export class AppExecution {
             update.endTime
         );
     }
-    
+
     failProcess(error: ExecutionError, ...failedStepIDs: string[]) {
         return this.update({
             error,
@@ -83,7 +83,7 @@ export class AppExecution {
                         return step;
                 }
             })
-        })
+        });
     }
 
     start(): AppExecution {

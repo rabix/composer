@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild, OnInit} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -21,19 +21,11 @@ import {map} from "rxjs/operators";
 
 
         <!--Common Execution Preview-->
-        <ng-template [ngIf]="appProgressSlice | async" let-state>
-            
-            <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
-                                 [appID]="host.tabData.id"
-                                 (stopExecution)="host.stopExecution()"
-                                 [error]="state?.error"
-                                 [executionState]="state?.state"
-                                 [stepStates]="state?.stepExecution"
-                                 [outdir]="state?.outdir"
-                                 [isRunning]="host.isExecuting">
-            </ct-execution-status>
-            
-        </ng-template>
+        <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
+                             [execution]="appProgressSlice | async"
+                             (stopExecution)="host.stopExecution()"
+                             [appID]="host.tabData.id">
+        </ct-execution-status>
 
 
         <!--Common Validation Report-->
@@ -47,7 +39,7 @@ import {map} from "rxjs/operators";
     `,
     styleUrls: ["./common-report-panel.component.scss"],
 })
-export class CommonReportPanelComponent extends DirectiveBase implements AfterViewInit {
+export class CommonReportPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     host: AppEditorBase;
@@ -70,14 +62,12 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
     }
 
     ngOnInit() {
-        this.appType = this.host instanceof WorkflowEditorComponent
-            ? "Workflow"
-            : "CommandLineTool";
 
-        this.appProgressSlice = this.host.store
-            .pipe(
-                map(appSelector(this.host.tabData.id)),
-            );
+        this.appType = this.host instanceof WorkflowEditorComponent ? "Workflow" : "CommandLineTool";
+
+        this.appProgressSlice = this.host.store.pipe(
+            map(appSelector(this.host.tabData.id)),
+        );
 
     }
 

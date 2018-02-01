@@ -24,7 +24,7 @@ import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service
                 <div class="form-group">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" value="bundled" formControlName="choice" name="choice"/>
-                        Bundled (v1.0.3)
+                        Bundled (v1.0.4)
                     </label>
                 </div>
 

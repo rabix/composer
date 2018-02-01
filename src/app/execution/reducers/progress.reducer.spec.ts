@@ -90,5 +90,5 @@ describe("Execution module", () => {
 
             });
         });
-    })
+    });
 });

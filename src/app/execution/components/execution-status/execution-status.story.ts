@@ -1,14 +1,27 @@
 import {storiesOf} from "@storybook/angular";
-import {action} from "@storybook/addon-actions";
 import {MomentModule} from "angular2-moment";
 import {ExecutionStatusComponent} from "./execution-status.component";
-import {ExecutionError} from "../../models";
-import {TabManagerToken, DirectoryExplorerToken} from "../../interfaces";
+import {ExecutionError, AppExecution, StepExecution} from "../../models";
+import {FileOpenerToken, DirectoryExplorerToken} from "../../interfaces";
+import {ExecutionDurationPipe} from "../../pipes/execution-duration.pipe";
 
 const statusPanelDefualts = {
     component: ExecutionStatusComponent,
     moduleMetadata: {
         imports: [MomentModule],
+        declarations: [ExecutionDurationPipe],
+        providers: [
+            {
+                provide: DirectoryExplorerToken, useValue: {
+                    explore: () => void 0
+                }
+            },
+            {
+                provide: FileOpenerToken, useValue: {
+                    open: () => void 0
+                }
+            }
+        ]
     }
 };
 
@@ -20,66 +33,41 @@ storiesOf("Execution Status Panel", module)
             appID: "test-app-id",
         } as Partial<ExecutionStatusComponent>
     }))
-    .add("can open directories and tabs", () => ({
-        component: ExecutionStatusComponent,
-        moduleMetadata: {
-            imports: [MomentModule],
-            providers: [
-                {
-                    provide: DirectoryExplorerToken, useValue: {
-                        explore: () => {
-                        }
-                    }
-                },
-                {
-                    provide: TabManagerToken, useValue: {}
-                }
-            ]
-
-        }
-
-    }))
-
     .add("step state overview", () => ({
         ...statusPanelDefualts,
         props: {
-            isRunning: true,
-            stepStates: [
-                {id: "step_a", label: "Mike", state: "pending"},
-                {id: "step_b", label: "Bob", state: "started", startTime: Date.now() - 33125},
-                {id: "step_c", label: "Joe", state: "completed", startTime: Date.now() - 43211, endTime: Date.now()},
-                {id: "step_d", label: "Danny", state: "failed"},
-                {id: "step_e", label: "Nick", state: "stopped"},
-                {id: "step_f", label: "Fred", state: "stopped"},
-                {id: "step_g", label: "Joel", state: "stopped"},
-                {id: "step_h", label: "Chris", state: "stopped"},
-                {id: "step_i", label: "Ronald", state: "stopped"},
-                {id: "step_j"},
-                {id: "step_k", state: "stopped"},
-            ]
+            execution: new AppExecution("out", [
+                new StepExecution("step_a", "Mike", "pending"),
+                new StepExecution("step_b", "Bob", "started", Date.now() - 33125),
+                new StepExecution("step_c", "Joe", "completed", Date.now() - 43211, Date.now()),
+                new StepExecution("step_d", "Danny", "failed"),
+                new StepExecution("step_e", "Nick", "stopped"),
+                new StepExecution("step_f", "Fred", "stopped"),
+                new StepExecution("step_g", "Joel", "stopped"),
+                new StepExecution("step_h", "Chris", "stopped"),
+                new StepExecution("step_i", "Ronald", "stopped"),
+                new StepExecution("step_j"),
+                new StepExecution("step_k", "Step K", "stopped"),
+            ])
         } as Partial<ExecutionStatusComponent>
     }))
 
     .add("execution error", () => ({
         ...statusPanelDefualts,
         props: {
-            isRunning: true,
-            stepStates: [
-                {id: "step_a", label: "Step A", state: "completed"},
-                {id: "step_b", label: "Step B", state: "failed"}
-            ],
-            error: new ExecutionError(127, "This is an error message")
+            execution: new AppExecution("outdir", [
+                new StepExecution("step_a", "Step A", "completed"),
+                new StepExecution("step_b", "Step B", "failed"),
+            ], new ExecutionError(127, "Docker is missing", "requirement"), "failed")
         } as Partial<ExecutionStatusComponent>
     }))
 
     .add("step execution failed", () => ({
         ...statusPanelDefualts,
         props: {
-            isRunning: false,
-            stepStates: [
-                {id: "step_a", label: "Step A", state: "completed"},
-                {id: "step_b", label: "Step B", state: "failed"}
-            ],
-            error: new ExecutionError(1, "Some step failed", "execution")
+            execution: new AppExecution("outdir", [
+                new StepExecution("step_a", "Step A", "completed"),
+                new StepExecution("step_b", "Step B", "failed"),
+            ], new ExecutionError(1, "Some step failed", "execution"), "failed")
         }
     }));

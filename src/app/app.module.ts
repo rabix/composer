@@ -27,10 +27,10 @@ import {OpenExternalFileService} from "./core/open-external-file/open-external-f
 import {ExportAppService} from "./services/export-app/export-app.service";
 import {StoreModule} from "@ngrx/store";
 import {EffectsModule} from "@ngrx/effects";
-import {TabManagerToken, DirectoryExplorerToken} from "./execution/interfaces";
+import {FileOpenerToken, DirectoryExplorerToken} from "./execution/interfaces";
 import {NativeSystemService} from "./native/system/native-system.service";
 import {WorkboxService} from "./core/workbox/workbox.service";
-import {directoryExplorerFactory, tabManagerFactory} from "./factories/execution";
+import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution";
 
 @NgModule({
     providers: [
@@ -60,8 +60,8 @@ import {directoryExplorerFactory, tabManagerFactory} from "./factories/execution
             deps: [NativeSystemService]
         },
         {
-            provide: TabManagerToken,
-            useFactory: tabManagerFactory,
+            provide: FileOpenerToken,
+            useFactory: fileOpenerFactory,
             deps: [WorkboxService]
         }
     ],

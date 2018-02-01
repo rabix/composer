@@ -101,7 +101,6 @@ export class ExecutorOutputParser {
         if (match) {
             const [, stepID, rest, stateMatch] = match;
 
-
             let status: ExecutionState = "failed";
 
             if (stateMatch === "has completed") {

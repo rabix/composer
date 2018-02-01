@@ -78,7 +78,7 @@ export class JobImportExportComponent implements OnInit, OnChanges {
                         Yaml.safeLoad(control.value, {json: true} as LoadOptions);
                         resolve(null);
                     } catch (ex) {
-                        resolve({parse: ex.message})
+                        resolve({parse: ex.message});
                     }
                 });
 

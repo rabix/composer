@@ -290,7 +290,7 @@ export class WorkboxService {
             }
         }, data) as TabData<any>;
 
-        if (id.endsWith(".json")) {
+        if (id.endsWith(".json") && !data.language) {
             tab.data.language = "json";
         }
 

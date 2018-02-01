@@ -8,7 +8,7 @@ export const appSelector = (appID: string) => {
         }
 
         return state.execution.progress[appID] || {};
-    }
+    };
 };
 
 

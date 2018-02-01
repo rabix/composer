@@ -18,13 +18,13 @@ export class StepExecution {
 
 
     constructor(id: string,
-                label: string,
+                label?: string,
                 state: ExecutionState = "pending",
                 startTime?: number,
                 endTime?: number) {
 
         this.id        = id;
-        this.label     = label;
+        this.label     = label || id;
         this.state     = state;
         this.startTime = startTime;
         this.endTime   = endTime;

@@ -1,5 +1,4 @@
-import {DirectoryExplorer, TabManager} from "../execution/interfaces";
-import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
+import {DirectoryExplorer, FileOpener} from "../execution/interfaces";
 import {NativeSystemService} from "../native/system/native-system.service";
 import {WorkboxService} from "../core/workbox/workbox.service";
 
@@ -11,13 +10,20 @@ export const directoryExplorerFactory = (native: NativeSystemService) => {
     } as DirectoryExplorer;
 };
 
-export const tabManagerFactory = (workspace: WorkboxService) => {
+export const fileOpenerFactory: (ws: WorkboxService) => FileOpener = (workspace: WorkboxService) => {
     return {
-        getOrCreate(tab: TabData<any>) {
-            return workspace.getOrCreateAppTab(tab);
-        },
-        open(tab: TabData<any>) {
+        open(path: string, language: string) {
+
+            const tab = workspace.getOrCreateAppTab({
+                id: path,
+                label: path,
+                type: "Code",
+                isWritable: false,
+                language: language,
+            });
+
             workspace.openTab(tab, false, true, true);
-        }
-    } as TabManager;
+        },
+
+    };
 };

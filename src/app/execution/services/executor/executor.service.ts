@@ -31,7 +31,7 @@ export class ExecutorService2 {
 
         let projectSlug;
         let appSlug;
-        let executionDate = [
+        const executionDate = [
             time.getFullYear(),
             time.getMonth() + 1,
             time.getDate(),
@@ -52,15 +52,13 @@ export class ExecutorService2 {
             [, projectSlug, appSlug] = appID.split("/");
         }
 
-        const fullPath = [
+        return [
             base,
             user,
             projectSlug,
             appSlug,
             executionDate
         ].filter(v => v).join(path.sep);
-
-        return fullPath;
 
     }
 
@@ -150,7 +148,7 @@ export class ExecutorService2 {
                     }
 
 
-                    obs.error(new Error(`Execution failed with exit code ${code}.`))
+                    obs.error(new Error(`Execution failed with exit code ${code}.`));
                 });
 
                 process.on("error", (err: any) => {
@@ -187,7 +185,7 @@ export class ExecutorService2 {
                 }
                 obs.complete();
 
-            }
+            };
 
         });
 
