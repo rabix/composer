@@ -14,16 +14,15 @@ import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-
             <div class="background-logo"></div>
 
             <div class="content">
-                <p class="welcome-text">The Rabix Composer is a standalone integrated development
-                    environment for workflow
-                    description languages that enables rapid workflow composition, testing, and
-                    integration
+                <p class="welcome-text">
+                    The Rabix Composer is a local development environment for workflow description languages
+                    which enables rapid workflow composition, testing, and integration
                     with online services like DockerHub.
                     <br/>
                     Visit
                     <a #infoLink href="http://rabix.io" data-test="info-link"
                        (click)="system.openLink(infoLink.href, $event)">rabix.io</a>
-                    for more info.
+                    for more information.
                 </p>
 
                 <h2 class="h5 mt-1">
@@ -34,7 +33,7 @@ import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-
                     <button data-test="connect-to-platform-btn" type="button"
                             (click)="onConnectButtonClick()"
                             class="btn btn-primary">
-                        Connect to Platform
+                        Connect to the Platform
                     </button>
                 </p>
             </div>

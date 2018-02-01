@@ -15,12 +15,15 @@ import {ToolInputListComponent} from "./tool-input-list.component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-state *ngIf="!readonly && !model?.inputs.length"
-                                [hasAction]="true"
-                                [buttonText]="'Add an Input'"
+                <ct-blank-state *ngIf="!readonly && !model?.inputs.length" (buttonClick)="addEntry()"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#input-ports'"
-                                [description]="blankStateDescription"
-                                (buttonClick)="addEntry()">
+                                [hasAction]="true">
+                    <section tc-button-text>Add an Input</section>
+                    <section tc-description>
+                        Create an input port for each input data file or for other variable parameters and options.
+                        Set connections to tool parameters or options which can be specified each time the tool is
+                        executed. Add secondary files to file ports for related index files.
+                    </section>
                 </ct-blank-state>
 
                 <!--List of entries-->
@@ -56,10 +59,6 @@ export class ToolInputsComponent extends DirectiveBase {
 
     @ViewChild(ToolInputListComponent)
     private inputList: ToolInputListComponent;
-
-    blankStateDescription = `The connections to tool parameters or options that can be set each time the tool is executed. Create a port for each
-    input data file and for other variable parameters and options here. Add secondary files to file ports for related index
-    files.`;
 
     addEntry() {
         this.inputList.addEntry();

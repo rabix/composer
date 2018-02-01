@@ -40,7 +40,7 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
 
                         <!--Offer projects so users can choose which to add-->
                         <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
-                            <p>Choose projects to add to the workspace:</p>
+                            <p>Choose projects to add to your workspace:</p>
                             <div>
                                 <ct-auto-complete data-test="add-source-modal-add-project"
                                                   [(ngModel)]="selectedProjects"

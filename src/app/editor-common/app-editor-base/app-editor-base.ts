@@ -281,7 +281,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 } else if (hasCopyOfProperty && !unlocked) {
 
                     const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                    this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {
                         type: "info"
                     });
                     this.isUnlockable = true;
