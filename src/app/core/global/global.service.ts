@@ -30,13 +30,13 @@ export class GlobalService {
 
     reloadPlatformData() {
 
-        const process = this.statusBar.startProcess("Syncing platform data. You might not see up-to-date information while sync is in progress.");
+        const process = this.statusBar.startProcess("Syncing Platform data. You might not see up-to-date information while sync is in progress.");
         this.platformRepository.fetch().subscribe((data) => {
-            this.statusBar.stopProcess(process, "Fetched platform data");
+            this.statusBar.stopProcess(process, "Fetched Platform data");
 
         }, err => {
-            this.notificationBar.showNotification("Cannot sync platform data. " + new ErrorWrapper(err));
-            this.statusBar.stopProcess(process, "Failed to fetch platform data.");
+            this.notificationBar.showNotification("Cannot sync with the Platform.  " + new ErrorWrapper(err));
+            this.statusBar.stopProcess(process, "Failed to fetch Platform data.");
         });
     }
 
@@ -52,7 +52,7 @@ export class GlobalService {
 
         this.checkForPlatformUpdatePromise = new Promise((resolve, reject) => {
 
-            const process = this.statusBar.startProcess("Checking for platform updates...");
+            const process = this.statusBar.startProcess("Checking for Platform updates...");
 
             this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
                 .take(1).subscribe((result: [GitHubRelease, string]) => {

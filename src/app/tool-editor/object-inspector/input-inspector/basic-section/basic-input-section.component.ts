@@ -1,6 +1,6 @@
 import {Observable} from "rxjs/Observable";
 import {
-    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChild, ViewChildren, ViewEncapsulation
+    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
@@ -60,7 +60,7 @@ import {ModalService} from "../../../../ui/modal/modal.service";
             <!--Include in command line -->
             <div class="form-group flex-container"
                  *ngIf="!isType('map') && !!form.controls['isBound']">
-                <label>Include in command line</label>
+                <label>Include in the command line</label>
                 <span class="align-right">
                         <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']"
                                           #includeInCommandLine>
@@ -243,7 +243,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 event.preventDefault();
 
                 this.modal.confirm({
-                    content: `If you turn the "Include in command line" option off, you might loose some input values.\nDo you want to proceed ?`
+                    content: `Turning this option off might cause you to lose some of the values for your inputs.\nDo you want to proceed ?`
                 }).then(() => {
                     baseToggleFnc(event);
                 }, () => {

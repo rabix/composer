@@ -49,7 +49,7 @@ import {GlobalService} from "../../global/global.service";
                                 type="button"
                                 data-test="credentials-modal-get-token-button"
                                 [disabled]="form.get('url').invalid"
-                                (click)="openTokenPage()">Get Token
+                                (click)="openTokenPage()">Access your Token
                         </button>
                     </div>
 
@@ -63,7 +63,7 @@ import {GlobalService} from "../../global/global.service";
 
                     <span class="text-danger" *ngIf="form.get('url').hasError('name')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                            <span>Given platform does not exist.</span>
+                            <span>Given Platform does not exist.</span>
                     </span>
 
                     <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
@@ -73,16 +73,16 @@ import {GlobalService} from "../../global/global.service";
 
                     <span class="text-danger" *ngIf="form.hasError('tokenCheck')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
+                        <span>Token is not valid for the selected Platform. ({{ form.getError("tokenCheck") }})</span>
                     </span>
 
                     <span *ngIf="form.hasError('timeout')" class="text-danger">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Connection timed-out while trying to contact the platform.</span>
+                        <span>Connection timed-out while trying to contact the Platform.</span>
                     </span>
                     <span *ngIf="form.hasError('notfound')" class="text-danger">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Cannot connect to the platform. Are you online?</span>
+                        <span>Cannot connect to the Platform. Are you online?</span>
                     </span>
 
 

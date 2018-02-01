@@ -17,17 +17,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                 <div>
 
-                    <!--Blank Tool Screen-->
-                    <ct-blank-state *ngIf="!readonly && !model.arguments.length"
-                                    [hasAction]="true"
-                                    [buttonText]="'Add an Argument'"
+                    <ct-blank-state *ngIf="!readonly && !model.arguments.length" (buttonClick)="addEntry()"
                                     [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#arguments'"
-                                    [description]="blankStateDescription"
-                                    (buttonClick)="addEntry()">
+                                    [hasAction]="true">
+                        <section tc-button-text>Add an Argument</section>
+                        <section tc-description>
+                            Set arguments such as parameters or options to hard code them for every
+                            execution of a tool. For instance, set the output file name as an argument instead of an
+                            input port to use a fixed output file name.
+                        </section>
                     </ct-blank-state>
 
                     <div *ngIf="readonly && !model.arguments.length" class="text-xs-center">
-                        This tool doesn't specify any arguments
+                        No arguments are specified for this tool
                     </div>
 
                     <!--List Header Row-->
@@ -156,15 +158,12 @@ export class ArgumentListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    blankStateDescription = `Parameters or options that are hard-coded for every execution of the tool. For example, you may 
-    want to use a fixed name for an output file, so the output file name would be an argument not an input port.`;
-
     constructor(public inspector: EditorInspectorService, private modal: ModalService) {
         super();
     }
 
     removeEntry(index) {
-        this.modal.delete("argument").then(() => {
+        this.modal.delete("Argument").then(() => {
 
             if (this.inspector.isInspecting(this.model.arguments[index].loc)) {
                 this.inspector.hide();

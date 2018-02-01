@@ -12,14 +12,14 @@ import {AppEditorBase} from "../../app-editor-base/app-editor-base";
         <!--Indicates that the app is an unlockable copy of another app-->
         <!--Same for T/W-->
         <div *ngIf="host.isReadonly && host.tabData.isWritable" class="tag tag-warning"
-             [ct-tooltip]="'This app is a copy of ' +  host.dataModel.customProps['sbg:copyOf']">
+             [ct-tooltip]="'This app is a read-only copy of ' +  host.dataModel.customProps['sbg:copyOf']">
             Copy
         </div>
 
         <!--Shows the CWL version of the app, same for T/W-->
         <!--Same for T/W-->
         <div *ngIf="host.dataModel" class="tag tag-info"
-             [ct-tooltip]="'The app is described using the displayed version(s) of CWL'">
+             [ct-tooltip]="'This app is described using the displayed version(s) of CWL'">
             {{ host.dataModel.cwlVersion }}
         </div>
 

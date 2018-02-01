@@ -26,7 +26,10 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
             </button>
         </div>
         <div *ngIf="showJob" #jobOutput class="job-preview">{{ job | json }}</div>
-        <div #output class="output">Before executing an analysis, make sure that Docker is running and that you have Java Runtime Environment version 8+ installed. Check here for the progress of your execution.</div>
+        <div #output class="output">
+            Check here for the progress of your execution. Before executing an analysis, make sure that 
+            Docker is running and that you have Java Runtime Environment version 8+ installed.
+        </div>
     `
 })
 

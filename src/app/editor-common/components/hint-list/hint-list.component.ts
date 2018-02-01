@@ -10,16 +10,18 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
     selector: "ct-hint-list",
     template: `
         <!--Blank Tool Screen-->
-        <ct-blank-state *ngIf="!readonly && !model.hints.length"
-                        [hasAction]="true"
-                        [buttonText]="'Add a Hint'"
-                        [description]=[blankStateDescription]
+        <ct-blank-state *ngIf="!readonly && !model.hints.length" (buttonClick)="addEntry()"
                         [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
-                        (buttonClick)="addEntry()">
+                        [hasAction]="true">
+            <section tc-button-text>Add a Hint</section>
+            <section tc-description>
+                Set execution hints and their values, which specify the requirements and preferences for execution.
+                For instance, use hints to specify the type of AWS instance to execute your task.
+            </section>
         </ct-blank-state>
 
         <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
-            This tool doesn't specify any hints
+            No hints are specified for this tool
         </div>
 
         <!--List Header Row-->
@@ -88,9 +90,6 @@ export class HintsComponent implements OnChanges {
 
     @Output()
     update = new EventEmitter();
-
-    blankStateDescription = `Execution hints and their values, which specify
-     execution requirements and suggestions, for example, the AWS instancetype to use.`;
 
     private sub: Subscription;
 

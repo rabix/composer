@@ -16,19 +16,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     }],
     template: `
         <ct-blank-state *ngIf="formControl.enabled && formControl.length === 0" (buttonClick)="addEntry()"
+                        [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#base-command'"
                         [hasAction]="true">
-            <section tc-button-text>Add base command</section>
+            <section tc-button-text>Add Base Command</section>
             <section tc-description>
-                The part of the command that comes before any tool parameters or options. You can also
-                include parameters or options
-                that you want to be fixed for every execution of the tool (provided they can be placed
-                before any variable
-                parameters and options in the command line), or these can be set as arguments below.
+                Set a base command which comes before any tool parameters or options. You can also include parameters or
+                options which remain fixed for every execution of the tool, provided they can be placed before variable
+                parameters and options in the command line. Conversely, you can see these additional parameters or options
+                via arguments below.
             </section>
         </ct-blank-state>
 
-        <div *ngIf="formControl.length === 0" class="text-xs-center">
-            This tool doesn't specify a base command
+        <div *ngIf="!formControl.enabled && formControl.length === 0" class="text-xs-center">
+            No base commands are specified for this tool
         </div>
 
         <ol *ngIf="formControl.length > 0" class="list-unstyled">
@@ -53,7 +53,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <button *ngIf="!readonly && formControl.enabled && formControl.length > 0" type="button"
                 class="btn btn-link add-btn-link no-underline-hover"
                 (click)="addEntry()">
-            <i class="fa fa-plus"></i> Add base command
+            <i class="fa fa-plus"></i> Add Base Command
         </button>
     `,
 })
@@ -112,7 +112,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements Control
     }
 
     removeEntry(index: number): void {
-        this.modal.delete("base command").then(() => {
+        this.modal.delete("Base Command").then(() => {
 
             // Reset the expression's validity
             // @TODO: if this is an ExpressionModel, model won't revalidate when an entry is removed
