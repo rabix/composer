@@ -1,25 +1,29 @@
 import {Action} from "@ngrx/store";
+import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
+import {ExecutorParamsConfig} from "../../../../electron/src/storage/types/executor-config";
 
-export const EXECUTION_PREPARE           = "[App Execution] prepare";
 export const EXECUTION_START             = "[App Execution] start";
+export const EXECUTION_STOP              = "[App Execution] stop";
+export const EXECUTION_PREPARED          = "[App Execution] prepared";
+export const EXECUTION_STARTED           = "[App Execution] started";
 export const EXECUTION_ERROR             = "[App Execution] error";
 export const EXECUTION_REQUIREMENT_ERROR = "[App Execution] requirement error";
-export const EXECUTION_COMPLETE          = "[App Execution] complete";
-export const EXECUTION_STOP              = "[App Execution] stop";
+export const EXECUTION_COMPLETED         = "[App Execution] completed";
+export const EXECUTION_STOPPED           = "[App Execution] stopped";
 export const EXECUTOR_OUTPUT             = "[App Execution] executor output";
-export const EXECUTION_STEP_FAIL         = "[App Execution] step failProcess";
-export const EXECUTION_STEP_START        = "[App Execution] step start";
-export const EXECUTION_STEP_COMPLETE     = "[App Execution] step complete";
+export const EXECUTION_STEP_FAILED       = "[App Execution] step failed";
+export const EXECUTION_STEP_STARTED      = "[App Execution] step started";
+export const EXECUTION_STEP_COMPLETED    = "[App Execution] step completed";
 
-export class ExecutionAction implements Action {
+export abstract class ExecutionAction implements Action {
     readonly type: string;
 
     constructor(public appID: string) {
     }
 }
 
-export class ExecutionPrepareAction extends ExecutionAction {
-    readonly type = EXECUTION_PREPARE;
+export class ExecutionPreparedAction extends ExecutionAction {
+    readonly type = EXECUTION_PREPARED;
 
     constructor(public appID: string,
                 public steps: { id: string, label?: string }[] = [],
@@ -28,8 +32,12 @@ export class ExecutionPrepareAction extends ExecutionAction {
     }
 }
 
-export class ExecutionStartAction extends ExecutionAction {
-    readonly type = EXECUTION_START;
+export class ExecutionStopAction extends ExecutionAction {
+    readonly type = EXECUTION_STOP;
+}
+
+export class ExecutionStartedAction extends ExecutionAction {
+    readonly type = EXECUTION_STARTED;
 }
 
 export class ExecutionErrorAction extends ExecutionAction {
@@ -49,19 +57,19 @@ export class ExecutionRequirementErrorAction extends ExecutionAction {
     }
 }
 
-export class ExecutionCompleteAction extends ExecutionAction {
-    readonly type = EXECUTION_COMPLETE;
+export class ExecutionCompletedAction extends ExecutionAction {
+    readonly type = EXECUTION_COMPLETED;
 }
 
-export class ExecutionStopAction extends ExecutionAction {
-    readonly type = EXECUTION_STOP;
+export class ExecutionStoppedAction extends ExecutionAction {
+    readonly type = EXECUTION_STOPPED;
 }
 
-export class ExecutorOutputAction {
+export class ExecutorOutputAction extends ExecutionAction {
     readonly type = EXECUTOR_OUTPUT;
 
     constructor(public appID: string, public source: string, public message: string) {
-
+        super(appID);
     }
 }
 
@@ -73,15 +81,14 @@ export abstract class ExecutionStepAction implements Action {
     }
 }
 
-export class ExecutionStepFailAction extends ExecutionStepAction {
-    readonly type = EXECUTION_STEP_FAIL;
+export class ExecutionStepFailedAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_FAILED;
 }
 
-export class ExecutionStepStartAction extends ExecutionStepAction {
-    readonly type = EXECUTION_STEP_START;
+export class ExecutionStepStartedAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_STARTED;
 }
 
-export class ExecutionStepCompleteAction extends ExecutionStepAction {
-    readonly type = EXECUTION_STEP_COMPLETE;
+export class ExecutionStepCompletedAction extends ExecutionStepAction {
+    readonly type = EXECUTION_STEP_COMPLETED;
 }
-

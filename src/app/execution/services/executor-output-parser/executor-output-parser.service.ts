@@ -4,9 +4,9 @@ import {Observable} from "rxjs/Observable";
 import {
     EXECUTOR_OUTPUT,
     ExecutorOutputAction,
-    ExecutionStepFailAction,
-    ExecutionStepCompleteAction,
-    ExecutionStepStartAction
+    ExecutionStepFailedAction,
+    ExecutionStepCompletedAction,
+    ExecutionStepStartedAction
 } from "../../actions/execution.actions";
 import {Action} from "@ngrx/store";
 import {ExecutionState} from "../../models";
@@ -42,13 +42,13 @@ export class ExecutorOutputParser {
                 switch (state as ExecutionState) {
 
                     case "failed":
-                        return Observable.of(new ExecutionStepFailAction(appID, stepID));
+                        return Observable.of(new ExecutionStepFailedAction(appID, stepID));
 
                     case "completed":
-                        return Observable.of(new ExecutionStepCompleteAction(appID, stepID));
+                        return Observable.of(new ExecutionStepCompletedAction(appID, stepID));
 
                     case "started":
-                        return Observable.of(new ExecutionStepStartAction(appID, stepID));
+                        return Observable.of(new ExecutionStepStartedAction(appID, stepID));
 
                     default:
                         return Observable.empty();

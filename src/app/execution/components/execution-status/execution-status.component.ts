@@ -1,8 +1,11 @@
-import {Component, EventEmitter, Input, Output, SimpleChanges, Optional as DIOptional, Inject, OnChanges} from "@angular/core";
+import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges} from "@angular/core";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppExecution, ExecutionState} from "../../models";
 import {DirectoryExplorerToken, DirectoryExplorer, FileOpenerToken, FileOpener} from "../../interfaces";
 import {Optional} from "../../utilities/types";
+import {Store} from "@ngrx/store";
+import {AppState} from "../../reducers";
+import {ExecutionStopAction} from "../../actions/execution.actions";
 
 @Component({
     selector: "ct-execution-status",
@@ -13,13 +16,6 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
     @Input()
     appID: string;
-
-    /**
-     * TODO: Should emit an action that stops execution
-     * @deprecated
-     */
-    @Output()
-    stopExecution = new EventEmitter<any>();
 
     @Input()
     execution: Optional<Partial<AppExecution>>;
@@ -34,7 +30,8 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
     isRunning = false;
 
-    constructor(@DIOptional() @Inject(DirectoryExplorerToken) directoryExplorer: DirectoryExplorer,
+    constructor(private store: Store<AppState>,
+                @DIOptional() @Inject(DirectoryExplorerToken) directoryExplorer: DirectoryExplorer,
                 @DIOptional() @Inject(FileOpenerToken) fileOpener: FileOpener) {
         super();
 
@@ -59,6 +56,10 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
         this.fileOpener.open(filePath, language);
 
+    }
+
+    stopExecution() {
+        this.store.dispatch(new ExecutionStopAction(this.appID));
     }
 
     private getJobFilePath(): Optional<string> {

@@ -1,14 +1,14 @@
 import {reducer} from "./progress.reducer";
 import {TabCloseAction} from "../../core/actions/core.actions";
 import {
-    ExecutionPrepareAction,
-    ExecutionCompleteAction,
-    ExecutionStartAction,
+    ExecutionPreparedAction,
+    ExecutionCompletedAction,
+    ExecutionStartedAction,
     ExecutionErrorAction,
-    ExecutionStopAction,
-    ExecutionStepStartAction,
-    ExecutionStepCompleteAction,
-    ExecutionStepFailAction
+    ExecutionStoppedAction,
+    ExecutionStepStartedAction,
+    ExecutionStepCompletedAction,
+    ExecutionStepFailedAction
 } from "../actions/execution.actions";
 import {AppExecution, StepExecution} from "../models";
 import objectContaining = jasmine.objectContaining;
@@ -34,7 +34,7 @@ describe("Execution module", () => {
 
             it("should create an execution state object upon receiving a preparation event", () => {
 
-                const action = new ExecutionPrepareAction("myApp", [
+                const action = new ExecutionPreparedAction("myApp", [
                     {id: "step_a", label: "Step A"},
                     {id: "step_b", label: "Step B"}
                 ], "/my/outdir");
@@ -77,13 +77,13 @@ describe("Execution module", () => {
                 const stepID = "test-step-id";
 
                 const state = [
-                    new ExecutionStartAction(appID),
-                    new ExecutionStepStartAction(appID, stepID),
-                    new ExecutionStepCompleteAction(appID, stepID),
-                    new ExecutionStepFailAction(appID, stepID),
-                    new ExecutionCompleteAction(appID),
+                    new ExecutionStartedAction(appID),
+                    new ExecutionStepStartedAction(appID, stepID),
+                    new ExecutionStepCompletedAction(appID, stepID),
+                    new ExecutionStepFailedAction(appID, stepID),
+                    new ExecutionCompletedAction(appID),
                     new ExecutionErrorAction(appID, 1),
-                    new ExecutionStopAction(appID)
+                    new ExecutionStoppedAction(appID)
                 ].reduce(reducer, {});
 
                 expect(Object.getOwnPropertyNames(state).length).toBe(0);

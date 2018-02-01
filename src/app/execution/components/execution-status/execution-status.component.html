@@ -2,7 +2,7 @@
 
     <!--Stop Execution Button-->
     <button class="btn btn-secondary" type="button" ct-tooltip="Stop Execution"
-            (click)="stopExecution.emit()"
+            (click)="stopExecution()"
             [class.text-danger]="execution && isRunning"
             [disabled]="!isRunning">
         <i class="fa fa-square fa-fw"></i>

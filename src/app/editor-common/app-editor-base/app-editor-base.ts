@@ -41,6 +41,8 @@ import {Store} from "@ngrx/store";
 import {ExecutorService} from "../../executor-service/executor.service";
 import {ExecutorService2} from "../../execution/services/executor/executor.service";
 import {AuthService} from "../../auth/auth.service";
+import {ExecutionStopAction} from "../../execution/actions/execution.actions";
+import {switchMap, flatMap, finalize, catchError} from "rxjs/operators";
 
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
@@ -114,12 +116,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
-
-    /**
-     * Used to emit signals that should stop app execution, if it's running.
-     * It is used a breaking emit, so anything can be pushed through it.
-     */
-    private executionStop = new Subject<any>();
 
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
@@ -774,45 +770,26 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private bindExecutionQueue() {
 
-        // When a new execution is in the line, run it
-        this.executionQueue
+        this.executionQueue.pipe(
+            switchMap(() => this.runOnExecutor().pipe(
+                finalize(() => this.isExecuting = false),
+                catchError(() => Observable.empty())
+            ))
+        ).subscribeTracked(this, () => void 0);
 
-        // Switch so the execution gets cancelled when new one is scheduled
-            .switchMap(() => {
-
-                // Starts the execution process
-                return this.runOnExecutor()
-
-                // Messages will be coming in but we need to unsubscribe at some point, so wait for the execution stream to emit
-                    .takeUntil(this.executionStop)
-
-                    // When done, turn off the UI flag
-                    .finally(() => {
-                        this.isExecuting = false;
-                    })
-
-                    // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
-                    .catch(err => {
-                        return Observable.empty();
-                    });
+        this.executionQueue.pipe(
+            flatMap(() => {
+                const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
+                return metaManager.getAppMeta("job").take(1);
             })
-            .subscribeTracked(this, () => {
-            });
-
-        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
-        this.executionQueue.flatMap(() => {
-            const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
-            return metaManager.getAppMeta("job").take(1);
-        }).subscribeTracked(this, job => {
-
+        ).subscribeTracked(this, () => {
             this.toggleReport("execution", true);
-
             this.isExecuting = true;
         });
     }
 
     stopExecution() {
-        this.executionStop.next(1);
+        this.store.dispatch(new ExecutionStopAction(this.tabData.id));
     }
 
     private runOnExecutor(): Observable<string | Object> {

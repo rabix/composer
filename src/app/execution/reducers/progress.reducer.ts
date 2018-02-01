@@ -1,19 +1,19 @@
 import {
-    ExecutionStartAction,
-    EXECUTION_COMPLETE,
-    ExecutionCompleteAction,
+    ExecutionStartedAction,
+    EXECUTION_COMPLETED,
+    ExecutionCompletedAction,
     EXECUTION_ERROR,
     ExecutionErrorAction,
-    EXECUTION_STOP,
+    EXECUTION_STOPPED,
     EXECUTION_REQUIREMENT_ERROR,
     ExecutionRequirementErrorAction,
-    EXECUTION_STEP_START,
-    EXECUTION_STEP_FAIL,
-    EXECUTION_STEP_COMPLETE,
-    ExecutionStepFailAction,
-    EXECUTION_PREPARE,
-    ExecutionPrepareAction,
-    EXECUTION_START
+    EXECUTION_STEP_STARTED,
+    EXECUTION_STEP_FAILED,
+    EXECUTION_STEP_COMPLETED,
+    ExecutionStepFailedAction,
+    EXECUTION_PREPARED,
+    ExecutionPreparedAction,
+    EXECUTION_STARTED
 } from "../actions/execution.actions";
 import {ProgressState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
@@ -43,9 +43,9 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return stateUpdate;
         }
 
-        case EXECUTION_PREPARE: {
+        case EXECUTION_PREPARED: {
 
-            const {steps, appID, outDirPath} = action as Partial<ExecutionPrepareAction>;
+            const {steps, appID, outDirPath} = action as Partial<ExecutionPreparedAction>;
 
             const stepExecution = steps.map(step => new StepExecution(step.id, step.label));
             const app           = new AppExecution(outDirPath, stepExecution);
@@ -53,9 +53,9 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app};
         }
 
-        case EXECUTION_START: {
+        case EXECUTION_STARTED: {
 
-            const {appID} = action as Partial<ExecutionStartAction>;
+            const {appID} = action as Partial<ExecutionStartedAction>;
             const app     = state[appID];
 
             if (!app) {
@@ -65,9 +65,9 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app.start()};
         }
 
-        case EXECUTION_COMPLETE: {
+        case EXECUTION_COMPLETED: {
 
-            const {appID} = action as Partial<ExecutionCompleteAction>;
+            const {appID} = action as Partial<ExecutionCompletedAction>;
             const app     = state[appID];
             if (!app) {
                 return state;
@@ -98,7 +98,7 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app.failProcess(new ExecutionError(1, message, "requirement"))};
         }
 
-        case EXECUTION_STOP: {
+        case EXECUTION_STOPPED: {
 
             const {appID} = action as Partial<ExecutionErrorAction>;
 
@@ -111,10 +111,10 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app.stop()};
         }
 
-        case EXECUTION_STEP_START:
-        case EXECUTION_STEP_FAIL:
-        case EXECUTION_STEP_COMPLETE: {
-            const {appID, stepID} = action as Partial<ExecutionStepFailAction>;
+        case EXECUTION_STEP_STARTED:
+        case EXECUTION_STEP_FAILED:
+        case EXECUTION_STEP_COMPLETED: {
+            const {appID, stepID} = action as Partial<ExecutionStepFailedAction>;
 
             const app = state[appID];
 
@@ -127,11 +127,11 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
                     if (step.id === stepID) {
 
                         let state: ExecutionState;
-                        if (action.type === EXECUTION_STEP_START) {
+                        if (action.type === EXECUTION_STEP_STARTED) {
                             state = "started";
-                        } else if (action.type === EXECUTION_STEP_COMPLETE) {
+                        } else if (action.type === EXECUTION_STEP_COMPLETED) {
                             state = "completed";
-                        } else if (action.type === EXECUTION_STEP_FAIL) {
+                        } else if (action.type === EXECUTION_STEP_FAILED) {
                             state = "failed";
                         }
 

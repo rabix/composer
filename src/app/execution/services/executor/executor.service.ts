@@ -5,15 +5,19 @@ import {Injectable} from "@angular/core";
 import {Store} from "@ngrx/store";
 import {
     ExecutorOutputAction,
-    ExecutionCompleteAction,
+    ExecutionCompletedAction,
     ExecutionErrorAction,
-    ExecutionStopAction,
+    ExecutionStoppedAction,
     ExecutionRequirementErrorAction,
-    ExecutionPrepareAction,
-    ExecutionStartAction
+    ExecutionPreparedAction,
+    ExecutionStartedAction,
+    EXECUTION_STOP,
+    ExecutionStopAction
 } from "../../actions/execution.actions";
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
+import {Actions} from "@ngrx/effects";
+import {filter} from "rxjs/operators";
 
 const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
 const path            = window["require"]("path");
@@ -21,8 +25,7 @@ const path            = window["require"]("path");
 @Injectable()
 export class ExecutorService2 {
 
-    constructor(private store: Store<any>) {
-
+    constructor(private store: Store<any>, private actions: Actions) {
     }
 
     makeOutputDirectoryName(rootDir, appID, user = "local", time = new Date()) {
@@ -89,16 +92,18 @@ export class ExecutorService2 {
         return Observable.create((obs: Observer<any>) => {
 
             let execution;
-            let isPrematureStop = true;
 
-            this.store.dispatch(new ExecutionPrepareAction(
+            /** Flag used to throw a stop action if we unsubscribe from this while execution is in progress */
+            let processStillRunning = true;
+
+            this.store.dispatch(new ExecutionPreparedAction(
                 appID,
                 stepList,
                 executionParams.outDir
             ));
 
             const startRunner = executor.execute(content, jobValue, executionParams).catch(ex => {
-                isPrematureStop = false;
+                processStillRunning = false;
                 throw ex;
             });
 
@@ -108,7 +113,7 @@ export class ExecutorService2 {
                     return;
                 }
 
-                this.store.dispatch(new ExecutionStartAction(appID));
+                this.store.dispatch(new ExecutionStartedAction(appID));
 
                 execution = runner;
 
@@ -117,7 +122,7 @@ export class ExecutorService2 {
                 obs.next(execution.getCommandLineString());
 
                 process.on("exit", (code, sig) => {
-                    isPrematureStop = false;
+                    processStillRunning = false;
 
                     /** Successful completion if exit code is 0 */
                     const isCompleted = code === 0;
@@ -130,7 +135,7 @@ export class ExecutorService2 {
 
 
                     if (isCompleted) {
-                        this.store.dispatch(new ExecutionCompleteAction(appID));
+                        this.store.dispatch(new ExecutionCompletedAction(appID));
                         obs.complete();
                         return;
 
@@ -173,22 +178,24 @@ export class ExecutorService2 {
                 obs.error(new Error(ex));
             });
 
-            /** @name executionUnsubscribe */
-            return () => {
-
-                if (isPrematureStop) {
-                    this.store.dispatch(new ExecutionStopAction(appID));
+            const cleanup = () => {
+                if (processStillRunning) {
+                    this.store.dispatch(new ExecutionStoppedAction(appID));
                 }
 
                 if (execution) {
                     execution.kill();
                 }
                 obs.complete();
-
             };
 
-        });
+            this.actions.ofType(EXECUTION_STOP).pipe(
+                filter((action: ExecutionStopAction) => action.appID === appID)
+            ).take(1).subscribe(() => cleanup());
 
+            /** @name executionUnsubscribe */
+            return () => cleanup();
+        });
     }
 
     private serialize(model: WorkflowModel | CommandLineToolModel): string {
