@@ -1,8 +1,5 @@
 import {Action} from "@ngrx/store";
-import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
-import {ExecutorParamsConfig} from "../../../../electron/src/storage/types/executor-config";
 
-export const EXECUTION_START             = "[App Execution] start";
 export const EXECUTION_STOP              = "[App Execution] stop";
 export const EXECUTION_PREPARED          = "[App Execution] prepared";
 export const EXECUTION_STARTED           = "[App Execution] started";
