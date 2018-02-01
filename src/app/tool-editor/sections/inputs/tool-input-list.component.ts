@@ -18,7 +18,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
-                This tool doesn't specify any inputs
+                No inputs are specified for this tool
             </div>
 
             <!--List Header Row-->

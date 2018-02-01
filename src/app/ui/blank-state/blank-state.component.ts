@@ -36,7 +36,6 @@ import {SystemService} from "../../platform-providers/system.service";
 
             <div class="row text-xs-center mb-1" *ngIf="learnMoreURL">
                 <div class="col-xs-12">
-                    or
                     <a #link [href]="learnMoreURL" class="clickable nav-link" data-test="learn-more-link"
                        (click)="$event.preventDefault(); system.openLink(link.href)">
                         Learn More

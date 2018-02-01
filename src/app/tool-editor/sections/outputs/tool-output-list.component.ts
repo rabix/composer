@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, Output, QueryList, TemplateRef, ViewChildren} from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../../lib/utils.lib";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
@@ -18,7 +17,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-blank-state>
 
             <div *ngIf="readonly && !entries.length" class="text-xs-center">
-                This tool doesn't specify any outputs
+                No outputs are specified for this tool
             </div>
 
             <!--List Header Row-->

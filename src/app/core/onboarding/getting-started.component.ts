@@ -19,19 +19,19 @@ import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-fee
                 <p class="subtitle">Before you start building</p>
 
                 <p>
-                    Learn how to set up your workspace by
+                    Learn how to
                     <a #localWorkspaceLink
                        href="http://docs.rabix.io/rabix-composer-configuration#add-a-local-workspace"
                        (click)="system.openLink(localWorkspaceLink.href, $event)"
                        data-test="local-workspace-link">
-                        adding a local workspace
+                        add a local workspace
                     </a>
                     and
                     <a #connectingPlatformLink
                        href="http://docs.rabix.io/rabix-composer-configuration#connect-a-platform-account"
                        (click)="system.openLink(connectingPlatformLink.href, $event)"
                        data-test="connecting-platform-link">
-                        connecting your Platform account.
+                        connect your Platform account.
                     </a>
                 </p>
             </div>

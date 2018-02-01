@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
-import {ExternalLinks} from "../../../cwl/external-links";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ToolOutputListComponent} from "./tool-output-list.component";
 
@@ -15,13 +14,15 @@ import {ToolOutputListComponent} from "./tool-output-list.component";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-state *ngIf="!readonly && !model?.outputs.length"
-                                [hasAction]="true"
-                                [buttonText]="'Add an Output'"
+                <ct-blank-state *ngIf="!readonly && !model?.outputs.length" (buttonClick)="addEntry()"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#output-ports'"
-                                [description]="blankStateDescription"
-                                (buttonClick)="addEntry()">
-
+                                [hasAction]="true">
+                    <section tc-button-text>Add an Output</section>
+                    <section tc-description>
+                        Create an output port for each output file and data item. You can also create output ports for
+                        intermediate files if you need to save them for later. List the index files a tool creates under
+                        secondary files for outputs.
+                    </section>
                 </ct-blank-state>
 
                 <!--List of entries-->
@@ -66,9 +67,6 @@ export class ToolOutputsComponent extends DirectiveBase {
     readonly update = new EventEmitter();
 
     @ViewChild(ToolOutputListComponent) outputList: ToolOutputListComponent;
-
-    blankStateDescription = `The connections to tool outputs. Create an output port for each output file and data item,
-     and also intermediate files if they need to be saved for later. Add secondary files to file ports for related index files.`;
 
     addEntry() {
         this.outputList.addEntry();
