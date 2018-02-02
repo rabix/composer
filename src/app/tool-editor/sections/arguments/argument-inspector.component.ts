@@ -172,7 +172,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit,
             event.preventDefault();
 
             this.modal.confirm({
-                content: `If you toggle "Use command line binding" option, you might loose some argument values.\nDo you want to proceed?`
+                content: `Turning this option on or off might cause you to lose some of the values for your arguments.\nDo you want to proceed?`
             }).then(() => {
                 baseToggleFnc(event);
             }, () => {

@@ -306,4 +306,11 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
         inputFormField.setValue(input.type.type === "array" ? [value] : value);
     }
+
+    isFileOrDirectory(input: WorkflowStepInputModel) {
+        const type = input.type.type;
+        const itemsType = input.type.items;
+
+        return type === "File" || type === "Directory" || itemsType === "File" || itemsType === "Directory";
+    }
 }

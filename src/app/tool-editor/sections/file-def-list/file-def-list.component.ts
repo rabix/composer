@@ -17,15 +17,18 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length"
-                                [hasAction]="true"
-                                [buttonText]="'Create a file'"
+                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addEntry()"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
-                                [description]="blankStateDescription"
-                                (buttonClick)="addDirent()">
+                                [hasAction]="true">
+                    <section tc-button-text>Create a File</section>
+                    <section tc-description>
+                        Set config files or temporary files needed for the tool to execute properly if these files
+                        are not already present in the Docker container. These files will be created in the tool’s
+                        working directory from the text content you specify here.
+                    </section>
 
                     <section tc-content *ngIf="!isSBDraft2">
-                        
+
                         <!--In case that tool is not draft2 then show dropdown for adding items-->
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
                             <button class="btn btn-primary" data-test="file-requirement-add-button" type="button" (click)="addItemDropDown.toggleMenu()">
@@ -46,11 +49,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             </ul>
                         </ng-template>
                     </section>
-
                 </ct-blank-state>
 
                 <div *ngIf="readonly && !fileRequirement.listing?.length" class="text-xs-center ">
-                    This tool doesn't create any file requirements
+                    No file requirements are specified for this tool
                 </div>
 
                 <!--FileDef List Entries-->
@@ -186,10 +188,6 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
     isSBDraft2;
-
-    blankStateDescription = `Any config or temporary files the tool expects to be present when it executes,
-     that aren’t already present in the Docker container. These files will be created in the tool’s working directory
-      from the text content you specify here.`;
 
     constructor(public inspector: EditorInspectorService, private modal: ModalService, private cdr: ChangeDetectorRef) {
         super();
