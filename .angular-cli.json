@@ -31,7 +31,6 @@
                     "output": "./"
                 }
             ],
-            "deployUrl": "",
             "index": "index.html",
             "main": "main.ts",
             "polyfills": "polyfills.ts",
