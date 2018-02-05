@@ -153,8 +153,6 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     ngAfterViewInit() {
 
-        // console.log("Inhjected model", this.appModel);
-
         this.arrayElements.changes.subscribeTracked(this, list => {
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];

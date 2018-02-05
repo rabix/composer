@@ -60,7 +60,7 @@ import {NewFileTabService} from "./new-file-tab.service";
                                                       data-test="recent-apps-list"
                                                       class="pl-1 pr-1 deep-unselectable"
                                                       [id]="entry?.id"
-                                                      [icon]="entry.type === 'Workflow' ? 'fa-share-alt': 'fa-terminal'"
+                                                      [icon]="entry.type === 'Workflow' ? 'fa-share-alt': entry.type === 'CommandLineTool' ? 'fa-terminal': 'fa-file-text-o'"
                                                       [title]="entry?.label"
                                                       [label]="entry?.description"
                                                       (dblclick)="openRecentApp(entry)">

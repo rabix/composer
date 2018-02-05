@@ -10,6 +10,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
+import {Store} from "@ngrx/store";
+import {TabCloseAction} from "../actions/core.actions";
 
 
 @Injectable()
@@ -33,6 +35,7 @@ export class WorkboxService {
                 private dataGateway: DataGatewayService,
                 private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
+                private store: Store<any>,
                 private platformRepository: PlatformRepositoryService) {
 
         // Whenever a user gets changed, we should restore their tabs
@@ -101,7 +104,7 @@ export class WorkboxService {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
+    openTab(tab: TabData<any>, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
 
         const {tabs} = this.extractValues();
 
@@ -177,6 +180,7 @@ export class WorkboxService {
 
         if (tab && tab.data && tab.data.id) {
             this.dataGateway.updateSwap(tab.data.id, null);
+            this.store.dispatch(new TabCloseAction(tab.data.id));
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
@@ -246,14 +250,7 @@ export class WorkboxService {
         this.activeTab.next(tab);
     }
 
-    getOrCreateAppTab<T>(data: {
-        id: string;
-        type: string;
-        label?: string;
-        isWritable?: boolean;
-        language?: string;
-
-    }, forceCreate = false, forceFetch = false): TabData<T> {
+    getOrCreateAppTab<T>(data: TabData<any>, forceCreate = false, forceFetch = false): TabData<T> {
 
         if (!forceCreate) {
             const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
@@ -293,7 +290,7 @@ export class WorkboxService {
             }
         }, data) as TabData<any>;
 
-        if (id.endsWith(".json")) {
+        if (id.endsWith(".json") && !data.language) {
             tab.data.language = "json";
         }
 

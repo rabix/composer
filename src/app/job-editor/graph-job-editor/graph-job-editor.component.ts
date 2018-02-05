@@ -10,9 +10,12 @@ import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {SVGExecutionProgressPlugin} from "../svg-execution-progress-plugin/svg-execution-progress-plugin";
 import {SVGJobFileDropPlugin} from "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
 import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
-import {EditorInspectorService} from "../inspector/editor-inspector.service";
+import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
+import {Store} from "@ngrx/store";
+import {StepExecution} from "../../execution/models";
 
 @Component({
     selector: "ct-graph-job-editor",
@@ -45,8 +48,11 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
     private inspectedInputs = [];
 
     constructor(private inspector: EditorInspectorService,
+                private store: Store<any>,
                 @Inject(APP_META_MANAGER) private metaManager: AppMetaManager) {
         super();
+
+
     }
 
     onNativeBrowserDrop(event) {
@@ -111,6 +117,7 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
     ngAfterViewInit() {
 
+
         this.graph = new WorkflowGraph({
             svgRoot: this.canvas.nativeElement,
             model: this.model as any,
@@ -121,7 +128,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
                 new SVGNodeMovePlugin(),
                 new SVGJobFileDropPlugin(),
                 new SVGArrangePlugin(),
-                new SVGRequiredInputMarkup()
+                new SVGRequiredInputMarkup(),
+                new SVGExecutionProgressPlugin(),
             ]
         });
 
@@ -152,6 +160,12 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
             this.updateJob(storedJob)
         });
+
+        this.store.select("jobEditor", "progress", this.appID, "stepExecution").distinctUntilChanged()
+            .subscribeTracked(this, (states: StepExecution[] = []) => {
+                const update = states.reduce((acc, step) => ({...acc, [step.id]: step.state}), {});
+                this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update)
+            });
     }
 
     private normalizeJob(jobObject: Object) {
@@ -282,5 +296,4 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         }
         this.inspector.hide();
     }
-
 }

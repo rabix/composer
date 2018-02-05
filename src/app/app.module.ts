@@ -1,6 +1,5 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
@@ -26,7 +25,12 @@ import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
-
+import {StoreModule} from "@ngrx/store";
+import {EffectsModule} from "@ngrx/effects";
+import {FileOpenerToken, DirectoryExplorerToken} from "./execution/interfaces";
+import {NativeSystemService} from "./native/system/native-system.service";
+import {WorkboxService} from "./core/workbox/workbox.service";
+import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution";
 
 @NgModule({
     providers: [
@@ -49,7 +53,17 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         PlatformConnectionService,
         PlatformRepositoryService,
         SettingsService,
-        StatusBarService
+        StatusBarService,
+        {
+            provide: DirectoryExplorerToken,
+            useFactory: directoryExplorerFactory,
+            deps: [NativeSystemService]
+        },
+        {
+            provide: FileOpenerToken,
+            useFactory: fileOpenerFactory,
+            deps: [WorkboxService]
+        }
     ],
     declarations: [
         MainComponent,
@@ -57,7 +71,6 @@ import {ExportAppService} from "./services/export-app/export-app.service";
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
         CoreModule,
         ReactiveFormsModule,
         UIModule,
@@ -66,6 +79,9 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         ToolEditorModule,
         WorkflowEditorModule,
         NativeModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot([])
+
     ],
     bootstrap: [MainComponent]
 })

@@ -1,0 +1,89 @@
+<div class="controls">
+
+    <!--Stop Execution Button-->
+    <button class="btn btn-secondary" type="button" ct-tooltip="Stop Execution"
+            (click)="stopExecution()"
+            [class.text-danger]="execution && isRunning"
+            [disabled]="!isRunning">
+        <i class="fa fa-square fa-fw"></i>
+    </button>
+
+    <!--Show Job  Button -->
+    <button *ngIf="fileOpener"
+            type="button" class="btn btn-secondary" ct-tooltip="Open Job File"
+            (click)="fileOpener.open(jobFilePath, 'yaml')"
+            [disabled]="!jobFilePath || error?.type === 'requirement'">
+        <i class="fa fa-indent fa-fw"></i>
+    </button>
+
+    <!--Open Outdir Button-->
+    <button type="button" class="btn btn-secondary" ct-tooltip="Open Output Directory"
+            *ngIf="directoryExplorer"
+            [class.text-info]="execution?.state === 'completed'"
+            [disabled]="!execution?.outdir || execution?.error?.type === 'requirement'"
+            (click)="directoryExplorer.explore(execution?.outdir)">
+        <i class="fa fa-folder-open fa-fw"></i>
+    </button>
+
+
+    <!--Open Error Log Button-->
+    <button *ngIf="fileOpener"
+            type="button" class="btn btn-secondary" ct-tooltip="Open Error Log"
+            [class.text-warning]="execution?.state === 'failed'"
+            (click)="fileOpener.open(errorLogPath, 'apache_conf')"
+            [disabled]="!errorLogPath || execution?.error?.type === 'requirement'">
+        <i class="fa fa-exclamation-circle fa-fw"></i>
+    </button>
+
+
+</div>
+
+<div class="status">
+    <div *ngIf="!execution?.stepExecution" #output class="p-1">
+        Check here for the progress of your execution.
+        Before executing an analysis, make sure that Docker is running and that you have Java Runtime
+        Environment version 8+ installed.<br/>
+        Check here for the progress of your execution.
+    </div>
+
+
+    <div *ngIf="execution?.error" class="execution-failure">
+        Execution failed with exit code {{ execution?.error.code }}
+    </div>
+
+    <div *ngIf="execution?.error && execution?.error.message" class="p-1">
+        {{ execution?.error.message }}
+    </div>
+
+    <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
+
+        <div *ngFor="let step of execution?.stepExecution"
+             [class.text-error]="step.state === 'failed'"
+             [class.text-info]="step.state === 'started'"
+             [class.text-success]="step.state === 'completed'">
+
+            <i class="fa fa-fw"
+               [class.fa-clock-o]="!step.state || step.state === 'pending'"
+               [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
+               [class.fa-circle-o-notch]="step.state === 'started'"
+               [class.fa-circle-thin]="step.state === 'stopped'"
+               [class.fa-times-circle]="step.state === 'failed'"
+               [class.fa-check-circle]="step.state === 'completed'"></i>
+
+            {{ step?.label || step.id }}
+
+            <span class="text-muted">
+                    {{ step.state }}
+
+                    <ng-container *ngIf="step.state === 'started' && step.startTime">
+                        {{ step.startTime | amTimeAgo:false }}
+                    </ng-container>
+
+                    <ng-container
+                        *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
+                        in {{ (step.endTime - step.startTime) | executionDuration }}
+                    </ng-container>
+                </span>
+        </div>
+    </div>
+</div>

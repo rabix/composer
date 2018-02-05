@@ -1,14 +1,12 @@
-@import "../../../assets/sass/variables";
+@import "../../../../assets/sass/variables";
 
 :host {
     $barWidth: 26px;
+    background: $panel-bg;
 
     display: flex;
     height: 100%;
-    font-family: monospace;
-    background: $layout-section-terminal-background;
     overflow: auto;
-
     flex-direction: row;
 
     .controls {
@@ -25,25 +23,19 @@
             color: #999;
         }
     }
-    .output,
-    .job-preview {
-        overflow: auto;
-        flex: 1;
-        padding: .2em .5em;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-    }
-
-    .job-preview {
-        border-right: 1px solid $layout-section-background;
-        white-space: pre;
-    }
 
     /deep/ .text-error {
         color: $brand-danger;
     }
 
-    /deep/ .outdir-link, .outdir-link:hover {
-        background: $btn-primary-bg !important;
+    .status {
+        width: 100%;
+        overflow: auto;
+    }
+
+    .execution-failure {
+        background: #4f2929;
+        color: white;
+        padding: .5em;
     }
 }

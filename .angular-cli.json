@@ -1,38 +1,41 @@
 {
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "project": {
-        "version": "1.0.0-rc.1",
         "name": "rabix-composer"
     },
     "apps": [
         {
             "root": "src",
             "outDir": "ng-dist",
-            "deployUrl": "",
             "assets": [
                 "assets",
                 "favicon.ico",
                 {
                     "glob": "font-awesome.min.css",
-                    "input": "../node_modules/font-awesome/css",
-                    "output": "css"
+                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/font-awesome/css/",
+                    "output": "css",
+                    "allowOutsideOutDir": false
                 },
                 {
                     "glob": "*",
-                    "input": "../node_modules/font-awesome/fonts",
-                    "output": "fonts"
+                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/font-awesome/fonts/",
+                    "output": "fonts",
+                    "allowOutsideOutDir": false
                 },
                 {
                     "glob": "ajv.min.js",
-                    "input": "../node_modules/ajv/dist/",
-                    "output": "./"
+                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/ajv/dist/",
+                    "output": "./",
+                    "allowOutsideOutDir": false
                 },
                 {
                     "glob": "js-yaml.min.js",
-                    "input": "../node_modules/js-yaml/dist/",
-                    "output": "./"
+                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/js-yaml/dist/",
+                    "output": "./",
+                    "allowOutsideOutDir": false
                 }
             ],
+            "deployUrl": "",
             "index": "index.html",
             "main": "main.ts",
             "polyfills": "polyfills.ts",
@@ -41,10 +44,10 @@
             "testTsconfig": "tsconfig.spec.json",
             "prefix": "ct",
             "styles": [
+                "assets/sass/main.scss",
                 "styles.css"
             ],
-            "scripts": [
-            ],
+            "scripts": [],
             "environmentSource": "environments/environment.ts",
             "environments": {
                 "dev": "environments/environment.ts",
@@ -79,8 +82,8 @@
     "defaults": {
         "styleExt": "scss",
         "component": {
-            "changeDetection": "OnPush",
-            "inlineTemplate": true
+            "inlineTemplate": true,
+            "changeDetection": "OnPush"
         }
     }
 }

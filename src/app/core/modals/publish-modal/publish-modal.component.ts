@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, ChangeDetectorRef} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {SlugifyPipe} from "ngx-pipes";
 import {PlatformAppSavingService} from "../../../editor-common/services/app-saving/platform-app-saving.service";
@@ -103,6 +103,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
     constructor(private dataGateway: DataGatewayService,
                 public modal: ModalService,
+                private cdr: ChangeDetectorRef,
                 private platformRepository: PlatformRepositoryService,
                 private slugify: SlugifyPipe) {
 
@@ -116,7 +117,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
             const {id, project} = group.getRawValue();
 
-            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`;
+            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/0`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
