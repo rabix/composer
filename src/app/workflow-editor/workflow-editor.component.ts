@@ -13,7 +13,7 @@ import {EditorInspectorService} from "../editor-common/inspector/editor-inspecto
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {ExecutorService} from "../executor/executor.service";
+import {ExecutorService} from "../executor-service/executor.service";
 import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../repository/local-repository.service";
@@ -25,6 +25,9 @@ import {WorkflowEditorService} from "./workflow-editor.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
 import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
+import {Store} from "@ngrx/store";
+import {AuthCredentials} from "../auth/model/auth-credentials";
+import {AuthService} from "../auth/auth.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -76,6 +79,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
                 exportApp: ExportAppService,
+                store: Store<any>,
+                auth: AuthService,
                 executorService: ExecutorService) {
         super(
             statusBar,
@@ -92,6 +97,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             fileRepository,
             workbox,
             exportApp,
+            store,
+            auth,
             executorService
         );
 

@@ -13,11 +13,13 @@ import {
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 import * as ace from "brace";
+
 import "brace/ext/language_tools";
 import "brace/ext/searchbox";
+
 import "brace/mode/c_cpp";
 import "brace/mode/html";
-
+import "brace/mode/apache_conf";
 import "brace/mode/java";
 import "brace/mode/javascript";
 import "brace/mode/json";
@@ -30,8 +32,11 @@ import "brace/mode/text";
 import "brace/mode/typescript";
 import "brace/mode/xml";
 import "brace/mode/yaml";
+
 import "brace/theme/chrome";
 import "brace/theme/idle_fingers";
+
+
 import {AceEditorOptions} from "./ace-editor-options";
 import {getModeForPath} from "./modelist";
 
@@ -51,7 +56,7 @@ import {getModeForPath} from "./modelist";
 export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDestroy, OnChanges {
 
     @Input()
-    options: Partial<AceEditorOptions>;
+    options: Partial<AceEditorOptions> = {};
 
     @Input()
     filePath?: string;
@@ -68,36 +73,35 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
     }
 
     ngOnInit() {
-        // Instantiate an editor
 
         // To avoid unnecessary change detection cycle because of mouse and other events that occur on Ace editor
         this.zone.runOutsideAngular(() => {
             this.editor = ace.edit(this.elementRef.nativeElement);
         });
 
+        const mode = this.determineMode(this.options.mode);
+
         this.editor.setOptions(Object.assign({
             theme: "ace/theme/idle_fingers",
-            mode: "ace/mode/text",
             enableBasicAutocompletion: true,
-        } as Partial<AceEditorOptions>, this.options));
+        } as Partial<AceEditorOptions>, this.options, {mode}));
 
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;
 
         // Automatically assign a mode if file path is given
-        if (this.filePath) {
+        if (!this.options.mode && this.filePath) {
             const mode = getModeForPath(this.filePath);
             this.editor.session.setMode(mode.mode);
         }
     }
 
-    ngOnDestroy() {
-        this.editor.destroy();
-    }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes["options"] && !changes["options"].isFirstChange()) {
-            this.editor.setOptions(changes["options"]);
+            const mode = this.determineMode(this.options ? this.options.mode : undefined);
+
+            this.editor.setOptions({...this.options, mode});
         }
     }
 
@@ -141,6 +145,33 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
 
     getEditorInstance(): ace.Editor {
         return this.editor;
+    }
+
+    ngOnDestroy() {
+        this.editor.destroy();
+    }
+
+    private ensureModePrefix(mode?: string): string | undefined {
+        const modePrefix = "ace/mode/";
+
+        if (!mode) {
+            return;
+        }
+
+        if (mode.startsWith(modePrefix)) {
+            return mode;
+        }
+
+        return modePrefix + mode;
+
+    }
+
+    private determineMode(desiredMode: string | undefined): string {
+        if (!desiredMode) {
+            return "ace/mode/text";
+        }
+
+        return this.ensureModePrefix(desiredMode);
     }
 
 }

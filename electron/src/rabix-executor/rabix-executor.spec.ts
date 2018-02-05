@@ -43,7 +43,7 @@ describe("rabix executor runner", function () {
         });
     });
 
-    it("executes a demo app", function (done) {
+    it.skip("executes a demo app", function (done) {
 
         const appPath = path.resolve(__dirname + "/test-resources/hello-world/app.yaml");
         const jobPath = path.resolve(__dirname + "/test-resources/hello-world/app.job.yaml");
@@ -53,25 +53,25 @@ describe("rabix executor runner", function () {
         let lastLog = "";
 
 
-        rabix.execute(app, YAML.safeLoad(job), {
-            noContainer: true,
-            quiet: true
-        },  (err, data) => {
-
-            if (err) {
-                return done(err);
-            }
-
-            if (data === IPC_EOS_MARK) {
-                assert.equal(lastLog, "Done.");
-                const outfileContent = fs.readFileSync(outdir + "/root/my-outfile.txt", "utf8");
-                assert.equal(outfileContent.trim(), "Hello world!");
-
-                done();
-            }
-
-            lastLog = data;
-        });
+        // rabix.execute(app, YAML.safeLoad(job), {
+        //     noContainer: true,
+        //     quiet: true
+        // },  (err, data) => {
+        //
+        //     if (err) {
+        //         return done(err);
+        //     }
+        //
+        //     if (data === IPC_EOS_MARK) {
+        //         assert.equal(lastLog, "Done.");
+        //         const outfileContent = fs.readFileSync(outdir + "/root/my-outfile.txt", "utf8");
+        //         assert.equal(outfileContent.trim(), "Hello world!");
+        //
+        //         done();
+        //     }
+        //
+        //     lastLog = data;
+        // });
 
 
     });

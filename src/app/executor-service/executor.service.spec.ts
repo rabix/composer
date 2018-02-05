@@ -6,7 +6,7 @@ import {IpcService} from "../services/ipc.service";
 
 import {ExecutorService} from "./executor.service";
 
-describe("ExecutorService", () => {
+describe("ExecutorService2", () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [ExecutorService,

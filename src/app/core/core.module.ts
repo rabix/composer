@@ -5,7 +5,7 @@ import {NgStringPipesModule} from "ngx-pipes";
 import {environment} from "../../environments/environment";
 import {AuthModule} from "../auth/auth.module";
 import {EditorCommonModule} from "../editor-common/editor-common.module";
-import {ExecutorService} from "../executor/executor.service";
+import {ExecutorService} from "../executor-service/executor.service";
 import {LayoutModule} from "../layout/layout.module";
 import {NativeModule} from "../native/native.module";
 import {ToolEditorModule} from "../tool-editor/tool-editor.module";

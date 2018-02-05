@@ -602,57 +602,5 @@ export function probeExecutorVersion(data: { path: string }, callback) {
             callback(null, `Version: ${version}`);
         });
     });
-}
 
-export function executeApp(data: {
-    appID: string,
-    content: string,
-    appSource: "local" | "user",
-    options: Object
-    config: Object
-}, callback, emitter) {
-
-    repositoryLoad.then(() => {
-        const {appID, content, appSource, options, config} = data;
-
-        const execConf = repository.local.executorConfig;
-
-        const execPath = execConf.choice === "bundled" ? undefined : execConf.path;
-
-        const rabix = new RabixExecutor(execPath);
-
-        let userID = "local";
-        if (appSource !== "local") {
-            userID = repository.local.activeCredentials.id;
-        }
-
-        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
-
-        let appJob = {};
-
-        const appMeta = repository[appSource].appMeta[appID] as AppMetaEntry;
-        if (appMeta && appMeta.job) {
-            appJob = appMeta.job;
-        }
-
-        new Promise((resolve, reject) => {
-            if (appSource === "local") {
-
-                resolver.resolveContent(content, appID)
-                    .then(obj => {
-                        const stringified = JSON.stringify(obj);
-                        resolve(stringified);
-                    }, reject);
-            } else {
-                resolve(content);
-            }
-
-        }).then((content: string) => {
-
-            rabix.execute(content, appJob, options, callback, emitter);
-
-        }, callback);
-
-
-    })
 }

@@ -17,5 +17,12 @@
             "dom.iterable"
         ],
         "downlevelIteration": true
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "node_modules/@types",
+        "electron",
+        "dist",
+        "spectron"
+    ]
 }

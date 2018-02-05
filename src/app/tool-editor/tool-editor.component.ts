@@ -15,12 +15,12 @@ import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
-import {GraphJobEditorComponent} from "../editor-common/graph-job-editor/graph-job-editor.component";
+import {GraphJobEditorComponent} from "../job-editor/graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
 import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
-import {ExecutorService} from "../executor/executor.service";
+import {ExecutorService} from "../executor-service/executor.service";
 import {NotificationBarService} from "../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../layout/status-bar/status-bar.service";
 import {LocalRepositoryService} from "../repository/local-repository.service";
@@ -30,6 +30,8 @@ import {ModalService} from "../ui/modal/modal.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
 import {Subscription} from "rxjs/Subscription";
 import {ExportAppService} from "../services/export-app/export-app.service";
+import {Store} from "@ngrx/store";
+import {AuthService} from "../auth/auth.service";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -102,6 +104,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
                 exportApp: ExportAppService,
+                store: Store<any>,
+                auth: AuthService,
                 executor: ExecutorService) {
 
         super(
@@ -119,6 +123,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             fileRepository,
             workbox,
             exportApp,
+            store,
+            auth,
             executor,
         );
     }
