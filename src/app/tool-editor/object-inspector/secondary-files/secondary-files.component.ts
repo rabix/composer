@@ -14,7 +14,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
         multi: true
     }],
     template: `
-        <ct-form-panel class="borderless" [collapsed]="true">
+        <ct-form-panel class="borderless" [collapsed]="false">
             <div class="tc-header">Secondary Files</div>
             <div class="tc-body">
                     <ct-blank-state *ngIf="formControl.enabled && formControl.length === 0"

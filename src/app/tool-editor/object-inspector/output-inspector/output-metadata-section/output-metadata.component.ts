@@ -20,7 +20,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
     template: `
         <ct-form-panel
                 *ngIf="output.type.type === 'File' || (output.type.type === 'array' && output.type.items === 'File')"
-                class="borderless" [collapsed]="true">
+                class="borderless" [collapsed]="false">
 
             <div class="tc-header">Metadata</div>
             <div class="tc-body" *ngIf="metadataForm">

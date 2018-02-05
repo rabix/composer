@@ -13,7 +13,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true}
     ],
     template: `
-        <ct-form-panel class="borderless" [collapsed]="true">
+        <ct-form-panel class="borderless" [collapsed]="false">
             <div class="tc-header">Description</div>
             <div class="tc-body" *ngIf="port && form">
 
