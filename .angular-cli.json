@@ -12,30 +12,25 @@
                 "favicon.ico",
                 {
                     "glob": "font-awesome.min.css",
-                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/font-awesome/css/",
-                    "output": "css",
-                    "allowOutsideOutDir": false
+                    "input": "../node_modules/font-awesome/css",
+                    "output": "css"
                 },
                 {
                     "glob": "*",
-                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/font-awesome/fonts/",
-                    "output": "fonts",
-                    "allowOutsideOutDir": false
+                    "input": "../node_modules/font-awesome/fonts",
+                    "output": "fonts"
                 },
                 {
                     "glob": "ajv.min.js",
-                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/ajv/dist/",
-                    "output": "./",
-                    "allowOutsideOutDir": false
+                    "input": "../node_modules/ajv/dist/",
+                    "output": "./"
                 },
                 {
                     "glob": "js-yaml.min.js",
-                    "input": "/Users/ivanbatic/WebstormProjects/cottontail-frontend/node_modules/js-yaml/dist/",
-                    "output": "./",
-                    "allowOutsideOutDir": false
+                    "input": "../node_modules/js-yaml/dist/",
+                    "output": "./"
                 }
             ],
-            "deployUrl": "",
             "index": "index.html",
             "main": "main.ts",
             "polyfills": "polyfills.ts",
