@@ -15,6 +15,8 @@ import {WorkflowStepInspectorTabStep} from "./object-inspector/step-inspector/ta
 import {UpdateStepModalComponent} from "./update-step-modal/update-step-modal.component";
 import {WorkflowEditorComponent} from "./workflow-editor.component";
 import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
+import {JobEditorModule} from "../job-editor/job-editor.module";
+
 
 @NgModule({
     declarations: [
@@ -39,8 +41,9 @@ import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/wor
         BrowserModule,
         CWLModule,
         EditorCommonModule,
-        LayoutModule,
         FormsModule,
+        JobEditorModule,
+        LayoutModule,
         ReactiveFormsModule,
         UIModule,
     ]

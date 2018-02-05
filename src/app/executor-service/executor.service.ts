@@ -33,6 +33,9 @@ export class ExecutorService {
             .switchMap(path => this.ipc.request("probeExecutorVersion"));
     }
 
+    /**
+     * @deprecated
+     */
     run(appID: string, content: string, options = {}): Observable<string> {
 
         const isLocal = AppHelper.isLocal(appID);

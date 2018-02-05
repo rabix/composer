@@ -2,7 +2,7 @@ import {Observable} from "rxjs/Observable";
 import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
-import {ExecutorService} from "../../../executor/executor.service";
+import {ExecutorService} from "../../../executor-service/executor.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";
@@ -24,7 +24,7 @@ import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service
                 <div class="form-group">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" value="bundled" formControlName="choice" name="choice"/>
-                        Bundled (v1.0.3)
+                        Bundled (v1.0.4)
                     </label>
                 </div>
 

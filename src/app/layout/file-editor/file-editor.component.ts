@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnInit, EventEmitter, AfterViewInit, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
@@ -9,6 +9,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {StatusBarService} from "../status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
+import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 
 @Component({
     selector: "ct-file-editor",
@@ -25,9 +26,14 @@ import {ErrorWrapper} from "../../core/helpers/error-wrapper";
                         type="button">
                     <i class="fa fa-fw fa-save"></i>
                 </button>
+
+                <button class="btn btn-secondary btn-sm" tooltipPlacement="bottom" ct-tooltip="Reload"
+                        (click)="reloadContent()">
+                    <i class="fa fa-fw fa-refresh"></i>
+                </button>
             </div>
         </ct-action-bar>
-        
+
         <div class="editor-layout">
             <ct-circular-loader *ngIf="isLoading"></ct-circular-loader>
 
@@ -40,13 +46,14 @@ import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 
             <ct-code-editor
                 *ngIf="!isLoading && !unavailableError"
+                [options]="{mode: tabData.language || null}"
                 [formControl]="fileContent"
                 [filePath]="tabData.id">
             </ct-code-editor>
         </div>
     `
 })
-export class FileEditorComponent extends DirectiveBase implements OnInit {
+export class FileEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
     @Input()
     tabData: AppTabData;
 
@@ -59,6 +66,12 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
 
     isDirty = false;
 
+    @ViewChild(CodeEditorComponent)
+    editor: CodeEditorComponent;
+
+
+    private codeReload = new EventEmitter();
+
     constructor(private dataGateway: DataGatewayService,
                 private codeSwapService: CodeSwapService,
                 private fileRepository: FileRepositoryService,
@@ -68,12 +81,15 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
     }
 
     ngOnInit(): void {
+
+
         // Subscribe editor content to tabData code changes
-        this.tabData.fileContent.subscribeTracked(this, (code: string) => {
+        this.codeReload.startWith(1).switchMap(() => this.tabData.fileContent).subscribeTracked(this, (code: string) => {
             this.isLoading = false;
             this.fileContent.setValue(code);
+            this.setAppDirtyState(false);
         }, (err) => {
-            this.isLoading = false;
+            this.isLoading        = false;
             this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while opening file";
         });
 
@@ -95,9 +111,15 @@ export class FileEditorComponent extends DirectiveBase implements OnInit {
 
     }
 
+    reloadContent() {
+        this.codeSwapService.discardSwapContent().take(1).subscribe(() => {
+            this.codeReload.emit();
+        });
+    }
+
     save() {
         const filename = AppHelper.getBasename(this.tabData.id);
-        const proc = this.status.startProcess(`Saving: ${filename}`);
+        const proc     = this.status.startProcess(`Saving: ${filename}`);
 
         this.fileRepository.saveFile(this.tabData.id, this.fileContent.value).then(() => {
             this.status.stopProcess(proc, `Saved: ${filename}`);

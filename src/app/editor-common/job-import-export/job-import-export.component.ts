@@ -1,6 +1,6 @@
 import {
     Component, EventEmitter, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges,
-    ViewChild
+    ViewChild, ChangeDetectorRef
 } from "@angular/core";
 import {FormControl} from "@angular/forms";
 import * as Yaml from "js-yaml";
@@ -57,6 +57,7 @@ export class JobImportExportComponent implements OnInit, OnChanges {
     constructor(public modal: ModalService,
                 private native: NativeSystemService,
                 private renderer: Renderer2,
+                private cdr: ChangeDetectorRef,
                 private fileRepository: FileRepositoryService) {
     }
 
@@ -64,17 +65,25 @@ export class JobImportExportComponent implements OnInit, OnChanges {
 
         this.jobControl = new FormControl(stringifyObject(this.job, this.exportFormat), [],
             FormAsyncValidator.debounceValidator(control => {
+                // FIXME: omfg
+                // CDR does not enable the “import” button properly when typing in the editor
+                setTimeout(() => {
+                    this.cdr.markForCheck();
+                    this.cdr.detectChanges();
+                }, 10);
+
                 return new Promise(resolve => {
 
                     try {
                         Yaml.safeLoad(control.value, {json: true} as LoadOptions);
                         resolve(null);
                     } catch (ex) {
-                        resolve({parse: ex.message})
+                        resolve({parse: ex.message});
                     }
                 });
 
             }));
+
         if (this.action === "export") {
             this.jobControl.disable();
         }
