@@ -23,7 +23,6 @@ import {map} from "rxjs/operators";
         <!--Common Execution Preview-->
         <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
                              [execution]="appProgressSlice | async"
-                             (stopExecution)="host.stopExecution()"
                              [appID]="host.tabData.id">
         </ct-execution-status>
 

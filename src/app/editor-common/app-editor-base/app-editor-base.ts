@@ -806,7 +806,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             const appID        = this.tabData.id;
             const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
 
-
             const executor = this.injector.get(ExecutorService2);
 
             const appIsLocal = AppHelper.isLocal(appID);

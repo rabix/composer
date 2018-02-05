@@ -150,16 +150,18 @@ export class ExecutorService2 {
                         return;
                     } else {
                         this.store.dispatch(new ExecutionErrorAction(appID, code));
+                        obs.error(new Error(`Execution failed with exit code ${code}.`));
                     }
 
-
-                    obs.error(new Error(`Execution failed with exit code ${code}.`));
                 });
 
                 process.on("error", (err: any) => {
                     if (err.code === "ENOENT" && err.path === "java") {
                         obs.error(new Error("Cannot run Java process. Please check if it is properly installed."));
+                        return;
                     }
+
+                    obs.error(new Error(err));
                 });
 
                 process.stdout.on("data", data => {
