@@ -10,25 +10,28 @@ import {
 } from "../../actions/execution.actions";
 import {Action} from "@ngrx/store";
 import {ExecutionState} from "../../models";
+import {parseContent} from "./log-parser";
 
 @Injectable()
 export class ExecutorOutputParser {
-
 
     @Effect()
     output: Observable<Action>;
 
     constructor(private actions: Actions) {
 
-        this.output = this.actions.ofType(EXECUTOR_OUTPUT)
-            .flatMap((action: ExecutorOutputAction) => {
-                const updates = this.mapOutputToStepStates(action.message);
+        this.output = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT)
+            .flatMap(action => {
+                const updates = parseContent(action.message);
+                const appID   = action.appID;
 
-                const list = Object.keys(updates).reduce((acc, id) => acc.concat({
-                    appID: action.appID,
-                    stepID: id,
-                    state: updates[id]
-                }), []);
+                if (updates.has(undefined)) {
+                    updates.set(appID, updates.get(undefined));
+                    updates.delete(undefined);
+                }
+
+                const list = [];
+                updates.forEach((state, stepID) => list.push({appID, stepID, state}));
 
                 if (list.length === 0) {
                     return Observable.empty();
@@ -56,67 +59,4 @@ export class ExecutorOutputParser {
 
             });
     }
-
-
-    private mapOutputToStepStates(text: string): { [stepID: string]: ExecutionState } {
-
-        const lines = text.split("\n");
-        const state = {};
-
-        for (let i = 0; i < lines.length; i++) {
-            const line   = lines[i];
-            const parsed = this.parseExecutorOutput(line);
-
-            if (!parsed) {
-                continue;
-            }
-
-            const {stepID, status} = parsed;
-            state[stepID]          = status;
-        }
-
-        return state;
-
-    }
-
-    private parseExecutorOutput(content: string): { stepID: string, status: ExecutionState } {
-
-        /**
-         *               Has something that contains “Job root.
-         *               |
-         *               |         then match the word after the dot, which is a step ID
-         *               |         |
-         *               |         |    capture whatever optionally follows, then discard captured value
-         *               |         |    |- whitespace (in “root.compile has started”)
-         *               |         |    |- dot (in “root.compile.subStep has started”)
-         *               |         |    |- comma (in “root.compile, job id 32454 has failed”)
-         *               |         |    |
-         *               |         |    |                then match the state that the executor flushes
-         *               |         |    |                |
-         *               ↓         ↓    ↓                ↓
-         */
-        const matcher = /Job root\.(.*?)(\s|,.*?|\..*?)?(has\scompleted|has\sstarted|failed)/i;
-        const match   = content.match(matcher);
-
-        if (match) {
-            const [, stepID, rest, stateMatch] = match;
-
-            let status: ExecutionState = "failed";
-
-            if (stateMatch === "has completed") {
-
-                // FIXME: Might match completion status for a sub-step, which we should ignore, needs better communication with bunny
-                if (rest.startsWith(".")) {
-                    return;
-                }
-
-                status = "completed";
-            } else if (stateMatch === "has started") {
-                status = "started";
-            }
-
-            return {stepID, status};
-        }
-    }
-
 }

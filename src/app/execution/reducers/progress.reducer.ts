@@ -19,7 +19,6 @@ import {ProgressState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
 import {AppExecution, ExecutionError, ExecutionState, StepExecution} from "../models";
 
-
 export function reducer<T extends { type: string | any }>(state: ProgressState = {}, action: T): ProgressState {
 
     switch (action.type) {
@@ -45,10 +44,10 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
 
         case EXECUTION_PREPARED: {
 
-            const {steps, appID, outDirPath} = action as Partial<ExecutionPreparedAction>;
+            const {steps, appID, outDirPath, appType} = action as Partial<ExecutionPreparedAction>;
 
             const stepExecution = steps.map(step => new StepExecution(step.id, step.label));
-            const app           = new AppExecution(outDirPath, stepExecution);
+            const app           = new AppExecution(appType, outDirPath, stepExecution);
 
             return {...state, [appID]: app};
         }
@@ -84,7 +83,7 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
                 return state;
             }
 
-            return {...state, [appID]: app.failProcess(new ExecutionError(exitCode, undefined, "execution"))};
+            return {...state, [appID]: app.fail(new ExecutionError(exitCode, undefined, "execution"))};
         }
 
         case EXECUTION_REQUIREMENT_ERROR: {
@@ -95,7 +94,7 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
                 return state;
             }
 
-            return {...state, [appID]: app.failProcess(new ExecutionError(1, message, "requirement"))};
+            return {...state, [appID]: app.fail(new ExecutionError(1, message, "requirement"))};
         }
 
         case EXECUTION_STOPPED: {
@@ -150,5 +149,4 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
         default:
             return state;
     }
-
 }
