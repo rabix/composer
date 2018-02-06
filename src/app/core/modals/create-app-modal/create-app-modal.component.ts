@@ -1,9 +1,9 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, OnInit, AfterViewInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import * as YAML from "js-yaml";
 import {SlugifyPipe} from "ngx-pipes";
 import {Observable} from "rxjs/Observable";
-import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
+import {Project} from "../../../../../electron/src/sbg-api-client/interfaces";
 import {AuthService} from "../../../auth/auth.service";
 import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
@@ -43,9 +43,7 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
                 <div class="form-group">
                     <label>App Name:</label>
                     <input class="form-control" formControlName="name" data-test="new-app-name"/>
-                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value"
-                       class="form-text text-muted"
-                    >
+                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value" class="form-text text-muted">
                         App ID: {{ remoteForm.get('name').value | slugify}}
                     </p>
                 </div>
@@ -133,7 +131,7 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
     `,
     styleUrls: ["./create-app-modal.component.scss"],
 })
-export class CreateAppModalComponent extends DirectiveBase implements OnInit {
+export class CreateAppModalComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input() appType: "CommandLineTool" | "Workflow" = "CommandLineTool";
     @Input() destination: "local" | "remote"         = "local";
@@ -141,10 +139,10 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
 
-    projectOptions               = [];
-    checkingSlug                 = false;
-    appTypeLocked                = false;
-    appCreationInProgress        = false;
+    projectOptions        = [];
+    checkingSlug          = false;
+    appTypeLocked         = false;
+    appCreationInProgress = false;
 
     error: string;
     localAppCreationInfo: string;
@@ -168,6 +166,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     }
 
     ngOnInit() {
+
         if (this.appType) {
             this.appTypeLocked = true;
         }
@@ -200,6 +199,12 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                     text: project.name
                 }));
             });
+    }
+
+    ngAfterViewInit() {
+        if (this.destination === "local") {
+            this.chooseFilepath();
+        }
     }
 
     submit() {
@@ -258,7 +263,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
                 this.localForm.patchValue({
                     path: path,
-                    name: name || AppHelper.getBasename(path, true)
+                    name: name || this.toTitleCase(AppHelper.getBasename(path, true))
                 });
 
                 setTimeout(() => {
@@ -266,7 +271,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
                     this.cdr.detectChanges();
                 });
 
-            }, () => {});
+            }, () => {
+            });
         });
     }
 
@@ -329,5 +335,9 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         });
 
         return;
+    }
+
+    private toTitleCase(str: string): string {
+        return str.replace(/\s+|[-_]/gi, " ").replace(/\w\S*/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase())
     }
 }
