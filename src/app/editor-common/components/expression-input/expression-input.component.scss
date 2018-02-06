@@ -2,6 +2,8 @@
 
 :host {
 
+    width: 100%;
+
     .direct-editing-disabled {
         .form-control {
             padding-left: 30px;
@@ -33,17 +35,20 @@
             border: 1px solid $input-bg-hover;
         }
 
+        .input-group {
+            display: flex;
+        }
+
+        .input-group-btn {
+            width: initial;
+        }
+
         .input-group-btn button {
-            height: 28.38px; //@fixme (this works but PLEASE fix me)
             width: 46px;
         }
 
         .input-group-btn, input {
             cursor: pointer;
         }
-
-
-
     }
-
 }
