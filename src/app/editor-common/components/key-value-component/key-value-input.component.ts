@@ -24,7 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     ],
     template: `
 
-        <div class="key-container col-sm-5"
+        <div class="key-container"
              *ngIf="form.controls['keyForm'].value !== null">
 
             <i class="fa fa-times-circle error-validation-icon"
@@ -48,24 +48,18 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-tooltip-content>
 
             <input class="form-control"
-                   [class.col-sm-12]="form.controls['keyForm'].valid"
-                   [class.col-sm-11]="!form.controls['keyForm'].valid"
                    *ngIf="form.controls['keyForm']"
                    [formControl]="form.controls['keyForm']"/>
         </div>
 
-        <div [class.col-sm-11]="form.controls['keyForm'].value === null"
-             *ngIf="form.controls['valueForm'] && readonly"
-             [class.col-sm-6]="form.controls['keyForm'].value !== null">
-            <input [class.half-width-value-input]="form.controls['keyForm'].value !== null"
-                   class="form-control"
+        <div *ngIf="form.controls['valueForm'] && readonly">
+            <input class="form-control"
                    [readonly]="readonly"
                    [formControl]="form.controls['valueForm']"/>
 
         </div>
 
-        <div *ngIf="form.controls['valueForm'] && !readonly"
-             class="col-sm-6">
+        <div *ngIf="form.controls['valueForm'] && !readonly" class="expression-input ml-1">
 
             <ct-expression-input
                     [context]="context"
