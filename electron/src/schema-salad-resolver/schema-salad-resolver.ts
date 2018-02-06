@@ -30,6 +30,10 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
 
             const entry = data[key];
 
+            /**
+             * A value being an external resource means that it represents a path to a file/url that should be read and have its content
+             * embedded in different ways (depending on key).
+             */
             const isExternalResource = typeof entry === "string" && [
                 "run",
                 "$mixin",
@@ -38,7 +42,10 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
             ].indexOf(key) !== -1;
 
             const isGraphReference    = isExternalResource && key === "run" && entry.startsWith("#");
-            const isGraphSubreference = !isExternalResource && typeof entry === "string" && entry.startsWith("#") && entry.indexOf("/") !== -1;
+            const isGraphSubreference = !isExternalResource
+                && typeof entry === "string"
+                && entry.startsWith("#")
+                && entry.indexOf("/") !== -1;
 
             if (isGraphSubreference && isResolvableGraph) {
 
@@ -54,7 +61,7 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
 
 
             } else if (isGraphReference) {
-                const embedding = new Promise((resolve, reject) => {
+                const embedding = new Promise((resolveEmbbedding, rejectEmbedding) => {
                     const graphID = entry.slice(1);
                     if (graph[graphID]) {
 
@@ -62,16 +69,16 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                             [key]: graph[graphID]
                         });
 
-                        resolve();
+                        resolveEmbbedding();
                         return;
                     }
 
-                    reject(new Error(`Graph id “${entry}” has no corresponding $graph entry`));
+                    rejectEmbedding(new Error(`Graph id “${entry}” has no corresponding $graph entry`));
                 });
 
                 future.push(embedding);
             } else if (isExternalResource) {
-                future.push(new Promise((resolve, reject) => {
+                future.push(new Promise((resolveExternalResource, rejectExternalResource) => {
 
                     let externalPath = source.split("/").slice(0, -1).concat(entry).join("/");
 
@@ -91,10 +98,9 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
 
                     traversed.add(externalPath);
 
-                    fetch(externalPath, {
-                        type: key === "$include" ? "text" : "json"
-                    }, rootPath, traversed).then((content) => {
-
+                    console.log("Fetching external", externalPath);
+                    const type = key === "$include" ? "text" : "json";
+                    fetch(externalPath, {type}, rootPath, traversed).then((content) => {
 
                         switch (key) {
 
@@ -104,7 +110,6 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                                 break;
                             case "$include":
                                 data[key] = content;
-
                                 break;
 
                             case "$mixin":
@@ -121,6 +126,10 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                                 Object.assign(data, newData);
 
                                 break;
+                            /**
+                             * When embedding a “run” value, we need to store the original source of that content so we can later remove
+                             * the content and restore the path to it
+                             */
                             case "run":
                             default:
                                 Object.assign(data, {
@@ -128,11 +137,12 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                                     "sbg:rdfId": entry,
                                     "sbg:rdfSource": externalPath
                                 });
+                                console.log("After run parsed", data);
                                 break;
                         }
 
-                        resolve(patchFn);
-                    }, reject);
+                        resolveExternalResource(patchFn);
+                    }, rejectExternalResource);
                 }));
             } else if (entry && typeof entry === "object") {
                 future.push(traverse(entry, source, root, rootPath, graph, traversedExternalPaths));
