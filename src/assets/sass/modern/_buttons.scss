@@ -54,29 +54,3 @@ $gradientDarken: 2%;
 .btn:enabled:hover {
     border-color: $btn-border-hover-color;
 }
-
-.btn-primary,
-.btn-primary:enabled:hover {
-    border-color: $btn-primary-border-color;
-
-    @if $btn-gradient-active {
-        $gradientStop: darken($btn-primary-bg, $gradientDarken);
-        background: $btn-primary-bg;
-
-    } @else {
-        background: $btn-primary-bg;
-    }
-}
-
-.btn-secondary,
-.btn-secondary:enabled:hover {
-
-    @if $btn-gradient-active {
-        $gradientStop: darken($btn-secondary-bg, $gradientDarken);
-
-        background: $btn-secondary-bg;
-
-    } @else {
-        background: $btn-secondary-bg;
-    }
-}

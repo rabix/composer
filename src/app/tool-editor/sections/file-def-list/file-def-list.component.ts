@@ -17,7 +17,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addEntry()"
+                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addDirent()"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
                                 [hasAction]="true">
                     <section tc-button-text>Create a File</section>
