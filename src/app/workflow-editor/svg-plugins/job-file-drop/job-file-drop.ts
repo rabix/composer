@@ -47,15 +47,15 @@ export class SVGJobFileDropPlugin extends PluginBase {
     }
 
     createLabelTSpanElements(txtEl: SVGTextElement) {
-        const idText = txtEl.textContent;
+        const idText      = txtEl.textContent;
         txtEl.textContent = "";
 
-        const id = document.createElementNS(this.svg.namespaceURI, 'tspan');
+        const id = document.createElementNS(this.svg.namespaceURI, "tspan");
         id.setAttribute("x", "0");
         id.textContent = idText;
         txtEl.appendChild(id);
 
-        const fileLabel = document.createElementNS(this.svg.namespaceURI, 'tspan');
+        const fileLabel = document.createElementNS(this.svg.namespaceURI, "tspan");
         fileLabel.classList.add("file-label");
         fileLabel.setAttribute("x", "0");
         fileLabel.setAttribute("dy", "15");
@@ -71,16 +71,17 @@ export class SVGJobFileDropPlugin extends PluginBase {
         // Find all input nodes that represent files or file arrays
         const query = this.svg.querySelectorAll([fileInputsSelector, fileArrayInputsSelector].join()) as NodeListOf<SVGGElement>;
 
-        for (let node of query) {
+        for (const node of query) {
 
             const inputID = node.getAttribute("data-id");
 
             if (!job[inputID]) {
-                this.updateNodeLabel(node, []);
+                this.updateNodeLabel(node, undefined);
                 continue;
             }
 
             const filePaths = [];
+
             for (const entry of [].concat(job[inputID])) {
 
                 if (entry === null) {
@@ -96,22 +97,28 @@ export class SVGJobFileDropPlugin extends PluginBase {
         }
     }
 
-    private updateNodeLabel(node: SVGGElement, paths: string[] = []): void {
-        const label   = node.querySelector(`.title .file-label`);
-        const isArray = node.classList.contains("type-array");
+    private updateNodeLabel(node: SVGGElement, values: string[] | undefined): void {
+        const label       = node.querySelector(`.title .file-label`);
+        const typeIsArray = node.classList.contains("type-array");
 
+        if (!node || !label) {
+            return;
+        }
 
-        if (node && label) {
-
-            if (paths.length > 1) {
-                label.textContent = `Added ${paths.length} files`;
-            } else if (paths.length === 1) {
-                label.textContent = AppHelper.getBasename(paths[0]);
-            } else if (isArray) {
-                label.textContent = "No files added"
+        if (values) {
+            if (values.length > 1) {
+                label.textContent = `Added ${values.length} files`;
+            } else if (values.length === 1) {
+                label.textContent = AppHelper.getBasename(values[0]);
+            } else if (values.length === 0 && typeIsArray) {
+                label.textContent = "Empty array";
             } else {
-                label.textContent = "No file added"
+                label.textContent = "No file added";
             }
+        } else if (typeIsArray) {
+            label.textContent = "No files added";
+        } else {
+            label.textContent = "No file added";
         }
     }
 }

@@ -47,6 +47,7 @@
         <!--Files and array of Files-->
         <ng-template ngSwitchCase="File">
             <ct-native-file-browser-form-field class="input-group"
+                                               [disableTextInput]="true"
                                                [useIcon]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="file">
@@ -70,6 +71,7 @@
         <ng-template ngSwitchCase="Directory">
             <ct-native-file-browser-form-field class="input-group"
                                                [useIcon]="true"
+                                               [disableTextInput]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="directory">
             </ct-native-file-browser-form-field>
