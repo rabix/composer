@@ -303,7 +303,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                     this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type} in ${node.label}`, {
                         appType: type,
                         destination,
-                        defaultFolder: node.id
+                        defaultFolder: destination === "local" ? node.id : undefined,
+                        defaultProject: destination === "remote" ? node.id : undefined
                     });
                 }
             });

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, OnInit, EventEmitter} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import * as YAML from "js-yaml";
 import {SlugifyPipe} from "ngx-pipes";
@@ -15,7 +15,7 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
-import {map, take} from "rxjs/operators";
+import {map, take, startWith, switchMap} from "rxjs/operators";
 
 @Component({
     selector: "ct-create-app-modal",
@@ -75,6 +75,22 @@ import {map, take} from "rxjs/operators";
                                       placeholder="Choose a destination project..."
                                       optgroupField="hash"
                                       data-test="new-app-destination-project"></ct-auto-complete>
+
+                    <p class="project-list-status">
+
+                        <ng-container *ngIf="isShowingAllProjects">Showing all projects.</ng-container>
+                        <ng-container *ngIf="!isShowingAllProjects">Showing added projects.</ng-container>
+
+                        <ng-container *ngIf="canToggleShowingAllProjects">
+                            <button *ngIf="isShowingAllProjects" type="button" class="btn btn-link btn-inline-link"
+                                    (click)="toggleShowingAllProjects.emit(false)">Show added.
+                            </button>
+                            <button *ngIf="!isShowingAllProjects" type="button" class="btn btn-link btn-inline-link"
+                                    (click)="toggleShowingAllProjects.emit(true)">Show all.
+                            </button>
+                        </ng-container>
+
+                    </p>
                 </div>
 
                 <div *ngIf="destination === 'remote' && remoteAppCreationError ">
@@ -124,6 +140,10 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     appTypeLocked         = false;
     appCreationInProgress = false;
 
+    isShowingAllProjects        = true;
+    canToggleShowingAllProjects = false;
+    toggleShowingAllProjects    = new EventEmitter<boolean>();
+
     error: string;
     remoteAppCreationError: string;
 
@@ -169,16 +189,38 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             this.remoteForm.patchValue({slug: this.slugify.transform(value)});
         });
 
+        this.toggleShowingAllProjects.pipe(
+            startWith(false),
+            switchMap(() => Observable.combineLatest(
+                this.platformRepository.getOpenProjects(),
+                this.platformRepository.getProjects(),
+            ), (shouldShowAll, projects) => ({shouldShowAll, projects})),
+            map(data => {
+                const {shouldShowAll, projects}             = data;
+                const [openProjects = [], allProjects = []] = projects;
 
-        // Check out open projects on platform and map them to select box options
-        this.platformRepository.getOpenProjects()
-            .map(projects => projects || [])
-            .subscribeTracked(this, projects => {
-                this.projectOptions = projects.map((project: Project) => ({
-                    value: project.id,
-                    text: project.name
-                }));
-            });
+                const openProjectsExist = openProjects.length !== 0;
+                const canToggle         = openProjectsExist;
+                const showProjects      = (!shouldShowAll && openProjectsExist) ? openProjects : allProjects;
+                const showAll           = showProjects === allProjects;
+
+                return {showAll, canToggle, projects: showProjects};
+            })
+        ).subscribeTracked(this, data => {
+            const {showAll, canToggle, projects} = data;
+
+            this.isShowingAllProjects        = showAll;
+            this.canToggleShowingAllProjects = canToggle;
+
+            this.projectOptions = projects.map((project: Project) => ({
+                value: project.id,
+                text: project.name
+            }));
+
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+
+        });
     }
 
     submit() {
@@ -205,28 +247,6 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             defaultPath: `${data.directoryPath}/${data.suggestedFilename}`,
             buttonLabel: "Done",
         })).catch(() => void 0);
-    }
-
-    private getDefaultFolder(app: any): Promise<string> {
-
-        return Observable.combineLatest(
-            this.localRepository.getExpandedFolders(),
-            this.localRepository.getLocalFolders()
-        ).pipe(
-            map(list => {
-                const [expanded, all] = list;
-                if (expanded.length) {
-                    return expanded[expanded.length - 1];
-                }
-
-                if (all.length) {
-                    return all[all.length - 1];
-                }
-
-                return app.getPath("home");
-            }),
-            take(1),
-        ).toPromise();
     }
 
     createLocal() {
@@ -273,7 +293,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         const newAppID = AppHelper.getAppIDWithRevision(`${project}/${slug}`, 0);
 
+
         this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(() => {
+
+            this.platformRepository.getOpenProjects().switchMap(projects => {
+                if (~projects.indexOf(project)) {
+                    return Observable.empty();
+                }
+                return this.platformRepository.addOpenProjects([project], true);
+            }).take(1).toPromise();
 
             const tab = this.workbox.getOrCreateAppTab({
                 id: AppHelper.getRevisionlessID(newAppID),
@@ -290,10 +318,28 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             this.appCreationInProgress  = false;
         });
 
-        return;
     }
 
-    private toTitleCase(str: string): string {
-        return str.replace(/\s+|[-_]/gi, " ").replace(/\w\S*/g, word => word[0].toUpperCase() + word.substr(1).toLowerCase())
+    private getDefaultFolder(app: any): Promise<string> {
+
+        return Observable.combineLatest(
+            this.localRepository.getExpandedFolders(),
+            this.localRepository.getLocalFolders()
+        ).pipe(
+            map(list => {
+                const [expanded, all] = list;
+                if (expanded.length) {
+                    return expanded[expanded.length - 1];
+                }
+
+                if (all.length) {
+                    return all[all.length - 1];
+                }
+
+                return app.getPath("home");
+            }),
+            take(1),
+        ).toPromise();
     }
+
 }
