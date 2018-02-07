@@ -1,4 +1,5 @@
 import {Action} from "@ngrx/store";
+import {AppType} from "../types";
 
 export const EXECUTION_STOP              = "[App Execution] stop";
 export const EXECUTION_PREPARED          = "[App Execution] prepared";
@@ -23,6 +24,7 @@ export class ExecutionPreparedAction extends ExecutionAction {
     readonly type = EXECUTION_PREPARED;
 
     constructor(public appID: string,
+                public appType: AppType,
                 public steps: { id: string, label?: string }[] = [],
                 public outDirPath: string) {
         super(appID);
@@ -65,7 +67,7 @@ export class ExecutionStoppedAction extends ExecutionAction {
 export class ExecutorOutputAction extends ExecutionAction {
     readonly type = EXECUTOR_OUTPUT;
 
-    constructor(public appID: string, public source: string, public message: string) {
+    constructor(public appID: string, public message: string, public source?: string) {
         super(appID);
     }
 }
@@ -80,6 +82,10 @@ export abstract class ExecutionStepAction implements Action {
 
 export class ExecutionStepFailedAction extends ExecutionStepAction {
     readonly type = EXECUTION_STEP_FAILED;
+
+    constructor(appID: string, stepID: string, public message?: string) {
+        super(appID, stepID);
+    }
 }
 
 export class ExecutionStepStartedAction extends ExecutionStepAction {

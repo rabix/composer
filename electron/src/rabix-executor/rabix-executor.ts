@@ -82,7 +82,7 @@ export class RabixExecutor {
             this.dumpJob(jobFilePath, jobValue),
             this.ensureFile(stdoutFilePath),
             this.ensureFile(stderrFilePath)
-        ])).then((filePaths: [string, string]) => {
+        ])).then(filePaths => {
 
             const [appPath, jobPath] = filePaths;
 

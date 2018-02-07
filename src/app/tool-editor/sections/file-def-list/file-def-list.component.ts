@@ -17,7 +17,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             <div class="tc-body">
 
                 <!--Blank Tool Screen-->
-                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addEntry()"
+                <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addFile()"
                                 [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
                                 [hasAction]="true">
                     <section tc-button-text>Create a File</section>
@@ -31,21 +31,15 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                         <!--In case that tool is not draft2 then show dropdown for adding items-->
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
-                            <button class="btn btn-primary" data-test="file-requirement-add-button" type="button" (click)="addItemDropDown.toggleMenu()">
-                                Add
-                            </button>
+                            <button class="btn btn-primary" type="button" data-test="file-requirement-add-button"  
+                                    (click)="addItemDropDown.toggleMenu()">Add</button>
                         </ct-generic-dropdown-menu>
 
                         <!--Template for add item dropdown -->
                         <ng-template #menu class="mr-1">
                             <ul class="list-unstyled" (click)="addItemDropDown.hide()">
-                                <li data-test="file-option" (click)="addDirent()">
-                                    File
-                                </li>
-
-                                <li data-test="expression-option" (click)="addExpression()">
-                                    Expression
-                                </li>
+                                <li data-test="file-option" (click)="addFile()">File</li>
+                                <li data-test="expression-option" (click)="addExpression()">Expression</li>
                             </ul>
                         </ng-template>
                     </section>
@@ -126,7 +120,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                 <ng-container *ngIf="!readonly && fileRequirement.listing?.length">
 
                     <!--If draft2 show button-->
-                    <button *ngIf="isSBDraft2; else v1Template" (click)="addDirent()"
+                    <button *ngIf="isSBDraft2; else v1Template" (click)="addFile()"
                             type="button"
                             class="btn pl-0 btn-link no-outline no-underline-hover"
                             data-test="tool-add-file-button-small">
@@ -136,7 +130,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                     <!--If not draft2 show dropdown for adding items-->
                     <ng-template #v1Template>
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
-                            <button type="button" 
+                            <button type="button"
                                     (click)="addItemDropDown.toggleMenu()"
                                     data-test="tool-add-file-button-small"
                                     class="btn pl-0 btn-link no-outline no-underline-hover">
@@ -147,7 +141,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                         <!--Template for add item dropdown -->
                         <ng-template #menu class="mr-1">
                             <ul class="list-unstyled" (click)="addItemDropDown.hide()">
-                                <li (click)="addDirent()" data-test="tool-v1-add-file">
+                                <li (click)="addFile()" data-test="tool-v1-add-file">
                                     File
                                 </li>
 
@@ -197,7 +191,7 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
         this.isSBDraft2 = this.model.cwlVersion === "sbg:draft-2";
     }
 
-    addDirent() {
+    addFile() {
 
         const newEntry = this.fileRequirement.addDirent({});
         this.update.next(this.fileRequirement.listing);

@@ -19,7 +19,7 @@ import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.componen
         <ct-action-bar>
             <div class="document-controls">
                 <button [disabled]="!tabData.isWritable || unavailableError"
-                        class="btn btn-secondary btn-sm"
+                        class="btn control-button"
                         tooltipPlacement="bottom"
                         ct-tooltip="Save"
                         (click)="save()"
@@ -27,7 +27,7 @@ import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.componen
                     <i class="fa fa-fw fa-save"></i>
                 </button>
 
-                <button class="btn btn-secondary btn-sm" tooltipPlacement="bottom" ct-tooltip="Reload"
+                <button class="btn control-button" tooltipPlacement="bottom" ct-tooltip="Reload"
                         (click)="reloadContent()">
                     <i class="fa fa-fw fa-refresh"></i>
                 </button>

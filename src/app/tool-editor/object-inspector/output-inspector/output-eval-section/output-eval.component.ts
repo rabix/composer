@@ -13,7 +13,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => OutputEvalSectionComponent), multi: true}
     ],
     template: `
-        <ct-form-panel class="borderless" [collapsed]="true">
+        <ct-form-panel class="borderless" [collapsed]="false">
             <div class="tc-header">Output eval</div>
             <div class="tc-body" *ngIf="output && outputEvalFormGroup">
 

@@ -26,6 +26,7 @@
     .preview {
         flex: 1;
         height: 100%;
+        border-top: 1px solid $black;
 
         &.warning .ace-idle-fingers {
             color: $code-warning;

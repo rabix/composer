@@ -10,7 +10,6 @@ import {
 } from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {AceEditorOptions} from "../../ui/code-editor/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
@@ -83,6 +82,8 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
     editorOptions: Partial<AceEditorOptions>;
     previewOptions: Partial<AceEditorOptions> = {
+        highlightGutterLine: false,
+        highlightActiveLine: false,
         wrap: true,
         readOnly: true,
         showLineNumbers: false,

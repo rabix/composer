@@ -1,6 +1,15 @@
 @import "../../../../assets/sass/variables";
 
 :host {
+
+    .header-row {
+        display: flex;
+    }
+
+    .header-title {
+        flex: 1;
+    }
+
     .invalid-entry {
         border: 2px solid $brand-danger;
     }

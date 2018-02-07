@@ -36,7 +36,7 @@ storiesOf("Execution Status Panel", module)
     .add("step state overview", () => ({
         ...statusPanelDefualts,
         props: {
-            execution: new AppExecution("out", [
+            execution: new AppExecution("Workflow", "out", [
                 new StepExecution("step_a", "Mike", "pending"),
                 new StepExecution("step_b", "Bob", "started", Date.now() - 33125),
                 new StepExecution("step_c", "Joe", "completed", Date.now() - 43211, Date.now()),
@@ -55,7 +55,7 @@ storiesOf("Execution Status Panel", module)
     .add("execution error", () => ({
         ...statusPanelDefualts,
         props: {
-            execution: new AppExecution("outdir", [
+            execution: new AppExecution("Workflow", "outdir", [
                 new StepExecution("step_a", "Step A", "completed"),
                 new StepExecution("step_b", "Step B", "failed"),
             ], new ExecutionError(127, "Docker is missing", "requirement"), "failed")
@@ -65,7 +65,7 @@ storiesOf("Execution Status Panel", module)
     .add("step execution failed", () => ({
         ...statusPanelDefualts,
         props: {
-            execution: new AppExecution("outdir", [
+            execution: new AppExecution("Workflow", "outdir", [
                 new StepExecution("step_a", "Step A", "completed"),
                 new StepExecution("step_b", "Step B", "failed"),
             ], new ExecutionError(1, "Some step failed", "execution"), "failed")

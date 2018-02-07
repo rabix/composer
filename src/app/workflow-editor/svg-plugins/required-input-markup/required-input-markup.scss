@@ -1,12 +1,17 @@
-@import "./../../../../assets/sass/variables";
+$node-required-fill: #f89406;
+$node-required-fill-fade: #94621b;
 
-.__plugin-required-input-markup {
+svg.cwl-workflow.__plugin-required-input-markup {
 
-    .node.input.__plugin-required-input-markup-required {
-
-        .inner {
-            fill: $brand-warning !important;
+    &.__selection-plugin-fade {
+        .node:not(.__selection-plugin-highlight) {
+            &.__plugin-required-input-markup-required .inner {
+                fill: $node-required-fill-fade;
+            }
         }
+    }
 
+    .node.__plugin-required-input-markup-required .inner {
+        fill:  $node-required-fill;
     }
 }
