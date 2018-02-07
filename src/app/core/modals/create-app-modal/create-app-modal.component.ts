@@ -77,19 +77,11 @@ import {map, take, startWith, switchMap} from "rxjs/operators";
                                       data-test="new-app-destination-project"></ct-auto-complete>
 
                     <p class="project-list-status">
-
-                        <ng-container *ngIf="isShowingAllProjects">Showing all projects.</ng-container>
-                        <ng-container *ngIf="!isShowingAllProjects">Showing added projects.</ng-container>
-
-                        <ng-container *ngIf="canToggleShowingAllProjects">
-                            <button *ngIf="isShowingAllProjects" type="button" class="btn btn-link btn-inline-link"
-                                    (click)="toggleShowingAllProjects.emit(false)">Show added.
-                            </button>
-                            <button *ngIf="!isShowingAllProjects" type="button" class="btn btn-link btn-inline-link"
-                                    (click)="toggleShowingAllProjects.emit(true)">Show all.
-                            </button>
-                        </ng-container>
-
+                        Showing {{ isShowingAllProjects ? 'all' : 'added' }} projects.
+                        <button type="button" class="btn btn-link btn-inline-link"
+                                (click)="toggleShowingAllProjects.emit(!isShowingAllProjects)">
+                            Show {{ isShowingAllProjects ? 'added' : 'all' }}
+                        </button>
                     </p>
                 </div>
 
