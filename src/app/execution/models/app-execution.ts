@@ -1,9 +1,11 @@
 import {ExecutionState} from "./types";
 import {ExecutionError} from "./execution-error";
 import {StepExecution} from "./step-progress";
+import {AppType} from "../types";
 
 export class AppExecution {
 
+    readonly appType: AppType;
     readonly state: ExecutionState;
     readonly stepExecution: StepExecution[];
     readonly outdir: string;
@@ -11,13 +13,15 @@ export class AppExecution {
     readonly startTime?: number;
     readonly endTime?: number;
 
-    constructor(outdir: string,
+    constructor(appType: AppType,
+                outdir: string,
                 stepProgress: StepExecution[],
                 error?: ExecutionError,
                 state: ExecutionState = "pending",
                 startTime?: number,
                 endTime?: number) {
 
+        this.appType       = appType;
         this.error         = error;
         this.outdir        = outdir;
         this.state         = state;
@@ -32,6 +36,7 @@ export class AppExecution {
         const update = Object.assign({}, this, params) as Partial<AppExecution>;
 
         return new AppExecution(
+            update.appType,
             update.outdir,
             update.stepExecution,
             update.error,
@@ -41,12 +46,16 @@ export class AppExecution {
         );
     }
 
-    failProcess(error: ExecutionError, ...failedStepIDs: string[]) {
+    fail(error: ExecutionError, ...failedStepIDs: string[]) {
         return this.update({
             error,
             state: "failed",
             endTime: Date.now(),
             stepExecution: this.stepExecution.map(step => {
+
+                if (this.appType === "CommandLineTool") {
+                    return step.transitionTo("failed");
+                }
 
                 if (~failedStepIDs.indexOf(step.id)) {
                     return step.transitionTo("failed");
@@ -87,12 +96,13 @@ export class AppExecution {
     }
 
     start(): AppExecution {
+        const stepState = this.appType === "Workflow" ? "pending" : "started";
         return this.update({
             state: "started",
             startTime: Date.now(),
             endTime: undefined,
             error: undefined,
-            stepExecution: this.stepExecution.map(step => step.transitionTo("pending"))
+            stepExecution: this.stepExecution.map(step => step.transitionTo(stepState))
         });
     }
 

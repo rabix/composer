@@ -12,12 +12,13 @@ import {
     ExecutionPreparedAction,
     ExecutionStartedAction,
     EXECUTION_STOP,
-    ExecutionStopAction
+    ExecutionStopAction,
 } from "../../actions/execution.actions";
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
 import {Actions} from "@ngrx/effects";
 import {filter} from "rxjs/operators";
+import {AppType} from "../../types";
 
 const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
 const path            = window["require"]("path");
@@ -98,6 +99,7 @@ export class ExecutorService2 {
 
             this.store.dispatch(new ExecutionPreparedAction(
                 appID,
+                model.class as AppType,
                 stepList,
                 executionParams.outDir
             ));
@@ -166,13 +168,13 @@ export class ExecutorService2 {
 
                 process.stdout.on("data", data => {
 
-                    this.store.dispatch(new ExecutorOutputAction(appID, "stdout", data.toString()));
+                    this.store.dispatch(new ExecutorOutputAction(appID, data.toString(), "stdout"));
 
                     obs.next(data.toString());
                 });
 
                 process.stderr.on("data", data => {
-                    this.store.dispatch(new ExecutorOutputAction(appID, "stderr", data.toString()));
+                    this.store.dispatch(new ExecutorOutputAction(appID, data.toString(), "stderr"));
                 });
 
             }, ex => {
