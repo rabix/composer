@@ -34,7 +34,7 @@ describe("Execution module", () => {
 
             it("should create an execution state object upon receiving a preparation event", () => {
 
-                const action = new ExecutionPreparedAction("myApp", [
+                const action = new ExecutionPreparedAction("myApp", "Workflow", [
                     {id: "step_a", label: "Step A"},
                     {id: "step_b", label: "Step B"}
                 ], "/my/outdir");
@@ -89,6 +89,47 @@ describe("Execution module", () => {
                 expect(Object.getOwnPropertyNames(state).length).toBe(0);
 
             });
+
+            it("should transition steps to pending state when starting a Workflow", () => {
+                const appID = "/root/app-id";
+                const state = reducer({
+                    [appID]: new AppExecution("Workflow", "app-outdir", [new StepExecution("app-id", "App Step")])
+                }, new ExecutionStartedAction(appID));
+
+                expect(state[appID].stepExecution[0].state).toBe("pending");
+            });
+
+            describe("CommandLineTool transitions", () => {
+
+                it("should move steps to started when starting app execution", () => {
+                    const appID = "/root/app-id";
+                    const state = reducer({
+                        [appID]: new AppExecution("CommandLineTool", "app-outdir", [new StepExecution("app-id", "Only Step")])
+                    }, new ExecutionStartedAction(appID));
+
+                    expect(state[appID].stepExecution[0].state).toBe("started");
+                });
+
+                it("should move steps to completed when completing app execution", () => {
+                    const appID = "/root/app-id";
+                    const state = reducer({
+                        [appID]: new AppExecution("CommandLineTool", "app-outdir", [new StepExecution("app-id", "Only Step")])
+                    }, new ExecutionCompletedAction(appID));
+
+                    expect(state[appID].stepExecution[0].state).toBe("completed");
+                });
+
+                it("should move steps to failed when erroring app execution", () => {
+                    const appID = "/root/app-id";
+                    const state = reducer({
+                        [appID]: new AppExecution("CommandLineTool", "app-outdir", [new StepExecution("app-id", "Only Step")])
+                    }, new ExecutionErrorAction(appID, 1));
+
+                    expect(state[appID].stepExecution[0].state).toBe("failed");
+                });
+
+            });
+
         });
     });
 });
