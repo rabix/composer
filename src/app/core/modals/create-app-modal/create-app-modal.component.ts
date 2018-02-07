@@ -1,9 +1,9 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, Input, OnInit, EventEmitter} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import * as YAML from "js-yaml";
 import {SlugifyPipe} from "ngx-pipes";
 import {Observable} from "rxjs/Observable";
-import {Project} from "../../../../../electron/src/sbg-api-client/interfaces/project";
+import {Project} from "../../../../../electron/src/sbg-api-client/interfaces";
 import {AuthService} from "../../../auth/auth.service";
 import {AppGeneratorService} from "../../../cwl/app-generator/app-generator.service";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
@@ -15,6 +15,7 @@ import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {map, take, startWith, switchMap} from "rxjs/operators";
 
 @Component({
     selector: "ct-create-app-modal",
@@ -42,10 +43,10 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
 
                 <div class="form-group">
                     <label>App Name:</label>
-                    <input class="form-control" formControlName="name" data-test="new-app-name"/>
-                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value"
-                       class="form-text text-muted"
-                    >
+                    <input class="form-control" data-test="new-app-name" autofocus
+                           placeholder="My New {{ destination === 'remote' ? remoteForm.get('type').value : localForm.get('type').value }}"
+                           formControlName="name"/>
+                    <p *ngIf="destination === 'remote' && remoteForm.get('name').value" class="form-text text-muted">
                         App ID: {{ remoteForm.get('name').value | slugify}}
                     </p>
                 </div>
@@ -66,21 +67,6 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
                     </select>
                 </div>
 
-                <div class="form-group" *ngIf="destination === 'local'">
-                    <label>Destination Path:</label>
-
-                    <button class="btn btn-secondary block"
-                            type="button"
-                            data-test="new-app-choose-filepath-button"
-                            (click)="chooseFilepath()">
-                        {{ defaultFolder ? "Choose a File Name" : "Choose a Local Folder" }}
-                    </button>
-
-                    <p class="form-text text-muted" *ngIf="localForm.get('path').value">
-                        Chosen Path: {{ localForm.get('path').value }}
-                    </p>
-                </div>
-
                 <div class="form-group" *ngIf="destination === 'remote' && !defaultProject">
                     <label>Destination Project:</label>
                     <ct-auto-complete formControlName="project"
@@ -89,19 +75,20 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
                                       placeholder="Choose a destination project..."
                                       optgroupField="hash"
                                       data-test="new-app-destination-project"></ct-auto-complete>
+
+                    <p class="project-list-status">
+                        Showing {{ isShowingAllProjects ? 'all' : 'added' }} projects.
+                        <button type="button" class="btn btn-link btn-inline-link"
+                                (click)="toggleShowingAllProjects.emit(!isShowingAllProjects)">
+                            Show {{ isShowingAllProjects ? 'added' : 'all' }}
+                        </button>
+                    </p>
                 </div>
 
                 <div *ngIf="destination === 'remote' && remoteAppCreationError ">
                     <span class="text-danger">
                         <i class="fa fa-times-circle fa-fw"></i>
                             {{ remoteAppCreationError }}
-                    </span>
-                </div>
-
-                <div *ngIf="destination === 'local' && localAppCreationInfo">
-                    <span class="text-info">
-                        <i class="fa fa-info-circle fa-fw"></i>
-                            {{ localAppCreationInfo }}
                     </span>
                 </div>
 
@@ -124,8 +111,7 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
                     </ct-loader-button-content>
                 </button>
 
-                <button type="submit" class="btn btn-primary" *ngIf="destination=== 'local'"
-                        [disabled]="!localForm.valid">
+                <button type="submit" class="btn btn-primary" *ngIf="destination=== 'local'" [disabled]="!localForm.valid">
                     Create
                 </button>
             </div>
@@ -141,13 +127,16 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     @Input() defaultFolder: string;
     @Input() defaultProject: string;
 
-    projectOptions               = [];
-    checkingSlug                 = false;
-    appTypeLocked                = false;
-    appCreationInProgress        = false;
+    projectOptions        = [];
+    checkingSlug          = false;
+    appTypeLocked         = false;
+    appCreationInProgress = false;
+
+    isShowingAllProjects        = true;
+    canToggleShowingAllProjects = false;
+    toggleShowingAllProjects    = new EventEmitter<boolean>();
 
     error: string;
-    localAppCreationInfo: string;
     remoteAppCreationError: string;
 
     localForm: FormGroup;
@@ -168,13 +157,13 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
     }
 
     ngOnInit() {
+
         if (this.appType) {
             this.appTypeLocked = true;
         }
 
         this.localForm = new FormGroup({
             name: new FormControl("", [Validators.required]),
-            path: new FormControl(undefined, [Validators.required]),
             cwlVersion: new FormControl("v1.0", [Validators.required]),
             type: new FormControl(this.appType, [Validators.required])
         });
@@ -188,18 +177,42 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         });
 
         // Transform remote name changes into slug value
-        this.remoteForm.get("name").valueChanges.subscribeTracked(this, (value) => this.remoteForm.patchValue({slug: this.slugify.transform(value)}));
+        this.remoteForm.get("name").valueChanges.subscribeTracked(this, value => {
+            this.remoteForm.patchValue({slug: this.slugify.transform(value)});
+        });
 
+        this.toggleShowingAllProjects.pipe(
+            startWith(false),
+            switchMap(() => Observable.combineLatest(
+                this.platformRepository.getOpenProjects(),
+                this.platformRepository.getProjects(),
+            ), (shouldShowAll, projects) => ({shouldShowAll, projects})),
+            map(data => {
+                const {shouldShowAll, projects}             = data;
+                const [openProjects = [], allProjects = []] = projects;
 
-        // Check out open projects on platform and map them to select box options
-        this.platformRepository.getOpenProjects()
-            .map(projects => projects || [])
-            .subscribeTracked(this, projects => {
-                this.projectOptions = projects.map((project: Project) => ({
-                    value: project.id,
-                    text: project.name
-                }));
-            });
+                const openProjectsExist = openProjects.length !== 0;
+                const canToggle         = openProjectsExist;
+                const showProjects      = (!shouldShowAll && openProjectsExist) ? openProjects : allProjects;
+                const showAll           = showProjects === allProjects;
+
+                return {showAll, canToggle, projects: showProjects};
+            })
+        ).subscribeTracked(this, data => {
+            const {showAll, canToggle, projects} = data;
+
+            this.isShowingAllProjects        = showAll;
+            this.canToggleShowingAllProjects = canToggle;
+
+            this.projectOptions = projects.map((project: Project) => ({
+                value: project.id,
+                text: project.name
+            }));
+
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+
+        });
     }
 
     submit() {
@@ -211,94 +224,55 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
         }
     }
 
-    chooseFilepath() {
+    chooseFilepath(): Promise<string> {
 
         const {app} = window["require"]("electron").remote;
 
-        const defaultFolder = Observable.combineLatest(
-            this.localRepository.getExpandedFolders(),
-            this.localRepository.getLocalFolders()
-        ).map(list => {
-            const [expanded, all] = list;
-            if (expanded.length) {
-                return expanded[expanded.length - 1];
-            }
-
-            if (all.length) {
-                return all[all.length - 1];
-            }
-
-            return app.getPath("home");
-        }).take(1);
-
-        defaultFolder.subscribeTracked(this, directoryPath => {
+        return this.getDefaultFolder(app).then(directoryPath => {
 
             const defaultFilename   = this.slugify.transform(`New ${this.appType}`) + ".cwl";
             const {name}            = this.localForm.getRawValue();
             const suggestedFilename = name ? (this.slugify.transform(name) + ".cwl") : defaultFilename;
-
-            this.native.createFileChoiceDialog({
-                title: "Choose a File Path",
-                defaultPath: `${directoryPath}/${suggestedFilename}`,
-                buttonLabel: "Done",
-            }).then((path) => {
-
-                // Indication of whether we need to add .cwl extension to the file name
-                this.localAppCreationInfo = undefined;
-
-                // If user did not choose anything, do nothing
-                if (!path) {
-                    return;
-                }
-
-                if (!AppHelper.endsWithAppExtension(path)) {
-                    path += ".cwl";
-                    this.localAppCreationInfo = "Extension .cwl was added to the file name.";
-                }
-
-                this.localForm.patchValue({
-                    path: path,
-                    name: name || AppHelper.getBasename(path, true)
-                });
-
-                setTimeout(() => {
-                    this.cdr.markForCheck();
-                    this.cdr.detectChanges();
-                });
-
-            }, () => {});
-        });
+            return {directoryPath, suggestedFilename};
+        }).then(data => this.native.createFileChoiceDialog({
+            title: "Choose a File Path",
+            defaultPath: `${data.directoryPath}/${data.suggestedFilename}`,
+            buttonLabel: "Done",
+        })).catch(() => void 0);
     }
 
     createLocal() {
-        this.error                = undefined;
-        this.localAppCreationInfo = undefined;
+        this.error = undefined;
 
-        const {path, name, cwlVersion, type} = this.localForm.getRawValue();
+        this.chooseFilepath().then(path => {
+            const {name, cwlVersion, type} = this.localForm.getRawValue();
 
-        const fileBasename = AppHelper.getBasename(path, true);
-        const folder       = AppHelper.getDirname(path);
+            const fileBasename = AppHelper.getBasename(path, true);
+            const folder       = AppHelper.getDirname(path);
 
-        const app  = AppGeneratorService.generate(cwlVersion, type, fileBasename, name);
-        const dump = YAML.dump(app);
+            const app  = AppGeneratorService.generate(cwlVersion, type, fileBasename, name);
+            const dump = YAML.dump(app);
 
-        this.fileRepository.saveFile(path, dump).then(() => {
+            return {path, dump, folder};
+        })
+            .then(data => this.fileRepository.saveFile(data.path, data.dump).then(() => data))
+            .then(data => {
+                const {path, folder} = data;
+                this.fileRepository.reloadPath(folder);
 
-            this.fileRepository.reloadPath(folder);
+                const tabData = {
+                    id: path,
+                    isWritable: true,
+                    language: "yaml",
+                    label: path.split("/").pop(),
+                    type: this.appType,
+                };
 
-            const tabData = {
-                id: path,
-                isWritable: true,
-                language: "yaml",
-                label: path.split("/").pop(),
-                type: this.appType,
-            };
+                this.workbox.openTab(this.workbox.getOrCreateAppTab(tabData));
+                this.modal.close();
 
-            this.workbox.openTab(this.workbox.getOrCreateAppTab(tabData));
-            this.modal.close();
-        }, err => {
-            this.error = err;
-        });
+            }).catch(err => this.error = err);
+
     }
 
     createRemote() {
@@ -311,7 +285,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         const newAppID = AppHelper.getAppIDWithRevision(`${project}/${slug}`, 0);
 
+
         this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(() => {
+
+            this.platformRepository.getOpenProjects().switchMap(projects => {
+                if (~projects.indexOf(project)) {
+                    return Observable.empty();
+                }
+                return this.platformRepository.addOpenProjects([project], true);
+            }).take(1).toPromise();
 
             const tab = this.workbox.getOrCreateAppTab({
                 id: AppHelper.getRevisionlessID(newAppID),
@@ -328,6 +310,28 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             this.appCreationInProgress  = false;
         });
 
-        return;
     }
+
+    private getDefaultFolder(app: any): Promise<string> {
+
+        return Observable.combineLatest(
+            this.localRepository.getExpandedFolders(),
+            this.localRepository.getLocalFolders()
+        ).pipe(
+            map(list => {
+                const [expanded, all] = list;
+                if (expanded.length) {
+                    return expanded[expanded.length - 1];
+                }
+
+                if (all.length) {
+                    return all[all.length - 1];
+                }
+
+                return app.getPath("home");
+            }),
+            take(1),
+        ).toPromise();
+    }
+
 }
