@@ -74,13 +74,13 @@
                             <!--No connections-->
                             <div *ngIf="input.source.length === 0 && input.isVisible">
 
-                                        <span class="text-warning" *ngIf="input.type.isNullable">
-                                            <i class="fa fa-warning fa-fw"></i> This port is not connected
-                                        </span>
+                                <span class="text-warning" *ngIf="input.type.isNullable">
+                                    <i class="fa fa-warning fa-fw"></i> This port is not connected
+                                </span>
 
                                 <span class="text-danger" *ngIf="!input.type.isNullable">
-                                            <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
-                                        </span>
+                                    <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                                </span>
 
                             </div>
 
