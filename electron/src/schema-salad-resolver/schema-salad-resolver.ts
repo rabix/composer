@@ -98,7 +98,6 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
 
                     traversed.add(externalPath);
 
-                    console.log("Fetching external", externalPath);
                     const type = key === "$include" ? "text" : "json";
                     fetch(externalPath, {type}, rootPath, traversed).then((content) => {
 
@@ -137,7 +136,6 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                                     "sbg:rdfId": entry,
                                     "sbg:rdfSource": externalPath
                                 });
-                                console.log("After run parsed", data);
                                 break;
                         }
 
