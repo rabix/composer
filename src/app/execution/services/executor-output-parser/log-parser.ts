@@ -33,9 +33,9 @@ export function parseLine(content: string): {
 } {
 
     const expression = [
-        // Has something that contains “Job root.
+        // Has something that contains “Job root”
         "Job root",
-        // Group 0,1: then match the word after the dot, which is a step ID
+        // Group 1: then match the word after the dot, which is a step ID
         "\\.(.*?)",
         // Group 2: capture whatever optionally follows, then discard captured value
         // |- whitespace (in “root.compile has started”)

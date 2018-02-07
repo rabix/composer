@@ -24,13 +24,8 @@ export class ExecutorOutputParser {
             .flatMap(action => {
                 const updates = parseContent(action.message);
                 const appID   = action.appID;
+                const list    = [];
 
-                if (updates.has(undefined)) {
-                    updates.set(appID, updates.get(undefined));
-                    updates.delete(undefined);
-                }
-
-                const list = [];
                 updates.forEach((state, stepID) => list.push({appID, stepID, state}));
 
                 if (list.length === 0) {
