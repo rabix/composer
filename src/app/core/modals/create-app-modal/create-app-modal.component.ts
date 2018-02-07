@@ -43,7 +43,7 @@ import {map, take, startWith, switchMap} from "rxjs/operators";
 
                 <div class="form-group">
                     <label>App Name:</label>
-                    <input class="form-control" data-test="new-app-name"
+                    <input class="form-control" data-test="new-app-name" autofocus
                            placeholder="My New {{ destination === 'remote' ? remoteForm.get('type').value : localForm.get('type').value }}"
                            formControlName="name"/>
                     <p *ngIf="destination === 'remote' && remoteForm.get('name').value" class="form-text text-muted">
