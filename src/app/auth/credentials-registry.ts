@@ -3,7 +3,6 @@ import {AuthCredentials} from "./model/auth-credentials";
 
 export interface CredentialsRegistry {
 
-
     getCredentials(): Observable<AuthCredentials[]>;
 
     setCredentials(credentials: AuthCredentials[]): Promise<any>;
@@ -11,5 +10,4 @@ export interface CredentialsRegistry {
     getActiveCredentials(): Observable<AuthCredentials>;
 
     setActiveCredentials(credentials: AuthCredentials | null): Promise<any>;
-
 }
