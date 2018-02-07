@@ -7,6 +7,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
+import {Observable} from "rxjs/Observable";
 
 @Component({
     selector: "ct-add-source-modal",
@@ -38,15 +39,20 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
                     <!--Projects are loaded-->
                     <ng-container *ngIf="(platformRepository.getProjects() | async) !== null; else projectsNotLoadedYet">
 
-                        <!--Offer projects so users can choose which to add-->
-                        <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
-                            <p>Choose projects to add to your workspace:</p>
-                            <div>
-                                <ct-auto-complete data-test="add-source-modal-add-project"
-                                                  [(ngModel)]="selectedProjects"
-                                                  [options]="closedProjectOptions"></ct-auto-complete>
+                        <ng-container *ngIf="allProjectsCount | async; else userHasNoProjects">
+                            
+                            <!--Offer projects so users can choose which to add-->
+                            <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
+                                <p>Choose projects to add to your workspace:</p>
+                                <div>
+                                    <ct-auto-complete data-test="add-source-modal-add-project"
+                                                      [(ngModel)]="selectedProjects"
+                                                      [options]="closedProjectOptions"></ct-auto-complete>
+                                </div>
                             </div>
-                        </div>
+                            
+                        </ng-container>
+                        
 
                     </ng-container>
 
@@ -70,9 +76,9 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             <ng-template #noUsers>
                 <p>You are not connected to any platform</p>
                 <p>
-                    <button type="button" 
-                            data-test="add-source-modal-connection-button" 
-                            class="btn btn-primary" 
+                    <button type="button"
+                            data-test="add-source-modal-connection-button"
+                            class="btn btn-primary"
                             (click)="openCredentialsForm()">
                         Add an Account
                     </button>
@@ -86,10 +92,16 @@ import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/p
             <ng-template #allProjectsAreAdded>
                 All your projects are added to the workspace.
             </ng-template>
+            
+            <ng-template #userHasNoProjects>
+                You have no projects.
+            </ng-template>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-test="add-source-modal-cancel-button" (click)="modal.close()">Cancel</button>
-                <button type="button" class="btn btn-primary" data-test="add-source-modal-apply-button" [disabled]="selectedProjects.length === 0"
+                <button type="button" class="btn btn-secondary" data-test="add-source-modal-cancel-button" (click)="modal.close()">Cancel
+                </button>
+                <button type="button" class="btn btn-primary" data-test="add-source-modal-apply-button"
+                        [disabled]="selectedProjects.length === 0"
                         (click)="onDone()">Done
                 </button>
             </div>
@@ -101,8 +113,10 @@ export class AddSourceModalComponent extends DirectiveBase {
     @Input()
     activeTab: "local" | "platform" = "local";
 
-    selectedProjects                                        = [];
-    localFoldersToAdd                                       = [];
+    selectedProjects  = [];
+    localFoldersToAdd = [];
+    allProjectsCount: Observable<number>;
+
     closedProjectOptions: { value: string, text: string }[] = null;
 
     constructor(public modal: ModalService,
@@ -113,6 +127,8 @@ export class AddSourceModalComponent extends DirectiveBase {
                 public auth: AuthService) {
 
         super();
+
+        this.allProjectsCount = this.platformRepository.getProjects().map(projects => projects ? projects.length : 0);
 
         this.platformRepository.getClosedProjects()
             .map(p => p || [])
