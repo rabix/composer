@@ -24,7 +24,7 @@ import {GlobalService} from "../../global/global.service";
 
                 <input type="hidden" formControlName="user"/>
 
-                <div class="row form-group" [class.has-warning]="form.get('url').invalid">
+                <div class="row form-group platform-row" [class.has-warning]="form.get('url').invalid">
                     <label class="col-xs-5 col-form-label">Platform:</label>
                     <div class="col-xs-7">
                         <ct-auto-complete [mono]="true"

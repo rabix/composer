@@ -52,6 +52,7 @@ import {TreeNodeComponent} from "./tree-view/tree-node/tree-node.component";
 import {TreeViewComponent} from "./tree-view/tree-view.component";
 import {NativeFileBrowserFormFieldComponent} from "./native-file-browser-form-field/native-file-browser-form-field.component";
 import {BlankStateComponent} from "./blank-state/blank-state.component";
+import {AutofocusDirective} from "./autofocus/autofocus.directive";
 
 @NgModule({
     imports: [
@@ -61,6 +62,7 @@ import {BlankStateComponent} from "./blank-state/blank-state.component";
     ],
     exports: [
         AutoCompleteComponent,
+        AutofocusDirective,
         BlankStateComponent,
         BlockLoaderComponent,
         LineLoaderComponent,
@@ -167,6 +169,7 @@ import {BlankStateComponent} from "./blank-state/blank-state.component";
         TreeNodeLabelDirective,
         TreeViewComponent,
         TrimValueAccessor,
+        AutofocusDirective,
     ]
 })
 export class UIModule {

@@ -41,7 +41,7 @@
                                 <ng-template #menu class="mr-1">
                                     <ul class="list-unstyled" (click)="portChangeDropDown.hide()">
                                         <li (click)="clear(jobGroup.get(input.id))">
-`1`                                            Set values to null
+                                            Set values to null
                                         </li>
                                     </ul>
                                 </ng-template>
@@ -63,7 +63,7 @@
                         <div *ngIf="jobGroup.get(input.id).disabled" class="text-xl-center mb-1">
                             <p class="text-muted">No values have been specified for this input</p>
                             <button class="btn btn-primary" type="button" (click)="enableEditing(input)">
-                                {{isFileOrDirectory(input) ? "Browse" : "Set Value"}}
+                                {{ isFileOrDirectory(input) ? "Browse" : "Set Value" }}
                             </button>
                         </div>
 
@@ -74,13 +74,13 @@
                             <!--No connections-->
                             <div *ngIf="input.source.length === 0 && input.isVisible">
 
-                                        <span class="text-warning" *ngIf="input.type.isNullable">
-                                            <i class="fa fa-warning fa-fw"></i> This port is not connected
-                                        </span>
+                                <span class="text-warning" *ngIf="input.type.isNullable">
+                                    <i class="fa fa-warning fa-fw"></i> This port is not connected
+                                </span>
 
                                 <span class="text-danger" *ngIf="!input.type.isNullable">
-                                            <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
-                                        </span>
+                                    <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                                </span>
 
                             </div>
 

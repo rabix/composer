@@ -31,13 +31,10 @@ import {FileOpenerToken, DirectoryExplorerToken} from "./execution/interfaces";
 import {NativeSystemService} from "./native/system/native-system.service";
 import {WorkboxService} from "./core/workbox/workbox.service";
 import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution";
+import {credentialsRegistryFactory} from "./factories/auth";
 
 @NgModule({
     providers: [
-        {
-            provide: CREDENTIALS_REGISTRY,
-            useClass: LocalRepositoryService
-        },
         AuthService,
         DataGatewayService,
         DomEventService,
@@ -48,22 +45,15 @@ import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
-        OpenExternalFileService,
         ModalService,
+        OpenExternalFileService,
         PlatformConnectionService,
         PlatformRepositoryService,
         SettingsService,
         StatusBarService,
-        {
-            provide: DirectoryExplorerToken,
-            useFactory: directoryExplorerFactory,
-            deps: [NativeSystemService]
-        },
-        {
-            provide: FileOpenerToken,
-            useFactory: fileOpenerFactory,
-            deps: [WorkboxService]
-        }
+        {provide: CREDENTIALS_REGISTRY, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},
+        {provide: DirectoryExplorerToken, useFactory: directoryExplorerFactory, deps: [NativeSystemService]},
+        {provide: FileOpenerToken, useFactory: fileOpenerFactory, deps: [WorkboxService]}
     ],
     declarations: [
         MainComponent,
