@@ -1,5 +1,6 @@
 import * as fs from "fs-extra";
 import {LocalRepository} from "./types/local-repository";
+import {defaultExecutionOutputDirectory} from "../controllers/execution-results.controller";
 
 export function heal(repository: LocalRepository, key?: keyof LocalRepository): Promise<boolean> {
 
@@ -39,6 +40,19 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
             }
 
             fixes.push(Promise.all(checks));
+        }
+
+        if (key === "executorConfig" || !key) {
+
+            if (!repository.executorConfig.outDir) {
+                fixes.push(new Promise((res, rej) => {
+
+                    repository.executorConfig.outDir = defaultExecutionOutputDirectory;
+                    modified = true;
+
+                    res();
+                }));
+            }
         }
 
 
