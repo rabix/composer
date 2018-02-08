@@ -21,11 +21,11 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         <div class="suggestions" *ngIf="!showCustom">
 
             <div class="radio-container" *ngFor="let item of list">
-                <button class="btn btn-secondary"
+                <button class="btn"
                         type="button"
                         data-test="quick-pick-button"
                         [attr.data-value]="item.value"
-                        [class.active]="computedVal?.toString() === item.value.toString()"
+                        [class.selected]="computedVal?.toString() === item.value.toString()"
                         [disabled]="readonly"
                         (click)="selectDefault(item.value)">
                     {{ item.label }}
