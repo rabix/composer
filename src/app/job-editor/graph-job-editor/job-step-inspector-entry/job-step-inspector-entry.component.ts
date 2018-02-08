@@ -1,7 +1,18 @@
 import {
-    AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Inject, Injector, Input, OnChanges,
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    forwardRef,
+    Inject,
+    Injector,
+    Input,
+    OnChanges,
     QueryList,
-    SimpleChanges, ViewChild, ViewChildren
+    SimpleChanges,
+    ViewChild,
+    ViewChildren
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
@@ -79,7 +90,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         switch (this.inputType) {
 
             case "record":
-                update = value instanceof Object ? value : {} as InputParameterModel;
+                update      = value instanceof Object ? value : {} as InputParameterModel;
                 const group = this.control as FormGroup;
                 if (!value) {
                     for (const key in group.controls) {
@@ -362,19 +373,13 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         const properties = ["multiSelections"] as any;
         properties.push(this.inputArrayItemsType === "File" ? "openFile" : "openDirectory");
 
-
         this.native.openFileChoiceDialog({properties}).then(filePaths => {
-            const items = filePaths.map(p => ({class: this.inputArrayItemsType, path: p}));
 
-            items.forEach((c) => {
-                (this.control as FormArray).push(new FormControl(c));
-            });
-
+            const fileOrDirEntries = filePaths.map(p => ({class: this.inputArrayItemsType, path: p}));
+            fileOrDirEntries.forEach(entry => (this.control as FormArray).push(new FormControl(entry)));
             this.cdr.markForCheck();
 
-        }, err => {
-
-        });
+        }, () => void 0);
 
     }
 }

@@ -1,11 +1,17 @@
 import {
-    AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output,
-    SimpleChanges
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    forwardRef,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
+    ChangeDetectorRef
 } from "@angular/core";
-import {
-    AbstractControl, ControlValueAccessor, FormControl, FormGroup,
-    NG_VALUE_ACCESSOR
-} from "@angular/forms";
+import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -46,7 +52,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     private jobValue: Object;
 
-    constructor(private native: NativeSystemService) {
+    constructor(private native: NativeSystemService, private cdr: ChangeDetectorRef) {
         super();
     }
 
@@ -257,13 +263,16 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     enableEditing(input: InputParameterModel): void {
 
         const inputFormField = this.jobGroup.get(input.id);
-        inputFormField.enable({onlySelf: true});
 
 
         let value;
 
         const isArray = input.type.type === "array";
-        const type = input.type.items || input.type.type;
+        const type    = input.type.items || input.type.type;
+
+        if (type !== "File" && type !== "Directory") {
+            inputFormField.enable({onlySelf: true});
+        }
 
         switch (type) {
             case "record":
@@ -292,13 +301,13 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
                 this.native.openFileChoiceDialog({properties}).then(filePaths => {
                     const fileValues = filePaths.map(p => ({class: type, path: p}));
 
-                    const value = !(isArray) ? fileValues[0] : fileValues;
+                    const value = !isArray ? fileValues[0] : fileValues;
+                    inputFormField.enable({onlySelf: true});
                     inputFormField.setValue(value);
+                    this.cdr.markForCheck();
 
-                }, err => {
-                });
-
-                return;
+                }, () => void 0);
+                break;
             default:
                 value = null;
                 break;
@@ -308,7 +317,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     isFileOrDirectory(input: WorkflowStepInputModel) {
-        const type = input.type.type;
+        const type      = input.type.type;
         const itemsType = input.type.items;
 
         return type === "File" || type === "Directory" || itemsType === "File" || itemsType === "Directory";
