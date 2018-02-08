@@ -553,7 +553,7 @@ ajv-keywords@^2.0.0, ajv-keywords@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-2.1.1.tgz#617997fc5f60576894c435f940d819e135b80762"
 
-ajv@^4.9.1:
+ajv@^4.8.2, ajv@^4.9.1:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
   dependencies:
@@ -3054,9 +3054,12 @@ cwl-svg@2.0.1:
   dependencies:
     core-js "^2.5.1"
 
-cwlts@1.15.18:
-  version "1.15.18"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.18.tgz#0ece7e670c7e0ea2b461a8fd22e42fc1b5c5e0e2"
+cwlts@1.15.19:
+  version "1.15.19"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.19.tgz#aa2a5d12b8a0c05954af5ac0b58be114491a59e3"
+  dependencies:
+    ajv "^4.8.2"
+    js-yaml "^3.9.0"
 
 cyclist@~0.2.2:
   version "0.2.2"
@@ -5544,7 +5547,7 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
 
-js-yaml@^3.10.0, js-yaml@^3.4.3, js-yaml@^3.7.0:
+js-yaml@^3.10.0, js-yaml@^3.4.3, js-yaml@^3.7.0, js-yaml@^3.9.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
   dependencies:
