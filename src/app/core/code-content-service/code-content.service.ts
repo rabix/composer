@@ -30,7 +30,7 @@ export class CodeSwapService {
         return this.patchSwap(null);
     }
 
-    private patchSwap(content): void {
+    private patchSwap(content): Promise<any[]> {
         const promises = [];
         const isLocal  = AppHelper.isLocal(this.appID);
 
@@ -57,6 +57,6 @@ export class CodeSwapService {
 
         }
 
-        Promise.all(promises);
+        return Promise.all(promises);
     }
 }
