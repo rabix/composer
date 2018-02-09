@@ -17,7 +17,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         }
     ],
     template: `
-        <ct-form-panel *ngIf="form" class="borderless" [collapsed]="true">
+        <ct-form-panel *ngIf="form" class="borderless" [collapsed]="false">
             <div *ngIf="cwlVersion !== 'v1.0'" class="tc-header">Stage Input</div>
             <div *ngIf="cwlVersion === 'v1.0'" class="tc-header">Load Content</div>
             <div class="tc-body" *ngIf="input && form">

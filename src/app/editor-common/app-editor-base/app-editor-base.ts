@@ -5,9 +5,9 @@ import {CommandLineToolModel, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
 import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {ReplaySubject} from "rxjs/ReplaySubject";
-import {ExecutorOutput} from "../../../../electron/src/rabix-executor/executor-output";
+import {Subject} from "rxjs/Subject";
+import {Store} from "@ngrx/store";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
 import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
@@ -20,29 +20,33 @@ import {ProceedToEditingModalComponent} from "../../core/modals/proceed-to-editi
 import {PublishModalComponent} from "../../core/modals/publish-modal/publish-modal.component";
 import {AppTabData} from "../../core/workbox/app-tab-data";
 import {WorkboxService} from "../../core/workbox/workbox.service";
-import {ExecutorService} from "../../executor/executor.service";
+import {FileRepositoryService} from "../../file-repository/file-repository.service";
 import {NotificationBarService} from "../../layout/notification-bar/notification-bar.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {StatusControlProvider} from "../../layout/status-bar/status-control-provider.interface";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
+import {ExportAppService} from "../../services/export-app/export-app.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
-import {AppExecutionPreviewComponent} from "../app-execution-panel/app-execution-preview.component";
 import {AppExportModalComponent} from "../app-export-modal/app-export-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
-import {GraphJobEditorComponent} from "../graph-job-editor/graph-job-editor.component";
+import {GraphJobEditorComponent} from "../../job-editor/graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
 import {AppUpdateService} from "../services/app-update/app-updating.service";
 import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
-import {FileRepositoryService} from "../../file-repository/file-repository.service";
-import {ExportAppService} from "../../services/export-app/export-app.service";
 import {WorkflowEditorComponent} from "../../workflow-editor/workflow-editor.component";
+import {ExecutorService} from "../../executor-service/executor.service";
+import {ExecutorService2} from "../../execution/services/executor/executor.service";
+import {AuthService} from "../../auth/auth.service";
+import {ExecutionStopAction} from "../../execution/actions/execution.actions";
+import {switchMap, flatMap, finalize, catchError} from "rxjs/operators";
+
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -100,12 +104,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     executionQueue = new Subject<any>();
 
+    /** TODO: Check where this is populated */
     executionJob: Object;
 
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
-
-    private executionPreview: AppExecutionPreviewComponent;
 
     /** Template of the status controls that will be shown in the status bar */
     @ViewChild("statusControls")
@@ -120,12 +123,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected appSavingService: AppSaver;
 
     private modelCreated = false;
-
-    /**
-     * Used to emit signals that should stop app execution, if it's running.
-     * It is used a breaking emit, so anything can be pushed through it.
-     */
-    private executionStop = new Subject<any>();
 
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
@@ -155,9 +152,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 protected localRepository: LocalRepositoryService,
                 protected fileRepository: FileRepositoryService,
                 protected workbox: WorkboxService,
+                protected exportApp: ExportAppService,
+                public store: Store<any>,
+                protected auth: AuthService,
                 public executor: ExecutorService,
-                protected updateService: AppUpdateService,
-                protected exportApp: ExportAppService) {
+                protected updateService: AppUpdateService) {
 
         super();
 
@@ -200,7 +199,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(codeChangesToValidate).map((state: AppValidityState) => {
             if (state.isValidCWL && this.dataModel) {
-                state.errors = state.errors.concat(this.dataModel.errors);
+                state.errors   = state.errors.concat(this.dataModel.errors);
                 state.warnings = state.warnings.concat(this.dataModel.warnings);
             }
 
@@ -219,11 +218,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         externalCodeChanges.subscribeTracked(this, (code: string) => {
             // Exteral code changes should update the internal state as well
             this.codeEditorContent.setValue(code);
-            this.resolveCurrentContent();
 
         }, (err) => {
             this.unavailableError = new ErrorWrapper(err).toString() || "Error occurred while fetching app";
-            this.isLoading = false;
+            this.isLoading        = false;
         });
 
         /**
@@ -301,7 +299,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 } else if (hasCopyOfProperty && !unlocked) {
 
                     const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                    this.notificationBar.showNotification(`This app is a copy of ${originalApp}`, {
+                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {
                         type: "info"
                     });
                     this.isUnlockable = true;
@@ -438,7 +436,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
-        this.executionPreview = this.reportPanelComponent.getAppExecutionPreview();
 
         this.bindExecutionQueue();
     }
@@ -508,7 +505,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 return result;
             }).catch(err => {
-                this.revisionChangingInProgress = false;
+                this.revisionChangingInProgress   = false;
                 this.revisionList.loadingRevision = false;
                 this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
             });
@@ -571,7 +568,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     editRunConfiguration() {
-        const appID = this.tabData.id;
+        const appID     = this.tabData.id;
         const appConfig = this.executor.getAppConfig(appID).take(1);
 
         appConfig.take(1).subscribeTracked(this, (context) => {
@@ -581,7 +578,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             });
 
             modal.context = context;
-            modal.appID = appID;
+            modal.appID   = appID;
 
             modal.onSubmit = (raw) => {
                 this.executor.setAppConfig(appID, raw);
@@ -792,8 +789,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
 
                 modal.confirmLabel = "Run";
-                modal.context = context;
-                modal.appID = appID;
+                modal.context      = context;
+                modal.appID        = appID;
 
                 return new Observable(observer => {
                     modal.onSubmit = (raw) => {
@@ -816,93 +813,53 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private bindExecutionQueue() {
 
-        // When a new execution is in the line, run it
-        this.executionQueue
+        this.executionQueue.pipe(
+            switchMap(() => this.runOnExecutor().pipe(
+                finalize(() => this.isExecuting = false),
+                catchError(() => Observable.empty())
+            ))
+        ).subscribeTracked(this, () => void 0);
 
-        // Switch so the execution gets cancelled when new one is scheduled
-            .switchMap(() => {
-
-                // Starts the execution process
-                return this.runOnExecutor()
-
-                // Messages will be coming in but we need to unsubscribe at some point, so wait for the execution stream to emit
-                    .takeUntil(this.executionStop.do(() => this.executionPreview.addMessage("Execution stopped")))
-
-                    // When done, turn off the UI flag
-                    .finally(() => this.isExecuting = false)
-
-                    // We need to catch the error here, because if we catch it in the end, this whole queue will terminate
-                    .catch(err => {
-                        const wrappedError = new ErrorWrapper(err).toString();
-                        this.executionPreview.addMessage(wrappedError, "ERROR");
-                        return Observable.empty();
-                    });
+        this.executionQueue.pipe(
+            flatMap(() => {
+                const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
+                return metaManager.getAppMeta("job").take(1);
             })
-            .subscribeTracked(this, (output: ExecutorOutput) => {
-
-                // Update output folder in the tree
-                if (output.type === "OUTDIR") {
-                    this.fileRepository.reloadPath(output.message);
-                }
-
-                // Output result comes as a JSON object with info about execution results
-                // Otherwise, it's a string, most likely an [INFO] log from stderr, which we should print out
-
-                let outputMessage = "";
-
-                if (typeof output.message === "object") {
-                    outputMessage += JSON.stringify(output, null, 4);
-                } else {
-                    outputMessage += output.message || "";
-                }
-
-                this.executionPreview.addMessage(outputMessage, output.type);
-
-
-            });
-
-        // Whenever a new app queues for execution, toggle the “isExecuting” GUI flag
-        this.executionQueue.flatMap(() => {
-            const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
-            return metaManager.getAppMeta("job").take(1);
-        }).subscribeTracked(this, job => {
-            this.executionPreview.clear();
-            this.executionPreview.job = job;
-
+        ).subscribeTracked(this, () => {
             this.toggleReport("execution", true);
-
             this.isExecuting = true;
         });
     }
 
     stopExecution() {
-        this.executionStop.next(1);
+        this.store.dispatch(new ExecutionStopAction(this.tabData.id));
     }
 
     private runOnExecutor(): Observable<string | Object> {
 
-        return new Observable(obs => {
+        const metaManager    = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const executorConfig = this.localRepository.getExecutorConfig();
+        const job            = metaManager.getAppMeta("job");
+        const user           = this.auth.getActive().map(user => user ? user.id : "local");
 
-            const modelObject = this.dataModel.serialize();
+        return Observable.combineLatest(job, executorConfig, user).take(1).switchMap(data => {
 
-            /** FIXME: Bunny traverses mistakenly into this to look for actual inputs, check if it's resolved */
-            delete modelObject["sbg:job"];
+            const [job, executorConfig, user] = data;
 
-            const modelText = Yaml.dump(modelObject, {});
+            const appID        = this.tabData.id;
+            const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
 
-            const runner = this.getExecutionContext().switchMap(context => {
+            const executor = this.injector.get(ExecutorService2);
 
-                return this.executor
-                    .run(this.tabData.id, modelText, context.executionParams)
-                    .finally(() => obs.complete());
+            const appIsLocal = AppHelper.isLocal(appID);
 
-            }).subscribe(obs);
+            const outDir = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
 
-            return () => {
-                runner.unsubscribe();
-            };
-
+            return executor.execute(appID, this.dataModel, job, executorPath, {outDir}).finally(() => {
+                this.fileRepository.reloadPath(outDir);
+            });
         });
+
     }
 
     showModalIfAppIsDirty(): Promise<boolean> {

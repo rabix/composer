@@ -1,0 +1,23 @@
+:host {
+
+    display: block;
+    flex: 1;
+
+    background: repeating-linear-gradient(
+            -45deg,
+            rgb(48, 48, 48),
+            rgb(48, 48, 48) 10px,
+            rgb(51, 51, 51) 10px,
+            rgb(51, 51, 51) 20px
+    );
+
+    /deep/ {
+        @import "../../workflow-editor/svg-plugins/job-file-drop/job-file-drop";
+        @import "../svg-execution-progress-plugin/svg-execution-progress-plugin";
+        @import "../../workflow-editor/svg-plugins/required-input-markup/required-input-markup";
+    }
+
+    .cwl-workflow {
+        fill: transparent;
+    }
+}

@@ -8,7 +8,6 @@ import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
 import {DataRepository} from "./storage/data-repository";
 import {ExecutorDefaultPathLoader} from "./storage/hooks/executor-config-hook";
-import {AppMetaEntry} from "./storage/types/app-meta";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
 import {heal} from "./storage/repository-healer";
@@ -19,14 +18,13 @@ const swapPath       = userDataPath + path.sep + "swap";
 const swapController = new SwapController(swapPath);
 
 const fsController          = require("./controllers/fs.controller");
-const executionResultsCtrl  = require("./controllers/execution-results.controller");
 const acceleratorController = require("./controllers/accelerator.controller");
 
-const deepLinkingProtocolController  = require("./controllers/open-external-file/deep-linking-protocol-controller");
-const openFileHandlerController = require("./controllers/open-external-file/open-file-handler-controller");
+const deepLinkingProtocolController = require("./controllers/open-external-file/deep-linking-protocol-controller");
+const openFileHandlerController     = require("./controllers/open-external-file/open-file-handler-controller");
 
-const resolver              = require("./schema-salad-resolver/schema-salad-resolver");
-const semver                = require("semver");
+const resolver = require("./schema-salad-resolver/schema-salad-resolver");
+const semver   = require("semver");
 
 let repository: DataRepository;
 let repositoryLoad: Promise<any>;
@@ -52,24 +50,24 @@ export function loadDataRepository() {
 
     repository.attachHook(new ExecutorDefaultPathLoader());
 
-    repositoryLoad = new Promise((resolve, reject) => {
+    repositoryLoad = new Promise((resolveLoad, rejectLoad) => {
         repository.load(err => {
             if (err) {
-                return reject(err);
+                return rejectLoad(err);
             }
 
             heal(repository.local).then(isModified => {
                 if (isModified) {
                     repository.updateLocal(repository.local, () => {
-                        resolve(1);
+                        resolveLoad(1);
                     });
                 }
 
-                resolve(1);
+                resolveLoad(1);
             });
 
         });
-    }).catch(err => void 0);
+    }).catch(() => void 0);
 }
 
 // File System Routes
@@ -106,8 +104,8 @@ export function pathExists(path, callback) {
     fsController.pathExists(path, callback);
 }
 
-export function resolve(path, callback: (err?: Error, result?: Object) => void) {
-    resolver.resolve(path).then(result => {
+export function resolve(filepath, callback: (err?: Error, result?: Object) => void) {
+    resolver.resolve(filepath).then(result => {
         callback(null, result);
     }, err => {
         callback(err);
@@ -602,57 +600,5 @@ export function probeExecutorVersion(data: { path: string }, callback) {
             callback(null, `Version: ${version}`);
         });
     });
-}
 
-export function executeApp(data: {
-    appID: string,
-    content: string,
-    appSource: "local" | "user",
-    options: Object
-    config: Object
-}, callback, emitter) {
-
-    repositoryLoad.then(() => {
-        const {appID, content, appSource, options, config} = data;
-
-        const execConf = repository.local.executorConfig;
-
-        const execPath = execConf.choice === "bundled" ? undefined : execConf.path;
-
-        const rabix = new RabixExecutor(execPath);
-
-        let userID = "local";
-        if (appSource !== "local") {
-            userID = repository.local.activeCredentials.id;
-        }
-
-        options["outDir"] = executionResultsCtrl.makeOutputDirectoryName(config["outDir"], appID, userID);
-
-        let appJob = {};
-
-        const appMeta = repository[appSource].appMeta[appID] as AppMetaEntry;
-        if (appMeta && appMeta.job) {
-            appJob = appMeta.job;
-        }
-
-        new Promise((resolve, reject) => {
-            if (appSource === "local") {
-
-                resolver.resolveContent(content, appID)
-                    .then(obj => {
-                        const stringified = JSON.stringify(obj);
-                        resolve(stringified);
-                    }, reject);
-            } else {
-                resolve(content);
-            }
-
-        }).then((content: string) => {
-
-            rabix.execute(content, appJob, options, callback, emitter);
-
-        }, callback);
-
-
-    })
 }

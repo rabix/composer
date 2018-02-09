@@ -1,6 +1,5 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {HttpModule} from "@angular/http";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
@@ -27,14 +26,16 @@ import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
 import {AppUpdateService} from "./editor-common/services/app-update/app-updating.service";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
-
+import {StoreModule} from "@ngrx/store";
+import {EffectsModule} from "@ngrx/effects";
+import {FileOpenerToken, DirectoryExplorerToken} from "./execution/interfaces";
+import {NativeSystemService} from "./native/system/native-system.service";
+import {WorkboxService} from "./core/workbox/workbox.service";
+import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution";
+import {credentialsRegistryFactory} from "./factories/auth";
 
 @NgModule({
     providers: [
-        {
-            provide: CREDENTIALS_REGISTRY,
-            useClass: LocalRepositoryService
-        },
         AuthService,
         DataGatewayService,
         DomEventService,
@@ -45,13 +46,16 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         IpcService,
         JavascriptEvalService,
         LocalRepositoryService,
-        OpenExternalFileService,
         ModalService,
+        OpenExternalFileService,
         PlatformConnectionService,
         PlatformRepositoryService,
         AppUpdateService,
         SettingsService,
-        StatusBarService
+        StatusBarService,
+        {provide: CREDENTIALS_REGISTRY, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},
+        {provide: DirectoryExplorerToken, useFactory: directoryExplorerFactory, deps: [NativeSystemService]},
+        {provide: FileOpenerToken, useFactory: fileOpenerFactory, deps: [WorkboxService]}
     ],
     declarations: [
         MainComponent,
@@ -59,7 +63,6 @@ import {ExportAppService} from "./services/export-app/export-app.service";
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
         CoreModule,
         ReactiveFormsModule,
         UIModule,
@@ -68,6 +71,9 @@ import {ExportAppService} from "./services/export-app/export-app.service";
         ToolEditorModule,
         WorkflowEditorModule,
         NativeModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot([])
+
     ],
     bootstrap: [MainComponent]
 })

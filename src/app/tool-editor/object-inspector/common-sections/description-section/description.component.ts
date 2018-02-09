@@ -13,13 +13,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         {provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DescriptionComponent), multi: true}
     ],
     template: `
-        <ct-form-panel class="borderless" [collapsed]="true">
+        <ct-form-panel class="borderless" [collapsed]="false">
             <div class="tc-header">Description</div>
             <div class="tc-body" *ngIf="port && form">
 
                 <div class="form-text">
-                    This description will be visible when using the tool in the workflow editor.
-                    It's best to be concise and informative.
+                    This description is visible from the workflow editor on the Platform.
+                    It’s best to be concise and informative.
                 </div>
 
                 <!--Label-->
@@ -70,7 +70,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                 <!--File Types-->
                 <div *ngIf="isFileType()" class="form-group">
-                    <label class="form-control-label">File types</label>
+                    <label class="form-control-label">File type(s)</label>
                     <ct-auto-complete [formControl]="form.controls['fileTypes']"
                                       [create]="true"></ct-auto-complete>
                 </div>

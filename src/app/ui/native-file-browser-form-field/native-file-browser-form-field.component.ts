@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, forwardRef, Input, Renderer2} from "@angular/core";
+import {ChangeDetectorRef, Component, forwardRef, Input, Renderer2, ViewChild, ElementRef, AfterViewChecked,} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NativeSystemService} from "../../native/system/native-system.service";
 
@@ -14,8 +14,7 @@ type SelectionType = "file" | "directory";
         }
     ],
     template: `
-        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()"
-               [disabled]="isDisabled || disableTextInput"/>
+        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()" [disabled]="isDisabled || disableTextInput"/>
 
         <span class="input-group-btn">
             <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
@@ -29,7 +28,7 @@ type SelectionType = "file" | "directory";
     `,
 
 })
-export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor {
+export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor, AfterViewChecked {
 
     /** Title of the modal windows that opens when user clicks on "browse" */
     @Input() modalTitle = "Choose File or Directory";
@@ -66,12 +65,15 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     isDisabled = false;
 
+
     onTouched = () => void 0;
 
     onChange = (value: any) => void 0;
 
-    private _value = "";
+    @ViewChild("pathInput")
+    pathInputField: ElementRef;
 
+    private _value = "";
 
     constructor(private native: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
     }
@@ -117,7 +119,6 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
         }
 
         this.value = obj;
-
     }
 
     registerOnChange(fn: any): void {
@@ -130,5 +131,22 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+    }
+
+    ngAfterViewChecked() {
+        this.updateInputScroll();
+    }
+
+    private updateInputScroll() {
+        setImmediate(() => {
+            if (!this.pathInputField && !this.pathInputField.nativeElement) {
+                return;
+            }
+
+            const el = this.pathInputField.nativeElement;
+            if (this.isDisabled || this.disableTextInput) {
+                el.scrollLeft = el.scrollWidth;
+            }
+        });
     }
 }

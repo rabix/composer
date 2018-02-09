@@ -33,19 +33,19 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 
             <!--List Header Row-->
-            <div class="editor-list-title row" *ngIf="!!keyValueFormList.length">
-                <div class="col-sm-5">{{keyColumnText}}</div>
-                <div class="col-sm-6">{{valueColumnText}}</div>
+            <div class="header-row form-control-label" *ngIf="!!keyValueFormList.length">
+                <div class="header-title">{{keyColumnText}}</div>
+                <div class="header-title">{{valueColumnText}}</div>
             </div>
 
             <!--Input List Entries-->
             <ul class="editor-list">
 
                 <!--List Entry-->
-                <li class="input-list-items container"
+                <li class="mb-1 container"
                     *ngFor="let entry of keyValueFormList; let i = index">
 
-                    <div class="editor-list-item clickable row"
+                    <div class="clickable row"
                          [class.invalid-entry]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
                         <ct-key-value-input
@@ -54,7 +54,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 [keyValidator]="keyValidator"
                                 [isDuplicate]="duplicateKeys.has(form.controls[entry.id].value.key)">
 
-                            <div *ngIf="!!entry" class="col-sm-1 align-right">
+                            <div *ngIf="!!entry" class="remove-icon">
                                 <i title="Delete" class="fa fa-trash text-hover-danger"
                                    (click)="removeEntry(entry)"></i>
                             </div>

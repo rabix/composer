@@ -1,5 +1,5 @@
 <ct-search-field [formControl]="searchContent"
-                 [placeholder]="'Search Apps'"></ct-search-field>
+                 [placeholder]="'Search'"></ct-search-field>
 
 <div>
     <button class="btn btn-link app-sources-btn" data-test="add-sources-button"
@@ -9,7 +9,7 @@
 
     <button class="btn btn-link sync-btn"
             data-test="sync-button"
-            ct-tooltip="Synchronize"
+            ct-tooltip="Fetch local and Platform data"
             tooltipPlacement="bottom"
             (click)="syncFileTree()">
         <i class="fa fa-refresh"></i>

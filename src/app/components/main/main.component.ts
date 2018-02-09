@@ -21,7 +21,7 @@ import {DomEventService} from "../../services/dom/dom-event.service";
         <div id="runnix" [class.active]="runnix | async"></div>
 
     `,
-    styleUrls: ["./../../../assets/sass/main.scss", "./main.component.scss"],
+    styleUrls: ["./main.component.scss"],
     providers: [
         UrlValidator,
         ContextService

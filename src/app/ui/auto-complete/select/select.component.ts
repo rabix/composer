@@ -96,6 +96,10 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     @Input()
     public maxItems = null;
 
+    // Press the [backspace] key and go back to editing the item without it being fully removed.
+    @Input()
+    public restoreOnBackSpace = true;
+
     // If true, the items that are currently selected will not be shown in the drop-down list
     @Input()
     public hideSelected = true;
@@ -184,9 +188,19 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     ngAfterViewInit() {
         this.zone.runOutsideAngular(() => {
+            const plugins = [];
+
+            // Add remove button only if its not a mono-selection (suggested input)
+            if (this.maxItems !== 1) {
+                plugins.push("remove_button");
+            }
+
+            if (this.restoreOnBackSpace) {
+                plugins.push("restore_on_backspace");
+            }
+
             const selectizeOptions = {
-                // Add remove button only if its not a mono-selection (suggested input)
-                plugins: this.maxItems !== 1 ? ["remove_button"] : [],
+                plugins,
                 delimiter: this.delimiter,
                 create: this.create,
                 createOnBlur: this.createOnBlur,

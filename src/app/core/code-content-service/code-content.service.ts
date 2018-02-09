@@ -27,7 +27,7 @@ export class CodeSwapService {
     }
 
     discardSwapContent() {
-        this.patchSwap(null);
+        return this.patchSwap(null);
     }
 
     private patchSwap(content): void {

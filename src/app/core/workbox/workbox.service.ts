@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {Store} from "@ngrx/store";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
@@ -12,6 +13,7 @@ import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
 import {CodeSwapService} from "../code-content-service/code-content.service";
 import {IpcService} from "../../services/ipc.service";
+import {TabCloseAction} from "../actions/core.actions";
 
 
 @Injectable()
@@ -36,6 +38,7 @@ export class WorkboxService {
                 private dataGateway: DataGatewayService,
                 private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
+                private store: Store<any>,
                 private platformRepository: PlatformRepositoryService) {
 
         // Whenever a user gets changed, we should restore their tabs
@@ -104,7 +107,7 @@ export class WorkboxService {
         this.priorityTabUpdate.next(1);
     }
 
-    openTab(tab, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
+    openTab(tab: TabData<any>, persistToRecentApps: boolean = true, syncState = true, replaceExistingIfExists = false) {
 
         const {tabs} = this.extractValues();
 
@@ -184,6 +187,7 @@ export class WorkboxService {
             const codeSwapService = new CodeSwapService(this.ipc, this.platformRepository, this.localRepository);
             codeSwapService.appID = tab.id;
             codeSwapService.discardSwapContent();
+            this.store.dispatch(new TabCloseAction(tab.data.id));
         }
 
         const currentlyOpenTabs = this.tabs.getValue();
@@ -253,14 +257,7 @@ export class WorkboxService {
         this.activeTab.next(tab);
     }
 
-    getOrCreateAppTab<T>(data: {
-        id: string;
-        type: string;
-        label?: string;
-        isWritable?: boolean;
-        language?: string;
-
-    }, forceCreate = false, forceFetch = false): TabData<T> {
+    getOrCreateAppTab<T>(data: TabData<any>, forceCreate = false, forceFetch = false): TabData<T> {
 
         if (!forceCreate) {
             const currentTab = this.tabs.getValue().find(existingTab => existingTab.id === data.id);
@@ -300,7 +297,7 @@ export class WorkboxService {
             }
         }, data) as TabData<any>;
 
-        if (id.endsWith(".json")) {
+        if (id.endsWith(".json") && !data.language) {
             tab.data.language = "json";
         }
 

@@ -5,8 +5,9 @@
     width: 100%;
 
     .key-container {
-        border: 2px solid transparent;
+        border: 1px solid transparent;
         display: flex;
+        flex: 1;
 
         .error-validation-icon, .warning-validation-icon {
             margin: auto;
@@ -21,10 +22,8 @@
         }
     }
 
-    // @fixme this whole component should be rewritten, please disregard horrible hacky code
-    /deep/ .fa-trash {
-        position: relative;
-        top: 3px;
+    .expression-input {
+        flex: 1;
     }
 }
 

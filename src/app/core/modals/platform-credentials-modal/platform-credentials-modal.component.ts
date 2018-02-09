@@ -24,9 +24,9 @@ import {GlobalService} from "../../global/global.service";
 
                 <input type="hidden" formControlName="user"/>
 
-                <div class="row form-group" [class.has-warning]="form.get('url').invalid">
-                    <label class="col-xs-4 col-form-label">Platform:</label>
-                    <div class="col-xs-8">
+                <div class="row form-group platform-row" [class.has-warning]="form.get('url').invalid">
+                    <label class="col-xs-5 col-form-label">Platform:</label>
+                    <div class="col-xs-7">
                         <ct-auto-complete [mono]="true"
                                           [create]="true"
                                           [sortField]="false"
@@ -38,21 +38,20 @@ import {GlobalService} from "../../global/global.service";
                 </div>
 
                 <div class="row form-group" [class.has-warning]="form.get('token').invalid">
-                    <label class="col-xs-4 col-form-label">Authentication Token:</label>
-                    <div class="col-xs-8  form-inline token-form">
+                    <label class="col-xs-5 col-form-label">Authentication Token:</label>
+                    <div class="col-xs-7 form-inline token-form">
                         <input data-test="credentials-modal-token-field"
                                formControlName="token"
                                class="form-control token-control"
                                type="password"/>
-
-                        <button class="ml-1 btn btn-secondary"
-                                type="button"
-                                data-test="credentials-modal-get-token-button"
-                                [disabled]="form.get('url').invalid"
-                                (click)="openTokenPage()">Get Token
-                        </button>
                     </div>
 
+                    <button class="btn btn-link"
+                            type="button"
+                            data-test="credentials-modal-get-token-button"
+                            [disabled]="form.get('url').invalid"
+                            (click)="openTokenPage()">Access your Token
+                    </button>
                 </div>
 
                 <div *ngIf="form.dirty && form.invalid">                    
@@ -63,7 +62,7 @@ import {GlobalService} from "../../global/global.service";
 
                     <span class="text-danger" *ngIf="form.get('url').hasError('name')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                            <span>Given platform does not exist.</span>
+                            <span>Given Platform does not exist.</span>
                     </span>
 
                     <span class="text-danger" *ngIf="form.get('token').hasError('pattern')">
@@ -73,16 +72,16 @@ import {GlobalService} from "../../global/global.service";
 
                     <span class="text-danger" *ngIf="form.hasError('tokenCheck')">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Token is not valid for the selected platform. ({{ form.getError("tokenCheck") }})</span>
+                        <span>Token is not valid for the selected Platform. ({{ form.getError("tokenCheck") }})</span>
                     </span>
 
                     <span *ngIf="form.hasError('timeout')" class="text-danger">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Connection timed-out while trying to contact the platform.</span>
+                        <span>Connection timed-out while trying to contact the Platform.</span>
                     </span>
                     <span *ngIf="form.hasError('notfound')" class="text-danger">
                         <i class="fa fa-times-circle fa-fw"></i>
-                        <span>Cannot connect to the platform. Are you online?</span>
+                        <span>Cannot connect to the Platform. Are you online?</span>
                     </span>
 
 

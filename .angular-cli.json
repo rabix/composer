@@ -1,14 +1,12 @@
 {
     "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
     "project": {
-        "version": "1.0.0-rc.1",
         "name": "rabix-composer"
     },
     "apps": [
         {
             "root": "src",
             "outDir": "ng-dist",
-            "deployUrl": "",
             "assets": [
                 "assets",
                 "favicon.ico",
@@ -41,10 +39,10 @@
             "testTsconfig": "tsconfig.spec.json",
             "prefix": "ct",
             "styles": [
+                "assets/sass/main.scss",
                 "styles.css"
             ],
-            "scripts": [
-            ],
+            "scripts": [],
             "environmentSource": "environments/environment.ts",
             "environments": {
                 "dev": "environments/environment.ts",
@@ -79,8 +77,8 @@
     "defaults": {
         "styleExt": "scss",
         "component": {
-            "changeDetection": "OnPush",
-            "inlineTemplate": true
+            "inlineTemplate": true,
+            "changeDetection": "OnPush"
         }
     }
 }

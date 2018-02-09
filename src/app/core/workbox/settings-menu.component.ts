@@ -38,9 +38,17 @@ import {WorkboxService} from "./workbox.service";
                     <span class="text-muted text-nowrap d-block small">{{ getPlatformLabel(c.url) }}</span>
                 </li>
                 <li (click)="openSettings()" data-test="settings-button"><i class="fa fa-cog fa-fw"></i> Settings</li>
-                <li (click)="openDocumentation()" data-test="documentation-button"><i class="fa fa-question-circle fa-fw"></i> Documentation</li>
+                <li (click)="openDocumentation()" 
+                    data-test="documentation-button" 
+                    [attr.data-url]="rabixDocLink">
+                    
+                    <i class="fa fa-question-circle fa-fw"></i> 
+                    Documentation
+                </li>
                 <li (click)="openFeedback()" data-test="send-feedback-button"><i class="fa fa-bullhorn fa-fw"></i> Send Feedback</li>
-                <li (click)="checkForPlatformUpdates()" *ngIf="global.platformIsOutdated" class="outdated-update"
+                <li (click)="checkForPlatformUpdates()" 
+                    *ngIf="global.platformIsOutdated" 
+                    class="outdated-update"
                     data-test="updates-available">
 
                     <i class="fa fa-refresh fa-fw "></i>
@@ -54,6 +62,8 @@ import {WorkboxService} from "./workbox.service";
     `
 })
 export class SettingsMenuComponent extends DirectiveBase {
+
+    private rabixDocLink = "http://docs.rabix.io/rabix-composer-home";
 
     hasWarning = false;
 
@@ -89,7 +99,7 @@ export class SettingsMenuComponent extends DirectiveBase {
     }
 
     openDocumentation(): void {
-        this.system.openLink("http://docs.rabix.io/rabix-composer-home");
+        this.system.openLink(this.rabixDocLink);
     }
 
     openFeedback(): void {

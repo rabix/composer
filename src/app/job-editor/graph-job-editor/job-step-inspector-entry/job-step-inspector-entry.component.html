@@ -1,0 +1,185 @@
+<div class="form-control-label" *ngIf="warning">
+    <span class="text-warning">
+        <i class="fa fa-times-circle fa-fw"></i>
+        {{ warning }}
+    </span>
+</div>
+
+<div [ngSwitch]="inputType" class="form-group">
+
+    <!--Each leaf field will be wrapped as an input group-->
+    <!--Nested fields below should not be wrapped into other container elements-->
+    <!--because it will break size and positioning-->
+    <div class="input-group">
+
+        <!--Enums-->
+        <ng-template ngSwitchCase="enum">
+            <select class="form-control" [formControl]="control" #input>
+                <option *ngFor="let val of inputEnumSymbols" [value]="val">
+                    {{ val }}
+                </option>
+            </select>
+        </ng-template>
+
+        <!--Numbers-->
+        <ng-template ngSwitchCase="int">
+            <input type="number" class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+        <ng-template ngSwitchCase="float">
+            <input type="number" class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+
+        <!--Strings-->
+        <ng-template ngSwitchCase="string">
+            <input class="form-control" [formControl]="control" [readonly]="readonly" #input/>
+        </ng-template>
+
+        <!--Booleans-->
+        <ng-template ngSwitchCase="boolean">
+            <ct-toggle-slider [formControl]="control"></ct-toggle-slider>
+        </ng-template>
+
+        <!--Maps-->
+        <ng-template ngSwitchCase="map">
+            <ct-map-list class="form-group" [formControl]="control"></ct-map-list>
+        </ng-template>
+
+        <!--Files and array of Files-->
+        <ng-template ngSwitchCase="File">
+            <ct-native-file-browser-form-field class="input-group"
+                                               [disableTextInput]="true"
+                                               [useIcon]="true"
+                                               [formControl]="control.get('path')"
+                                               selectionType="file">
+            </ct-native-file-browser-form-field>
+
+            <button *ngIf="control.get('path').enabled" class="btn btn-link file-meta-edit-btn" type="button"
+                    (click)="promptFileMetadata()">
+                <ng-container *ngIf="metadataKeysCount > 0 || secondaryFilesCount > 0; else defaultTitle">
+
+                    {{ secondaryFilesCount }} secondary {{ secondaryFilesCount === 1 ? 'file' : 'files'}},
+                    {{ metadataKeysCount }} metadata
+                </ng-container>
+
+                <ng-template #defaultTitle>Add secondary files and metadata</ng-template>
+
+            </button>
+
+        </ng-template>
+
+        <!--Directories and array of Directories-->
+        <ng-template ngSwitchCase="Directory">
+            <ct-native-file-browser-form-field class="input-group"
+                                               [useIcon]="true"
+                                               [disableTextInput]="true"
+                                               [formControl]="control.get('path')"
+                                               selectionType="directory">
+            </ct-native-file-browser-form-field>
+        </ng-template>
+
+    </div>
+
+    <!--Records-->
+    <ng-template ngSwitchCase="record">
+
+        <ng-container *ngIf="inputRecordFields.length === 0">This record has no fields.</ng-container>
+
+        <div *ngFor="let entry of inputRecordFields" class="ml-1">
+
+            <label>
+
+                {{entry?.label || entry.id}}
+
+                <span class="text-muted">({{entry.type.type}})</span>
+
+                <i *ngIf="entry.description"
+                   class="fa fa-info-circle text-muted"
+                   [ct-tooltip]="ctt"
+                   tooltipPlacement="top"></i>
+
+            </label>
+
+            <ct-job-step-inspector-entry
+                [formControl]="control.get(entry.id)"
+                [readonly]="readonly"
+                [inputType]="entry.type.type"
+                [inputArrayItemsType]="entry.type.items"
+                [inputEnumSymbols]="entry.type.symbols"
+                [inputRecordFields]="entry.type.fields">
+            </ct-job-step-inspector-entry>
+
+            <ct-tooltip-content #ctt>
+                <div class="tooltip-info">{{ entry.description }}</div>
+            </ct-tooltip-content>
+        </div>
+    </ng-template>
+
+    <!--Arrays-->
+    <ng-template ngSwitchCase="array">
+
+        <div *ngFor="let ctrl of control.controls; let idx = index;" class="array-row">
+
+            <!--Delete button if array of maps-->
+            <div *ngIf="inputArrayItemsType === 'map'" class="pb-1">
+                <span class="text-muted">
+                     [{{idx}}]
+                </span>
+
+                <span *ngIf="!readonly"
+                      class="remove-icon pull-right"
+                      ct-tooltip="Delete map array"
+                      (click)="deleteFromArray(idx)">
+                    <i class="fa fa-trash clickable"></i>
+                </span>
+            </div>
+
+            <div class="array-entry">
+                <ct-job-step-inspector-entry #arrayItem
+                                             [inputType]="inputArrayItemsType"
+                                             [inputEnumSymbols]="inputEnumSymbols"
+                                             [inputRecordFields]="inputRecordFields"
+                                             [readonly]="readonly"
+                                             [formControl]="ctrl">
+                </ct-job-step-inspector-entry>
+
+                <!--Delete button if not array of maps-->
+                <span *ngIf="inputArrayItemsType !== 'map' && !readonly"
+                      class="remove-icon pull-right"
+                      ct-tooltip="Delete"
+                      (click)="deleteFromArray(idx)">
+                    <i class="fa fa-trash clickable"></i>
+                </span>
+            </div>
+        </div>
+
+        <ng-container *ngIf="control.enabled">
+
+            <!--Add array item button in case that element is not File or Directory-->
+            <ng-container
+                *ngIf="inputArrayItemsType !== 'File' && inputArrayItemsType !== 'Directory'; else arrayFileOrDirectory">
+                <button *ngIf="!readonly"
+                        (click)="addArrayEntry()" type="button"
+                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                    <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
+                </button>
+            </ng-container>
+
+            <!--Add array item button in case that element is File or Directory-->
+            <ng-template #arrayFileOrDirectory>
+                <button *ngIf="!readonly"
+                        (click)="addArrayFileOrDirectory()" type="button"
+                        class="btn pl-0 btn-link no-outline no-underline-hover">
+                    <i class="fa fa-plus"></i> New {{ inputArrayItemsType }}
+                </button>
+            </ng-template>
+
+        </ng-container>
+
+    </ng-template>
+
+    <!--Unknown-->
+    <ng-template ngSwitchDefault>
+        Unknown input type: {{ inputType || "null" }}
+    </ng-template>
+
+</div>

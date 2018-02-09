@@ -29,19 +29,19 @@ import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
             </div>
 
             <div class="form-group">
-                <label class="form-control-label">Position</label>
-                <input class="form-control"
-                       type="number"
-                       data-test="position-field"
-                       [formControl]="form.controls['position']"/>
-            </div>
-
-            <div class="form-group">
                 <label class="form-control-label">Prefix</label>
                 <input class="form-control"
                        data-test="prefix-field"
                        [ct-disabled]="isType('record') || readonly"
                        [formControl]="form.controls['prefix']"/>
+            </div>            
+
+            <div class="form-group">
+                <label class="form-control-label">Position</label>
+                <input class="form-control"
+                       type="number"
+                       data-test="position-field"
+                       [formControl]="form.controls['position']"/>
             </div>
 
             <div class="form-group">

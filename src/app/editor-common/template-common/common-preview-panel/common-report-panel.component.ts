@@ -1,10 +1,13 @@
-import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild, OnInit} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkflowEditorComponent} from "../../../workflow-editor/workflow-editor.component";
 import {AppEditorBase} from "../../app-editor-base/app-editor-base";
-import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execution-preview.component";
+import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
+import {appSelector} from "../../../execution/reducers/selectors";
+import {AppExecution} from "../../../execution/models";
+import {map} from "rxjs/operators";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -16,12 +19,13 @@ import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execut
             </span>
         </div>
 
+
         <!--Common Execution Preview-->
-        <ct-app-execution-preview [hidden]="host.reportPanel !== 'execution'" #executionPreview
-                                  (stopExecution)="host.stopExecution()"
-                                  [job]="host.executionJob"
-                                  [isRunning]="host.isExecuting">
-        </ct-app-execution-preview>
+        <ct-execution-status [hidden]="host.reportPanel !== 'execution'" #executionPreview
+                             [execution]="appProgressSlice | async"
+                             [appID]="host.tabData.id">
+        </ct-execution-status>
+
 
         <!--Common Validation Report-->
         <ct-validation-report *ngIf="host.reportPanel === 'validation'"
@@ -34,7 +38,7 @@ import {AppExecutionPreviewComponent} from "../../app-execution-panel/app-execut
     `,
     styleUrls: ["./common-report-panel.component.scss"],
 })
-export class CommonReportPanelComponent extends DirectiveBase implements AfterViewInit {
+export class CommonReportPanelComponent extends DirectiveBase implements OnInit, AfterViewInit {
 
     @Input()
     host: AppEditorBase;
@@ -47,22 +51,23 @@ export class CommonReportPanelComponent extends DirectiveBase implements AfterVi
 
     appType: string;
 
-    @ViewChild("executionPreview", {read: AppExecutionPreviewComponent})
-    private appExecutionPreview: AppExecutionPreviewComponent;
+    @ViewChild("executionPreview", {read: ExecutionStatusComponent})
+    private appExecutionPreview: ExecutionStatusComponent;
+
+    appProgressSlice: Observable<Partial<AppExecution>>;
 
     constructor(private domEvents: DomEventService, private element: ElementRef) {
         super();
     }
 
     ngOnInit() {
-        this.appType = this.host instanceof WorkflowEditorComponent
-            ? "Workflow"
-            : "CommandLineTool";
 
-    }
+        this.appType = this.host instanceof WorkflowEditorComponent ? "Workflow" : "CommandLineTool";
 
-    getAppExecutionPreview(): AppExecutionPreviewComponent {
-        return this.appExecutionPreview;
+        this.appProgressSlice = this.host.store.pipe(
+            map(appSelector(this.host.tabData.id)),
+        );
+
     }
 
     ngAfterViewInit() {

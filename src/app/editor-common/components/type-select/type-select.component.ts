@@ -1,4 +1,4 @@
-import {Component, forwardRef, Input} from "@angular/core";
+import {Component, forwardRef} from "@angular/core";
 import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {ParameterTypeModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";
@@ -24,7 +24,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
         </div><!--Type-->
 
         <div class="form-group" *ngIf="paramType.type !== 'array'">
-            <label>Allow array as well as single item</label>
+            <label>Allow array as well as a single item</label>
             <span class="pull-right">
                     <ct-toggle-slider data-test="allow-array-toggle" [formControl]="form.controls['isItemOrArray']"></ct-toggle-slider>
                 </span>

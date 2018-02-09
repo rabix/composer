@@ -35,6 +35,7 @@ import {ToolOutputsComponent} from "./sections/outputs/tool-outputs.component";
 import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolEditorComponent} from "./tool-editor.component";
 import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
+import {JobEditorModule} from "../job-editor/job-editor.module";
 
 @NgModule({
     declarations: [
@@ -80,7 +81,8 @@ import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor
         ReactiveFormsModule,
         EditorCommonModule,
         CWLModule,
-        UIModule
+        UIModule,
+        JobEditorModule
     ]
 })
 export class ToolEditorModule {
