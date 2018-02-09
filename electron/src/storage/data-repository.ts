@@ -360,7 +360,6 @@ export class DataRepository {
             }
 
             const deletables = files
-                .map(file => file.slice(0, -5)) // remove .json extension
                 .filter(profile => profile !== "local" && profileIDs.indexOf(profile) === -1) // take just the ones not present in profiles
                 .map(profile => new Promise((resolve, reject) => {
 

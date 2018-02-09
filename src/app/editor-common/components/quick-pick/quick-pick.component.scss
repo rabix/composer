@@ -15,12 +15,17 @@
         }
     }
 
-    .btn {
-        flex: 1;
-    }
+    .radio-container .btn {
+        background-color: $input-bg;
+        color: $smoke;
 
-    .btn.selected {
-        border: 2px solid $brand-primary;
+        &.selected {
+            border: 2px solid $brand-primary;
+        }
+
+        &:hover {
+            border: 2px solid $brand-primary;
+        }
     }
 
     .custom-btn {

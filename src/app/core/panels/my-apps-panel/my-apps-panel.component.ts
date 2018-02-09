@@ -272,7 +272,7 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         const platformRootMenuItems = [
             new MenuItem("Open a Project", {
                 click: () => {
-                    const component = this.modal.fromComponent(AddSourceModalComponent, "Open a Project");
+                    const component     = this.modal.fromComponent(AddSourceModalComponent, "Open a Project");
                     component.activeTab = "platform";
                 }
             }),
@@ -300,21 +300,12 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
             return new MenuItem(`New ${type}`, {
                 click: () => {
-                    const modal = this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type} in ${node.label}`);
-
-                    modal.appType     = type;
-                    modal.destination = destination;
-                    if (destination === "local") {
-                        modal.defaultFolder = node.id;
-
-                        // Wait for component to initialize, then open the dialog for choosing the file path
-                        setTimeout(() => {
-                            modal.chooseFilepath();
-                        });
-                    } else {
-                        modal.defaultProject = node.id;
-                    }
-
+                    this.modal.fromComponent(CreateAppModalComponent, `Create a new ${type} in ${node.label}`, {
+                        appType: type,
+                        destination,
+                        defaultFolder: destination === "local" ? node.id : undefined,
+                        defaultProject: destination === "remote" ? node.id : undefined
+                    });
                 }
             });
         };

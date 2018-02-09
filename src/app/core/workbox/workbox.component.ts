@@ -51,7 +51,7 @@ import {WorkboxService} from "./workbox.service";
                         <!-- Code tab-->
                         <ng-template ngSwitchCase="Code">
                             <div class="tab-icon">
-                                <i class="fa fa-file-text-o"></i>
+                                <i class="fa fa-file"></i>
                             </div>
 
                             <div class="title"
@@ -93,7 +93,7 @@ import {WorkboxService} from "./workbox.service";
                         <!-- New File tab-->
                         <ng-template ngSwitchCase="NewFile">
                             <div class="tab-icon">
-                                <i class="fa fa-file-o"></i>
+                                <i class="fa fa-home"></i>
                             </div>
 
                             <div class="title"
