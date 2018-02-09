@@ -104,11 +104,11 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 localRepository: LocalRepositoryService,
                 fileRepository: FileRepositoryService,
                 workbox: WorkboxService,
-                updateService: AppUpdateService,
                 exportApp: ExportAppService,
                 store: Store<any>,
                 auth: AuthService,
-                executor: ExecutorService) {
+                executor: ExecutorService,
+                updateService: AppUpdateService) {
 
         super(
             statusBar,
@@ -124,11 +124,11 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             localRepository,
             fileRepository,
             workbox,
+            exportApp,
             store,
             auth,
             executor,
-            updateService,
-            exportApp
+            updateService
         );
     }
 
