@@ -73,8 +73,8 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                 <div *ngIf="form.get('type').value === 'idea'" class="description">
                     Please let us know:
                     <ul class="ml-2">
-                        <li>Which feature you would like to add?</li>
-                        <li>Why it is important for you?</li>
+                        <li>Which feature would you like to add?</li>
+                        <li>Why is it important for you?</li>
                         <li>The problem it would solve?</li>
                     </ul>
                 </div>
@@ -85,7 +85,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
                     <ul class="ml-2">
                         <li>What happened?</li>
                         <li>What were you trying to do when the problem occured?</li>
-                        <li>What did you expected to see instead?</li>
+                        <li>What did you expect to see instead?</li>
                     </ul>
                 </div>
 
