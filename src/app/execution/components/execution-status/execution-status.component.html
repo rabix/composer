@@ -12,7 +12,7 @@
     <button *ngIf="fileOpener"
             type="button" class="btn btn-secondary" ct-tooltip="Open Job File"
             (click)="fileOpener.open(jobFilePath, 'yaml')"
-            [disabled]="!jobFilePath || error?.type === 'requirement'">
+            [disabled]="!jobFilePath || execution?.error?.type === 'requirement'">
         <i class="fa fa-indent fa-fw"></i>
     </button>
 

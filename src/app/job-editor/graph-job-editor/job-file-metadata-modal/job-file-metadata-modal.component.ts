@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, OnChanges} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {ModalService} from "../../../ui/modal/modal.service";
 
@@ -16,6 +16,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                         <ct-native-file-browser-form-field class="input-group secondary-file-input"
                                                            [formControl]="group.get('path')"
                                                            [useIcon]="true"
+                                                           [relativePathRoot]="relativePathRoot"
                                                            [browseIcon]="group.get('class').value === 'File' ? 'fa-file' : 'fa-folder'"
                                                            [selectionType]="group.get('class').value === 'File' ? 'file' : 'directory'">
                         </ct-native-file-browser-form-field>
@@ -58,7 +59,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
     `,
     styleUrls: ["./job-file-metadata-modal.component.scss"],
 })
-export class JobFileMetadataModalComponent implements OnInit {
+export class JobFileMetadataModalComponent implements OnInit, OnChanges {
 
     @Input()
     secondaryFiles: { class: "File" | "Directory", path: string }[] = [];
@@ -72,6 +73,9 @@ export class JobFileMetadataModalComponent implements OnInit {
     @Input()
     allowDirectories = true;
 
+    @Input()
+    relativePathRoot: string;
+
     form: FormGroup;
 
     constructor(private modal: ModalService) {
@@ -79,6 +83,7 @@ export class JobFileMetadataModalComponent implements OnInit {
 
     ngOnInit() {
 
+        console.log("Init");
 
         this.form = new FormGroup({
             secondaryFiles: new FormArray([]),
@@ -98,12 +103,17 @@ export class JobFileMetadataModalComponent implements OnInit {
         }
     }
 
+    ngOnChanges() {
+        console.log("Changes");
+    }
+
     deleteSecondaryFile(index: number) {
         const ctrl = this.form.get("secondaryFiles") as FormArray;
         ctrl.removeAt(index);
     }
 
     addSecondaryFile(path = "", type: "File" | "Directory") {
+        console.log("Add sec");
         const ctrl = this.form.get("secondaryFiles") as FormArray;
 
         ctrl.push(new FormGroup({
@@ -113,7 +123,8 @@ export class JobFileMetadataModalComponent implements OnInit {
     }
 
     applyChanges() {
-        let fVal = this.form.value;
+        console.log("Apply");
+        const fVal = this.form.value;
 
         fVal.secondaryFiles = fVal.secondaryFiles.filter(entry => entry.path.trim() !== "");
 

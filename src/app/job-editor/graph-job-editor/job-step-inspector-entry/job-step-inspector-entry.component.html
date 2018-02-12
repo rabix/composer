@@ -48,6 +48,7 @@
         <ng-template ngSwitchCase="File">
             <ct-native-file-browser-form-field class="input-group"
                                                [disableTextInput]="true"
+                                               [relativePathRoot]="relativePathRoot"
                                                [useIcon]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="file">
@@ -71,6 +72,7 @@
         <ng-template ngSwitchCase="Directory">
             <ct-native-file-browser-form-field class="input-group"
                                                [useIcon]="true"
+                                               [relativePathRoot]="relativePathRoot"
                                                [disableTextInput]="true"
                                                [formControl]="control.get('path')"
                                                selectionType="directory">

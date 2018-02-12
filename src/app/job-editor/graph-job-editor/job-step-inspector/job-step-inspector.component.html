@@ -53,6 +53,7 @@
                         <!--Input-->
                         <ct-job-step-inspector-entry *ngIf="jobGroup.get(input.id).enabled"
                                                      [formControl]="jobGroup.get(input.id)"
+                                                     [relativePathRoot]="relativePathRoot"
                                                      [inputType]="input.type.type"
                                                      [inputArrayItemsType]="input.type.items"
                                                      [inputEnumSymbols]="input.type.symbols"

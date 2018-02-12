@@ -36,7 +36,6 @@ import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service
 
                         <ng-container *ngIf="form.get('choice').value === 'custom'">
                             <ct-native-file-browser-form-field class="input-group mt-1"
-                                                               [disableTextInput]="true"
                                                                [hidden]=""
                                                                formControlName="path"></ct-native-file-browser-form-field>
 
