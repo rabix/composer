@@ -189,7 +189,8 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             ), (shouldShowAll, projects) => ({shouldShowAll, projects})),
             map(data => {
                 const {shouldShowAll, projects}             = data;
-                const [openProjects = [], allProjects = []] = projects;
+
+                const [openProjects, allProjects] = [projects[0] || [], projects[1] || []];
 
                 const openProjectsExist = openProjects.length !== 0;
                 const canToggle         = openProjectsExist;
