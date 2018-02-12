@@ -109,6 +109,13 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         this.inspectorService = inspector;
 
         this.updateService.update
+            .do(async () => {
+
+                // If model has not been created, attempt to create it, because we potentially need to update steps
+                if (!this.dataModel) {
+                    await this.resolveCurrentContent();
+                }
+            })
             .filter((data: {id: string, app: any}) => {
 
                 /**
@@ -117,7 +124,9 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                  */
                 let filterFn = (step) => false;
                 if (this.tabData.dataSource === "local") {
-                    filterFn = (step) => step.customProps["sbg:rdfId"] === data.id || step.runPath === data.id;
+                    filterFn = (step) => {
+                        return this.getStepAbsolutePath(step.customProps["sbg:rdfId"]) === data.id || this.getStepAbsolutePath(step.runPath) === data.id;
+                    }
                 } else if (data.id && !AppHelper.isLocal(data.id)) {
                     filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
                 }
@@ -135,7 +144,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                             this.invalidSteps.splice(invalidStepIndex, 1);
                         }
 
-                        steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
+                        steps = this.dataModel.steps.filter(step => this.getStepAbsolutePath(step.customProps["sbg:rdfId"]) === data.id);
                         steps.forEach(step => step.setRunProcess(data.app));
 
                         // If an updated node was open in inspector, reopen inspector with updated node information
@@ -246,5 +255,24 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
         hints.model = this.dataModel;
         hints.readonly = this.isReadonly;
+    }
+
+    private getStepAbsolutePath(path: string): string {
+        if (path.indexOf("./") === -1 && path.indexOf("../") === -1) {
+            return path;
+        }
+
+        let wfPathSplit = this.tabData.id.split("/");
+
+        if (path.indexOf("./") === 0) {
+            return path.replace(".", wfPathSplit.slice(0, wfPathSplit.length - 1).join("/") + "/")
+        }
+
+        // Find string of only '../' sequences, up to the first time the '../' sequence does not show up, ie. folder name
+        const regex         =  /^(?!\/)(\.\.\/)+/g;
+        const matchStr      = path.match(regex).join("");
+        const numParentDirs = matchStr.length / "../".length;
+
+        return wfPathSplit.slice(0, wfPathSplit.length - 1 - numParentDirs).join("/") + "/" + path.substr(matchStr.length);
     }
 }

@@ -194,7 +194,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         /** We skip validation for first code changes in local apps because initial resolve will call validation */
         const codeChangesToValidate = Observable.merge(this.resolveDocumentChanges,
-            this.codeEditorContent.valueChanges.debounceTime(300).skip(this.tabData.dataSource === "local" ? 1 : 0).distinctUntilChanged());
+            this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged());
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
         const schemaValidation = this.appValidator.createValidator(codeChangesToValidate).map((state: AppValidityState) => {
@@ -266,19 +266,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 return;
             }
 
-            // If app is not initially resolvable and user proceeds to edit, we have to inform the user to
-            // manually click resolve to fix issues after validation has been passed
-            if (this.tabData.dataSource === "local" && !this.dataModel) {
-                this.validationState.warnings = this.validationState.warnings.concat({
-                    loc: "document",
-                    type: "error",
-                    message: "No JSON schema issues. Resolve to enable other editor tabs."
-                });
-            }
-
             // We have to resolve after validation if app is a workflow with invalid steps
-            const isWorkflowWithInvalidSteps = this instanceof WorkflowEditorComponent && (<WorkflowEditorComponent>this).invalidSteps.length;
-            const continuation: Promise<any> = this.tabData.dataSource === "local" && isWorkflowWithInvalidSteps ?
+            const continuation: Promise<any> = this.tabData.dataSource === "local" && (this.isWorkflowWithInvalidSteps() || !this.dataModel) ?
                 this.resolveToModel(code) : Promise.resolve();
 
             continuation.then(() => {
@@ -318,7 +307,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** When the first validation ends, turn off the loader and determine which view we can show. Invalid app forces code view */
         firstValidationEnd.subscribe(state => {
             if (this.tabData.dataSource === "local") {
-                this.viewMode = state.isValidCWL && this.isResolved ? this.getPreferredTab() : "code";
+                this.viewMode = state.isValidCWL && !this.isWorkflowWithInvalidSteps() ? this.getPreferredTab() : "code";
             } else {
                 this.viewMode = state.isValidCWL ? this.getPreferredTab() : "code";
             }
@@ -459,7 +448,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      */
     tabsUnlocked(): boolean {
         let codeCondition = this.validationState && this.validationState.isValidCWL && !this.isResolvingContent &&
-            !this.isValidatingCWL && (this.tabData.dataSource === "local" ? this.isResolved : true);
+            !this.isValidatingCWL;
         if (this.viewMode === "code") {
             return codeCondition;
         }
@@ -932,5 +921,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         if (this.dataModel) {
             return this.dataModel instanceof WorkflowModel;
         }
+    }
+
+    private isWorkflowWithInvalidSteps() {
+        return !!(this instanceof WorkflowEditorComponent && (<WorkflowEditorComponent>this).invalidSteps.length);
     }
 }
