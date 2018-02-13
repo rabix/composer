@@ -1,12 +1,4 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    OnInit,
-    Output
-} from "@angular/core";
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angular/core";
 import {StepModel, WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {ObjectHelper as OH} from "../../../../helpers/object.helper";
 import {StatusBarService} from "../../../../layout/status-bar/status-bar.service";
@@ -38,7 +30,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                        *ngIf="hasMetadata(input)"
                                        [ct-tooltip]="ctt"
                                        [tooltipPlacement]="'bottom'"></i>
-                                    
+
                                     {{ input.label || input.id }}
                                     <span class="text-muted">({{input.type.type}})</span>
 
@@ -62,10 +54,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <!--Port options for all other types-->
                                 <div *ngIf="!isType(input, ['File', 'Directory'])" class="input-control">
 
-                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left"
-                                                              #portChangeDropDown>
-                                        <button type="button" 
-                                                [disabled]="readonly" 
+                                    <ct-generic-dropdown-menu [ct-menu]="menu" menuAlign="left" #portChangeDropDown>
+                                        <button type="button"
+                                                [disabled]="readonly"
                                                 class="btn btn-unstyled"
                                                 data-test="port-options-button"
                                                 (click)="portChangeDropDown.toggleMenu()">
@@ -94,6 +85,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 </div>
                             </div>
+                            
+                            
 
                             <!--Input-->
                             <ct-workflow-step-inspector-entry [input]="input"
@@ -111,13 +104,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--No connections-->
                                 <div *ngIf="input.source.length === 0 && input.isVisible">
-                            <span class="text-warning" *ngIf="input.type.isNullable">
-                                <i class="fa fa-warning fa-fw"></i> This port is not connected
-                            </span>
-
+                                    <span class="text-warning" *ngIf="input.type.isNullable">
+                                        <i class="fa fa-warning fa-fw"></i> This port is not connected
+                                    </span>
+    
                                     <span class="text-danger" *ngIf="!input.type.isNullable">
-                                <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
-                            </span>
+                                        <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
+                                    </span>
                                 </div>
 
                                 <!--List of connections-->
@@ -133,16 +126,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--Description-->
                                 <div *ngIf="input.description" class="value">
-                               
-                                        {{input.description}}
-                               
+                                    {{input.description}}
                                 </div>
-    <div *ngIf="input.customProps['sbg:toolDefaultValue']">                                    <span class="title">
-                                            Suggested Value:
-                                        </span>
-                                    <span class="valueindent">
-                                            {{input.customProps["sbg:toolDefaultValue"]}}
-                                    </span>
+                                
+                                <div *ngIf="input.customProps['sbg:toolDefaultValue']">
+                                    <span class="title">Suggested Value:</span>
+                                    <span class="valueindent">{{input.customProps["sbg:toolDefaultValue"]}}</span>
                                 </div>
 
 
@@ -154,17 +143,27 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                         {{(input.fileTypes || []).join(",")}}
                                     </span>
                                 </div>
-                                
+
                                 <div *ngIf="input.customProps['sbg:altPrefix']">
                                     <span class="title">
                                         Alternative Command Line Prefix:
                                     </span>
-                                        <span class="value indent">
+                                    <span class="value indent">
                                         {{input.customProps["sbg:altPrefix"]}}
                                         </span>
                                 </div>
-                                
+
                             </ct-tooltip-content>
+
+                            <div class="form-group">
+                                
+                                <label class="form-control-label">Merge Method</label>
+                                
+                                <select class="form-control" [ngModel]="input.linkMerge.value" (ngModelChange)="input.linkMerge.value = $event; change.emit()" [ngModelOptions]="{standalone: true}">
+                                    <option value="merge_nested">Nested</option>
+                                    <option value="merge_flattened">Flattened</option>
+                                </select>
+                            </div>
 
                         </div>
                     </form>
@@ -309,8 +308,9 @@ export class StepInputsInspectorComponent extends DirectiveBase implements OnIni
     ngOnChanges() {
 
         // Whenever inputs are updated, regroup them and sort them for display
-        const grouped    = this.step.in.reduce((acc, item) => {
+        const grouped = this.step.in.reduce((acc, item) => {
             const group = this.isType(item, "File") ? "Files" : "App parameters";
+
             return Object.assign(acc, group ? {[group]: (acc[group] || []).concat(item)} : null);
 
         }, {});
