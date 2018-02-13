@@ -1,11 +1,12 @@
 import {ExecutionState} from "../../models";
 import {Optional} from "../../utilities/types";
 
+
 /**
  * Parses a block of Bunny log text in order to try to extract information about
  * step progress (starting, stopping, failures).
  */
-export function parseContent(text: string): Map<Optional<string>, ExecutionState> {
+export function extractStepProgress(text: string): Map<Optional<string>, ExecutionState> {
 
     const lines = text.split("\n");
     const state = new Map<Optional<string>, ExecutionState>();
@@ -22,6 +23,18 @@ export function parseContent(text: string): Map<Optional<string>, ExecutionState
     }
 
     return state;
+}
+
+export function extractDockerTimeout(text: string): Optional<number> {
+    // Failed to pull docker image. Retrying in 30 seconds
+    const matched = text.match(/Failed to pull docker image\. Retrying in (\d+) seconds/i);
+
+    if (matched) {
+        const number = parseInt(matched[1]);
+        if (!isNaN(number)) {
+            return number;
+        }
+    }
 }
 
 /**

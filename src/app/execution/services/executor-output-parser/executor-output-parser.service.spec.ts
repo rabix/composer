@@ -38,7 +38,7 @@ describe("ExecutorOutputParserService", () => {
 
         dispatch(new ExecutorOutputAction("my_app_id", "Job root.my_step_id has started"));
 
-        service.output.subscribe((result: ExecutionStepStartedAction) => {
+        service.stepStates.subscribe((result: ExecutionStepStartedAction) => {
             expect(result instanceof ExecutionStepStartedAction).toBeTruthy();
             expect(result.appID).toBe("my_app_id");
             expect(result.stepID).toBe("my_step_id");
@@ -50,7 +50,7 @@ describe("ExecutorOutputParserService", () => {
     it("produces an ExecutionStepCompletedAction", done => {
         dispatch(new ExecutorOutputAction("my_app_id", "Job root.my_step_id has completed"));
 
-        service.output.subscribe((result: ExecutionStepCompletedAction) => {
+        service.stepStates.subscribe((result: ExecutionStepCompletedAction) => {
             expect(result instanceof ExecutionStepCompletedAction).toBeTruthy();
             expect(result).toEqual(objectContaining<ExecutionStepCompletedAction>({
                 appID: "my_app_id",
@@ -67,7 +67,7 @@ describe("ExecutorOutputParserService", () => {
 
         dispatch(new ExecutorOutputAction("my_app_id", msg));
 
-        service.output.subscribe((result: ExecutionStepFailedAction) => {
+        service.stepStates.subscribe((result: ExecutionStepFailedAction) => {
 
             expect(result instanceof ExecutionStepFailedAction).toBeTruthy();
             expect(result).toEqual(objectContaining<ExecutionStepFailedAction>({

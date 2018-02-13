@@ -13,7 +13,9 @@ import {
     ExecutionStepFailedAction,
     EXECUTION_PREPARED,
     ExecutionPreparedAction,
-    EXECUTION_STARTED
+    EXECUTION_STARTED,
+    EXECUTION_DOCKER_PULL_TIMEOUT,
+    ExecutionDockerPullTimeoutAction
 } from "../actions/execution.actions";
 import {ProgressState} from "./index";
 import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
@@ -145,6 +147,21 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: update};
         }
 
+        case EXECUTION_DOCKER_PULL_TIMEOUT: {
+            const {appID, timeout} = action as Partial<ExecutionDockerPullTimeoutAction>;
+
+            const app = state[appID];
+            if (!app) {
+                return state;
+            }
+
+            const update = app.update({
+                dockerPullTimeout: timeout
+            });
+
+            return {...state, [appID]: update};
+
+        }
 
         default:
             return state;

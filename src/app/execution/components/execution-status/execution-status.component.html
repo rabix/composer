@@ -46,6 +46,10 @@
         Check here for the progress of your execution.
     </div>
 
+    <div *ngIf="dockerPullTimeoutCountdown" class="docker-pull-timeout">
+        <ng-container *ngIf="isOffline">You are offline.</ng-container>
+        <ng-container>Cannot pull Docker image. Retrying in {{ dockerPullTimeoutCountdown }} seconds.</ng-container>
+    </div>
 
     <div *ngIf="execution?.error" class="execution-failure">
         Execution failed with exit code {{ execution?.error.code }}
