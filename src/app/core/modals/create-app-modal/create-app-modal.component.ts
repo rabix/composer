@@ -314,6 +314,10 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
     private getDefaultFolder(app: any): Promise<string> {
 
+        if (this.defaultFolder) {
+            return Promise.resolve(this.defaultFolder);
+        }
+
         return Observable.combineLatest(
             this.localRepository.getExpandedFolders(),
             this.localRepository.getLocalFolders()

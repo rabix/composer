@@ -17,6 +17,7 @@ import * as ace from "brace";
 import "brace/ext/language_tools";
 import "brace/ext/searchbox";
 
+import "brace/mode/text";
 import "brace/mode/c_cpp";
 import "brace/mode/html";
 import "brace/mode/apache_conf";
@@ -28,7 +29,6 @@ import "brace/mode/python";
 import "brace/mode/r";
 import "brace/mode/scss";
 import "brace/mode/sh";
-import "brace/mode/text";
 import "brace/mode/typescript";
 import "brace/mode/xml";
 import "brace/mode/yaml";
@@ -84,15 +84,17 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         this.editor.setOptions(Object.assign({
             theme: "ace/theme/idle_fingers",
             enableBasicAutocompletion: true,
-        } as Partial<AceEditorOptions>, this.options, {mode}));
+        } as Partial<AceEditorOptions>, this.options));
+
+        this.editor.session.setMode(mode);
 
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;
 
         // Automatically assign a mode if file path is given
         if (!this.options.mode && this.filePath) {
-            const mode = getModeForPath(this.filePath);
-            this.editor.session.setMode(mode.mode);
+            const m = getModeForPath(this.filePath);
+            this.editor.session.setMode(m.mode);
         }
     }
 
@@ -101,7 +103,8 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
         if (changes["options"] && !changes["options"].isFirstChange()) {
             const mode = this.determineMode(this.options ? this.options.mode : undefined);
 
-            this.editor.setOptions({...this.options, mode});
+            this.editor.setOptions({...this.options});
+            this.editor.session.setMode(mode);
         }
     }
 
