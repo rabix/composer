@@ -1,6 +1,7 @@
 import fs = require("fs-extra");
 import yaml = require("js-yaml");
 import request = require("request");
+import path = require("path");
 import {LoadOptions} from "js-yaml";
 import {RecursiveNestingError} from "./errors/recursive-nesting.error";
 
@@ -80,7 +81,7 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
             } else if (isExternalResource) {
                 future.push(new Promise((resolveExternalResource, rejectExternalResource) => {
 
-                    let externalPath = source.split("/").slice(0, -1).concat(entry).join("/");
+                    let externalPath = path.normalize(source.split("/").slice(0, -1).concat(entry).join("/"));
 
                     if (isUrl(entry) || (!isUrl(source) && isLocalFile(entry))) {
                         externalPath = entry;

@@ -49,6 +49,6 @@ export class ClosingDirtyAppsModalComponent {
     }
 
     onCancel() {
-        this.modal.close();
+        this.decision.error(null);
     }
 }
