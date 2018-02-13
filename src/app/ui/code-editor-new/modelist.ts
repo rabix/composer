@@ -1,3 +1,5 @@
+import {TextMode} from "brace";
+
 const supportedModes = {
     ABAP: ["abap"],
     ABC: ["abc"],
@@ -181,7 +183,7 @@ for (const name in supportedModes) {
     modesByName[filename] = mode;
     modes.push(mode);
 }
-export function getModeForPath(path) {
+export function getModeForPath(path): TextMode & {mode: string} {
     let mode       = modesByName["text"];
     const fileName = path.split(/[\/\\]/).pop();
     for (let i = 0; i < modes.length; i++) {
