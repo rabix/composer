@@ -169,6 +169,9 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     @ViewChildren("tabComponentContainer")
     private tabComponentContainers: QueryList<any>;
 
+    /** True if prompt closing modal is open */
+    private promptClosingModalOpen = false;
+
     /**  Components that are shown in tab */
     tabComponents = [];
 
@@ -186,30 +189,30 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
     ngOnInit() {
 
-
-
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab
-        this.ipc.watch("accelerator", "CmdOrCtrl+W").subscribeTracked(this, () => {
+        this.ipc.watch("accelerator", "CmdOrCtrl+W")
+            .filter(() => !this.promptClosingModalOpen)
+            .subscribeTracked(this, () => {
             this.workbox.closeTab();
         });
 
         // Switch to the tab on the right
         this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
-            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
             .subscribeTracked(this, () => {
                 this.workbox.activateNext();
             });
 
         // Switch to the tab on the left
         this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
-            .filter(_ => this.activeTab && this.tabs.length > 1)
+            .filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
             .subscribeTracked(this, () => {
                 this.workbox.activatePrevious();
             });
 
         this.ipc.watch("accelerator", "CmdOrCtrl+S")
-            .filter(_ => this.activeTab !== undefined)
+            .filter(_ => this.activeTab !== undefined && !this.promptClosingModalOpen)
             .map(() => {
                 const activeTabIndex = this.tabs.indexOf(this.activeTab);
                 return this.tabComponents[activeTabIndex];
@@ -300,6 +303,10 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      */
     closeTab(tab: TabData<any>) {
 
+        if (this.promptClosingModalOpen) {
+            return;
+        }
+
         const index = this.tabs.findIndex((t) => t === tab);
 
         if (index === -1) {
@@ -310,16 +317,26 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
         if (component.isDirty) {
 
-            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
-                title: "Save changes?"
-            });
+            this.modal.wrapPromise((resolve) => {
 
-            modal.confirmationLabel = "Save";
-            modal.discardLabel      = "Close without saving";
+                this.promptClosingModalOpen = true;
 
-            modal.decision.take(1).subscribe((result) => {
-                this.modal.close();
-                result ? component.save() : this.workbox.closeTab(tab, true);
+                const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
+                    title: "Save changes?"
+                });
+
+                modal.confirmationLabel = "Save";
+                modal.discardLabel = "Close without saving";
+
+                modal.decision.take(1).finally(() => {
+                    this.modal.close();
+                    resolve();
+                }).subscribe((result) => {
+                    result ? component.save() : this.workbox.closeTab(tab, true);
+                }, noop);
+
+            }).then(noop, () => {
+                this.promptClosingModalOpen = false;
             });
 
         } else {
@@ -362,6 +379,10 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      */
     private closeAllTabs(preserve: TabData<any>[] = []) {
 
+        if (this.promptClosingModalOpen) {
+            return;
+        }
+
         const components = preserve.map((tab) => this.getTabComponent(tab).tabComponent);
 
         const hasDirtyTabs = this.tabComponents.find((tabComponent) => {
@@ -371,7 +392,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         const modalTitle = `Close ${components.length ? "other" : "all"} tabs`;
 
         if (hasDirtyTabs) {
-            //
+            this.promptClosingModalOpen = true;
+
             // If there are apps that are Dirty show modal
             const modal = this.modal.confirm({
                 title: modalTitle,
@@ -381,7 +403,10 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
             modal.then(() => {
                 this.workbox.closeAllTabs(preserve, true);
-            }, noop);
+                this.promptClosingModalOpen = false;
+            }, () => {
+                this.promptClosingModalOpen = false;
+            });
 
         } else {
             this.workbox.closeAllTabs(preserve, true);
