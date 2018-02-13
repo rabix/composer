@@ -79,20 +79,23 @@ export class CodeEditorComponent implements OnInit, ControlValueAccessor, OnDest
             this.editor = ace.edit(this.elementRef.nativeElement);
         });
 
-        const mode = this.determineMode(this.options.mode);
+        const mode           = this.options.mode;
+        const determinedMode = this.determineMode(mode);
+
+        delete this.options.mode;
 
         this.editor.setOptions(Object.assign({
             theme: "ace/theme/idle_fingers",
             enableBasicAutocompletion: true,
         } as Partial<AceEditorOptions>, this.options));
 
-        this.editor.session.setMode(mode);
+        this.editor.session.setMode(determinedMode);
 
         // Hack for disabling the warning message about a deprecated method
         this.editor.$blockScrolling = Infinity;
 
         // Automatically assign a mode if file path is given
-        if (!this.options.mode && this.filePath) {
+        if (!mode && this.filePath) {
             const m = getModeForPath(this.filePath);
             this.editor.session.setMode(m.mode);
         }
