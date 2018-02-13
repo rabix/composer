@@ -157,9 +157,12 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                             <div class="form-group">
                                 
-                                <label class="form-control-label">Merge Method</label>
+                                <label class="form-control-label">Link Merge Method</label>
                                 
-                                <select class="form-control" [ngModel]="input.linkMerge.value" (ngModelChange)="input.linkMerge.value = $event; change.emit()" [ngModelOptions]="{standalone: true}">
+                                <select class="form-control" [disabled]="readonly" 
+                                        [ngModel]="input.linkMerge.value" 
+                                        (ngModelChange)="input.linkMerge.value = $event; change.emit()" 
+                                        [ngModelOptions]="{standalone: true}">
                                     <option value="merge_nested">Nested</option>
                                     <option value="merge_flattened">Flattened</option>
                                 </select>
