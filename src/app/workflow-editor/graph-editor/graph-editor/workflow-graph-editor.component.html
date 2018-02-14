@@ -95,8 +95,8 @@
                 [port]="inspectedNode"
                 [graph]="graph"
                 [workflowModel]="model"
+                (change)="change.emit()"
                 [readonly]="readonly">
-
             </ct-workflow-io-inspector>
 
         </div>
