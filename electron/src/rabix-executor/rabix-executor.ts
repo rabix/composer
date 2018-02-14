@@ -113,11 +113,15 @@ export class RabixExecutor {
         return new Promise((resolve, reject) => {
             const java = spawn("java", ["-version"]);
 
+            java.on("error", () => {
+                reject(new Error("Please install Java 8 or higher in order to execute apps."));
+            });
+
             java.stderr.once("data", (data) => {
                 data = data.toString().split("\n")[0];
 
                 try {
-                    const javaVersion = parseFloat(data.match(/\"(.*?)\"/)[1])
+                    const javaVersion = parseFloat(data.match(/\"(.*?)\"/)[1]);
 
                     if (javaVersion >= versionRequirement) {
                         return resolve();
