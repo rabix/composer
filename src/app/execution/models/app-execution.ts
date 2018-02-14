@@ -53,6 +53,10 @@ export class AppExecution {
             endTime: Date.now(),
             stepExecution: this.stepExecution.map(step => {
 
+                if(error.type === "requirement"){
+                    return step.transitionTo("stopped");
+                }
+
                 if (this.appType === "CommandLineTool") {
                     return step.transitionTo("failed");
                 }
