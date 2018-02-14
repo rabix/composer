@@ -152,6 +152,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         try {
             this.graph.fitToViewport();
+            this.draw.emit(this);
         } catch (ex) {
             setTimeout(() => {
                 console.warn("Workflow should be able to fit in by now...");
@@ -426,6 +427,13 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     }
 
     /**
+     * Open node in object inspector by passing in id
+     */
+    openNodeInInspectorById(id: string, forceRecreate = false) {
+        this.inspector.show(this.inspectorTemplate, id, forceRecreate);
+    }
+
+    /**
      * Set focus on Canvas
      */
     setFocusOnCanvas() {
@@ -575,5 +583,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
      */
     private canDraw(): boolean {
         return Workflow.canDrawIn(this.canvas.nativeElement);
+    }
+
+    getStepUpdates() {
+        this.graph.getPlugin(UpdatePlugin).getStepUpdates();
     }
 }

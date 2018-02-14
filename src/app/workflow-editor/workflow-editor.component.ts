@@ -4,6 +4,7 @@ import * as Yaml from "js-yaml";
 import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
+import {AppHelper} from "../core/helpers/AppHelper";
 import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
@@ -22,6 +23,7 @@ import {IpcService} from "../services/ipc.service";
 import {ModalService} from "../ui/modal/modal.service";
 import {WorkflowGraphEditorComponent} from "./graph-editor/graph-editor/workflow-graph-editor.component";
 import {WorkflowEditorService} from "./workflow-editor.service";
+import {AppUpdateService} from "../editor-common/services/app-update/app-updating.service";
 import {FileRepositoryService} from "../file-repository/file-repository.service";
 import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
@@ -81,7 +83,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
                 exportApp: ExportAppService,
                 store: Store<any>,
                 auth: AuthService,
-                executorService: ExecutorService) {
+                executorService: ExecutorService,
+                updateService: AppUpdateService) {
         super(
             statusBar,
             notificationBar,
@@ -99,10 +102,67 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             exportApp,
             store,
             auth,
-            executorService
+            executorService,
+            updateService
         );
 
         this.inspectorService = inspector;
+
+        this.updateService.update
+            .filter((data: {id: string, app: any}) => {
+
+                /**
+                 *  Perform filter to see if updated app is a part of this workflow - all local workflows
+                 *  and platform workflows that have the 'sbg:id" property should be updated if necessary
+                 */
+                let filterFn = (step) => false;
+                if (this.tabData.dataSource === "local") {
+                    filterFn = (step) => step.customProps["sbg:rdfId"] === data.id || step.runPath === data.id;
+                } else if (data.id && !AppHelper.isLocal(data.id)) {
+                    filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
+                }
+                return this.dataModel && this.dataModel.steps.filter(filterFn).length > 0;
+            })
+            .subscribeTracked(this, (data: {id: string, app: any}) => {
+
+                if (this.tabData.dataSource === "local") {
+                    let steps;
+                    const invalidStepIndex = this.invalidSteps.indexOf(data.id);
+                    if (data.app) {
+
+                        // If step-to-be-updated is a valid app, remove it from the list of invalid steps (if included)
+                        if (~invalidStepIndex) {
+                            this.invalidSteps.splice(invalidStepIndex, 1);
+                        }
+
+                        steps = this.dataModel.steps.filter(step => step.customProps["sbg:rdfId"] === data.id);
+                        steps.forEach(step => step.setRunProcess(data.app));
+
+                        // If an updated node was open in inspector, reopen inspector with updated node information
+                        if (this.graphEditor && this.showInspector && steps && this.graphEditor.inspectedNode) {
+                            const inspectedStep = steps.filter((step) => step.connectionId === this.graphEditor.inspectedNode.connectionId)[0];
+                            if (inspectedStep) {
+                                this.graphEditor.openNodeInInspectorById(this.graphEditor.inspectedNode.id, true);
+                            }
+                        }
+
+                        this.resolveAfterModelAndCodeSync().then(() => {}, err => console.warn);
+                    } else {
+
+                        // Add step to list of invalid steps (if not already included)
+                        if (!~invalidStepIndex) {
+                            this.invalidSteps.push(data.id);
+                            this.resolveContent(this.getModelText()).then(() => {}, err => console.warn);
+                        }
+                    }
+                } else {
+                    if (this.graphEditor) {
+                        this.graphEditor.getStepUpdates();
+                    } else {
+                        this.graphDrawQueue.push(() => this.graphEditor.getStepUpdates());
+                    }
+                }
+            });
     }
 
     protected getPreferredTab(): string {
@@ -121,6 +181,13 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     /** Model that's recreated on document change */
     dataModel: WorkflowModel;
+
+    /**
+     * Used to keep track of invalid steps (in local workflows only). App validation will not show errors
+     * for (not embedded) invalid steps, so we need this list to know whether or not to call resolve after validation.
+     * Steps can become invalid if the app behind the step is saved while invalid.
+     */
+    invalidSteps = [];
 
     @ViewChild(WorkflowGraphEditorComponent)
     graphEditor: WorkflowGraphEditorComponent;
@@ -145,10 +212,10 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
      * Serializes model to text. It also adds sbg:modified flag to indicate
      * the text has been formatted by the GUI editor
      */
-    protected getModelText(embed = false): string {
+    protected getModelText(forceJSON = false, embed = false): string {
         const wf = embed || this.tabData.dataSource === "app" ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
 
-        return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
+        return this.tabData.language === "json" || this.tabData.dataSource === "app" || forceJSON ?
             JSON.stringify(wf, null, 4) : Yaml.dump(wf);
     }
 

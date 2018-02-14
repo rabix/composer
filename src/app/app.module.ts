@@ -23,6 +23,7 @@ import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
 import {WorkflowEditorModule} from "./workflow-editor/workflow-editor.module";
+import {AppUpdateService} from "./editor-common/services/app-update/app-updating.service";
 import {OpenExternalFileService} from "./core/open-external-file/open-external-file.service";
 import {ExportAppService} from "./services/export-app/export-app.service";
 import {StoreModule} from "@ngrx/store";
@@ -49,6 +50,7 @@ import {credentialsRegistryFactory} from "./factories/auth";
         OpenExternalFileService,
         PlatformConnectionService,
         PlatformRepositoryService,
+        AppUpdateService,
         SettingsService,
         StatusBarService,
         {provide: CREDENTIALS_REGISTRY, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},

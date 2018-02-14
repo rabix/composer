@@ -87,7 +87,7 @@ export class UpdatePlugin extends PluginBase {
     /**
      * Call updates service to get information about steps if they have updates and mark ones that can be updated
      */
-    private getStepUpdates() {
+    getStepUpdates() {
 
         this.updateStatusProcess       = this.statusBar.startProcess("Checking for app updates…");
         const nestedAppRevisionlessIDs = this.workflow.model.steps

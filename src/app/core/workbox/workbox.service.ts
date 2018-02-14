@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {Store} from "@ngrx/store";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
@@ -10,7 +11,8 @@ import {LocalRepositoryService} from "../../repository/local-repository.service"
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
-import {Store} from "@ngrx/store";
+import {CodeSwapService} from "../code-content-service/code-content.service";
+import {IpcService} from "../../services/ipc.service";
 import {TabCloseAction} from "../actions/core.actions";
 
 
@@ -32,6 +34,7 @@ export class WorkboxService {
     private priorityTabUpdate = new Subject();
 
     constructor(private auth: AuthService,
+                private ipc: IpcService,
                 private dataGateway: DataGatewayService,
                 private fileRepository: FileRepositoryService,
                 private localRepository: LocalRepositoryService,
@@ -115,7 +118,9 @@ export class WorkboxService {
 
         if (foundTab) {
             if (replaceExistingIfExists) {
-                this.dataGateway.updateSwap(foundTab.data.id, null);
+                const codeSwapService = new CodeSwapService(this.ipc, this.platformRepository, this.localRepository);
+                codeSwapService.appID = foundTab.data.id;
+                codeSwapService.discardSwapContent();
                 tabs.splice(foundTabIndex, 1, tab);
                 this.tabs.next(tabs);
             } else {
@@ -179,7 +184,9 @@ export class WorkboxService {
         }
 
         if (tab && tab.data && tab.data.id) {
-            this.dataGateway.updateSwap(tab.data.id, null);
+            const codeSwapService = new CodeSwapService(this.ipc, this.platformRepository, this.localRepository);
+            codeSwapService.appID = tab.id;
+            codeSwapService.discardSwapContent();
             this.store.dispatch(new TabCloseAction(tab.data.id));
         }
 

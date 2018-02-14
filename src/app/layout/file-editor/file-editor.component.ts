@@ -112,9 +112,9 @@ export class FileEditorComponent extends DirectiveBase implements OnInit, AfterV
     }
 
     reloadContent() {
-        this.codeSwapService.discardSwapContent().take(1).subscribe(() => {
+        this.codeSwapService.discardSwapContent().then(() => {
             this.codeReload.emit();
-        });
+        })
     }
 
     save() {

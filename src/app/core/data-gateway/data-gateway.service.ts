@@ -24,9 +24,7 @@ export class DataGatewayService {
     }
 
 
-    constructor(private ipc: IpcService,
-                private platformRepository: PlatformRepositoryService,
-                private localRepository: LocalRepositoryService) {
+    constructor(private ipc: IpcService) {
     }
 
     checkIfPathExists(path) {
@@ -118,38 +116,6 @@ export class DataGatewayService {
      */
     getUserWithToken(url, token): Observable<any> {
         return this.ipc.request("getUserByToken", {url, token});
-    }
-
-    updateSwap(fileID, content): Promise<any> {
-        const isLocal = AppHelper.isLocal(fileID);
-        const appID = isLocal ? fileID : AppHelper.getRevisionlessID(fileID);
-
-        const promises = [];
-
-        promises.push(this.ipc.request("patchSwap", {
-            local: isLocal,
-            swapID: appID,
-            swapContent: content
-        }).toPromise());
-
-        // If there is no content swap should be deleted, so we need to remove AppMeta data
-        if (!content) {
-
-            // Remove swapUnlocked meta (only for platform apps)
-            if (!isLocal) {
-                promises.push(this.platformRepository.patchAppMeta(appID, "swapUnlocked", false));
-            }
-
-            // Remove isDirty meta
-            if (!isLocal) {
-                promises.push(this.platformRepository.patchAppMeta(appID, "isDirty", false));
-            } else {
-                promises.push(this.localRepository.patchAppMeta(appID, "isDirty", false));
-            }
-
-        }
-
-        return Promise.all(promises);
     }
 
     sendFeedbackToPlatform(type: string, text: string): Promise<any> {

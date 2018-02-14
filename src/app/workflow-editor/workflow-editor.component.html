@@ -36,7 +36,7 @@
                               [data]="tabData"
                               [readonly]="isReadonly"
                               [(model)]="dataModel"
-                              (change)="syncModelAndCode(false)"
+                              (change)="dumpSwap()"
                               (draw)="onGraphDraw($event)"
                               class="editor-main">
     </ct-workflow-graph-editor>
@@ -48,7 +48,7 @@
 
     <ct-app-info *ngIf="viewMode === 'info' && !isLoading && dataModel"
                  [readonly]="isReadonly"
-                 (change)="syncModelAndCode(false)"
+                 (change)="dumpSwap()"
                  [class.flex-col]="showInspector"
                  [model]="dataModel">
     </ct-app-info>

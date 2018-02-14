@@ -8,6 +8,8 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import * as Yaml from "js-yaml";
+import {LoadOptions} from "js-yaml";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import * as unidecode from "unidecode";
 
@@ -81,11 +83,11 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
     @Input()
     appContent: string;
 
+    @Output()
+    published = new EventEmitter<{id: string, app: any}>();
+
     @Input()
     appID: string;
-
-    @Output()
-    published = new EventEmitter<string>();
 
     error: string;
 
@@ -163,7 +165,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         const {revisionNote, appID, content} = this.outputForm.getRawValue();
 
         this.isPublishing = true;
-        let saveCall: Promise<any>;
+        let saveCall: Promise<string>;
 
         if (this.revision === 0) {
             saveCall = this.platformRepository.createApp(appID, content);
@@ -171,9 +173,9 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             saveCall = this.platformRepository.saveAppRevision(appID, content, revisionNote);
         }
 
-        saveCall.then(() => {
+        saveCall.then((str) => {
             this.isPublishing = false;
-            this.published.emit(appID);
+            this.published.emit({id: appID, app: Yaml.safeLoad(str, {json: true} as LoadOptions)});
             this.close();
             return appID;
         }, (err) => {
