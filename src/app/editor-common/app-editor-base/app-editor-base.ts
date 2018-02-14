@@ -275,7 +275,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const props             = this.dataModel.customProps || {};
                 const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
                 const isNotWritable     = !this.tabData.isWritable;
-                const isLocal           = this.tabData.dataSource === "local"
+                const isLocal           = this.tabData.dataSource === "local";
 
                 if (isNotWritable || isLocal) {
                     this.isUnlockable = false;
