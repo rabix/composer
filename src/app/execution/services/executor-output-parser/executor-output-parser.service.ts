@@ -6,23 +6,28 @@ import {
     ExecutorOutputAction,
     ExecutionStepFailedAction,
     ExecutionStepCompletedAction,
-    ExecutionStepStartedAction
+    ExecutionStepStartedAction,
+    ExecutionDockerPullTimeoutAction
 } from "../../actions/execution.actions";
 import {Action} from "@ngrx/store";
 import {ExecutionState} from "../../models";
-import {parseContent} from "./log-parser";
+import {extractStepProgress, extractDockerTimeout} from "./log-parser";
+import {flatMap, map, filter} from "rxjs/operators";
 
 @Injectable()
 export class ExecutorOutputParser {
 
     @Effect()
-    output: Observable<Action>;
+    stepStates: Observable<Action>;
+
+    @Effect()
+    dockerPullFailure: Observable<Action>;
 
     constructor(private actions: Actions) {
 
-        this.output = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT)
-            .flatMap(action => {
-                const updates = parseContent(action.message);
+        this.stepStates = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT).pipe(
+            flatMap(action => {
+                const updates = extractStepProgress(action.message);
                 const appID   = action.appID;
                 const list    = [];
 
@@ -33,8 +38,8 @@ export class ExecutorOutputParser {
                 }
 
                 return Observable.of(...list);
-            })
-            .flatMap(data => {
+            }),
+            flatMap(data => {
                 const {appID, stepID, state} = data;
 
                 switch (state as ExecutionState) {
@@ -52,6 +57,13 @@ export class ExecutorOutputParser {
                         return Observable.empty();
                 }
 
-            });
+            })
+        );
+
+        this.dockerPullFailure = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT).pipe(
+            map(action => ({appID: action.appID, timeout: extractDockerTimeout(action.message)})),
+            filter(data => data.timeout !== undefined),
+            map(data => new ExecutionDockerPullTimeoutAction(data.appID, Date.now() + data.timeout * 1000))
+        );
     }
 }

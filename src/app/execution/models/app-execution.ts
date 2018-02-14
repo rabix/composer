@@ -12,6 +12,7 @@ export class AppExecution {
     readonly error?: ExecutionError;
     readonly startTime?: number;
     readonly endTime?: number;
+    readonly dockerPullTimeout?: number;
 
     constructor(appType: AppType,
                 outdir: string,
@@ -19,15 +20,17 @@ export class AppExecution {
                 error?: ExecutionError,
                 state: ExecutionState = "pending",
                 startTime?: number,
-                endTime?: number) {
+                endTime?: number,
+                dockerPullTimeout?: number) {
 
-        this.appType       = appType;
-        this.error         = error;
-        this.outdir        = outdir;
-        this.state         = state;
-        this.stepExecution = stepProgress;
-        this.startTime     = startTime;
-        this.endTime       = endTime;
+        this.appType           = appType;
+        this.error             = error;
+        this.outdir            = outdir;
+        this.state             = state;
+        this.stepExecution     = stepProgress;
+        this.startTime         = startTime;
+        this.endTime           = endTime;
+        this.dockerPullTimeout = dockerPullTimeout;
 
     }
 
@@ -42,7 +45,8 @@ export class AppExecution {
             update.error,
             update.state,
             update.startTime,
-            update.endTime
+            update.endTime,
+            update.dockerPullTimeout
         );
     }
 
@@ -51,6 +55,7 @@ export class AppExecution {
             error,
             state: "failed",
             endTime: Date.now(),
+            dockerPullTimeout: undefined,
             stepExecution: this.stepExecution.map(step => {
 
                 if (this.appType === "CommandLineTool") {
@@ -83,6 +88,7 @@ export class AppExecution {
             startTime: undefined,
             endTime: undefined,
             error: undefined,
+            dockerPullTimeout: undefined,
             stepExecution: this.stepExecution.map(step => {
                 switch (step.state) {
                     case "pending":
@@ -102,6 +108,7 @@ export class AppExecution {
             startTime: Date.now(),
             endTime: undefined,
             error: undefined,
+            dockerPullTimeout: undefined,
             stepExecution: this.stepExecution.map(step => step.transitionTo(stepState))
         });
     }
@@ -110,6 +117,7 @@ export class AppExecution {
         return this.update({
             state: "completed",
             endTime: Date.now(),
+            dockerPullTimeout: undefined,
             stepExecution: this.stepExecution.map(step => step.transitionTo("completed"))
         });
     }
