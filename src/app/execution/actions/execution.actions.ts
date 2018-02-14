@@ -1,17 +1,18 @@
 import {Action} from "@ngrx/store";
 import {AppType} from "../types";
 
-export const EXECUTION_STOP              = "[App Execution] stop";
-export const EXECUTION_PREPARED          = "[App Execution] prepared";
-export const EXECUTION_STARTED           = "[App Execution] started";
-export const EXECUTION_ERROR             = "[App Execution] error";
-export const EXECUTION_REQUIREMENT_ERROR = "[App Execution] requirement error";
-export const EXECUTION_COMPLETED         = "[App Execution] completed";
-export const EXECUTION_STOPPED           = "[App Execution] stopped";
-export const EXECUTOR_OUTPUT             = "[App Execution] executor output";
-export const EXECUTION_STEP_FAILED       = "[App Execution] step failed";
-export const EXECUTION_STEP_STARTED      = "[App Execution] step started";
-export const EXECUTION_STEP_COMPLETED    = "[App Execution] step completed";
+export const EXECUTION_STOP                = "[App Execution] stop";
+export const EXECUTION_PREPARED            = "[App Execution] prepared";
+export const EXECUTION_STARTED             = "[App Execution] started";
+export const EXECUTION_ERROR               = "[App Execution] error";
+export const EXECUTION_REQUIREMENT_ERROR   = "[App Execution] requirement error";
+export const EXECUTION_COMPLETED           = "[App Execution] completed";
+export const EXECUTION_STOPPED             = "[App Execution] stopped";
+export const EXECUTOR_OUTPUT               = "[App Execution] executor output";
+export const EXECUTION_STEP_FAILED         = "[App Execution] step failed";
+export const EXECUTION_STEP_STARTED        = "[App Execution] step started";
+export const EXECUTION_STEP_COMPLETED      = "[App Execution] step completed";
+export const EXECUTION_DOCKER_PULL_TIMEOUT = "[App Execution] docker pull warning";
 
 export abstract class ExecutionAction implements Action {
     readonly type: string;
@@ -94,4 +95,13 @@ export class ExecutionStepStartedAction extends ExecutionStepAction {
 
 export class ExecutionStepCompletedAction extends ExecutionStepAction {
     readonly type = EXECUTION_STEP_COMPLETED;
+}
+
+export class ExecutionDockerPullTimeoutAction extends ExecutionAction {
+
+    readonly type = EXECUTION_DOCKER_PULL_TIMEOUT;
+
+    constructor(appID: string, public timeout: number) {
+        super(appID);
+    }
 }
