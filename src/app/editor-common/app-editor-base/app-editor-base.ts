@@ -117,6 +117,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private modelCreated = false;
 
+    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
+
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
      * or from any mode when switching revisions.
@@ -126,11 +128,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * {@link revisionHackFlagSwitchOn}
      */
     protected revisionChangingInProgress = false;
-
-    /**
-     * Show modal when app is dirty when changing revisions to prevent loosing changes
-     */
-    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
 
     constructor(protected statusBar: StatusBarService,
                 protected notificationBar: NotificationBarService,
@@ -324,14 +321,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
     }
 
-    save(): void {
+    save(loadUpdate = true): Promise<boolean> {
 
         const appName = this.tabData.id;
 
         const proc = this.statusBar.startProcess(`Saving ${appName}`);
         const text = this.viewMode === "code" ? this.codeEditorContent.value : this.getModelText();
 
-        this.appSavingService
+        return this.appSavingService
             .save(this.tabData.id, text)
             .then(update => {
                 /**
@@ -341,24 +338,28 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                  */
 
-                if (this.tabData.dataSource !== "local") {
-                    this.revisionChangingInProgress = true;
-                }
+                if (loadUpdate) {
+                    if (this.tabData.dataSource !== "local") {
+                        this.revisionChangingInProgress = true;
+                    }
 
-                this.priorityCodeUpdates.next(update);
+                    this.priorityCodeUpdates.next(update);
+                }
 
                 // After app is saved, app state is not Dirty any more
                 this.setAppDirtyState(false);
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
+                return true;
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
-                    return;
+                    return false;
                 }
 
                 this.notificationBar.showNotification(`Saving failed: ${err.message}`);
                 this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
+                return false;
             });
     }
 
@@ -821,31 +822,27 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     showModalIfAppIsDirty(): Promise<boolean> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise((changeRevision, preventRevisionChange) => {
 
             if (!this.isDirty) {
-                return resolve(true);
+                return changeRevision();
             }
 
-            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
-                title: "Change revision"
-            });
-
-            modal.confirmationLabel = "Save";
-            modal.discardLabel      = "Change without saving";
-
-            modal.decision.take(1).subscribe((result) => {
-
-                if (result) {
-                    this.modal.close();
-                    this.save();
-                    reject();
-                } else {
-                    resolve(true);
-                    this.modal.close();
+            const dialog = this.modal.fromComponent(ClosingDirtyAppsModalComponent, "Change revision", {
+                confirmationLabel: "Save",
+                discardLabel: "Change without saving",
+                onCancel: () => preventRevisionChange(),
+                onDiscard: () => changeRevision(),
+                onConfirm: () => {
+                    this.save(false).then(isSaved => {
+                        isSaved ? changeRevision() : preventRevisionChange();
+                    });
                 }
             });
 
+            dialog.inAnyCase = () => {
+                this.modal.close(dialog);
+            }
         });
 
     }

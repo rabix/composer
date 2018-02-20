@@ -6,32 +6,46 @@ import {PromptComponent} from "./common/prompt.component";
 import {ModalOptions} from "./modal-options";
 import {ModalComponent} from "./modal.component";
 import {ErrorComponent} from "./common/error.component";
+import {filter, take} from "rxjs/operators";
 
 @Injectable()
 export class ModalService {
 
+    openModals: ComponentRef<ModalComponent> [] = [];
+
     private rootViewContainer: ViewContainerRef;
 
-    private modalComponentsRefStack: ComponentRef<ModalComponent> [] = [];
-
-    private onClose = new Subject();
+    private onClose = new Subject<any>();
 
     constructor(private resolver: ComponentFactoryResolver) {
 
-        this.onClose.subscribe(() => this.cleanComponentRef());
+        this.onClose.subscribe(component => {
+            this.cleanComponentRef(component);
+        });
     }
 
     setViewContainer(view: ViewContainerRef): void {
         this.rootViewContainer = view;
     }
 
-    close() {
-        this.onClose.next();
+    close(component?: any) {
+
+        if (component) {
+            for (let i = this.openModals.length - 1; i >= 0; i--) {
+                const modal = this.openModals[i];
+                if (modal.instance.nestedComponentRef.instance === component) {
+                    this.onClose.next(modal);
+                    return;
+                }
+            }
+        } else {
+            this.onClose.next();
+        }
     }
 
-    fromComponent<T>(component: { new (...args: any[]): T; }, title?: string): T;
-    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions>);
-    fromComponent<T>(component: { new (...args: any[]): T; }, options?: Partial<ModalOptions> | string, instanceProperties?: Partial<T>): T;
+    fromComponent<T>(component: { new(...args: any[]): T; }, title?: string): T;
+    fromComponent<T>(component: { new(...args: any[]): T; }, options?: Partial<ModalOptions>);
+    fromComponent<T>(component: { new(...args: any[]): T; }, options?: Partial<ModalOptions> | string, instanceProperties?: Partial<T>): T;
     fromComponent<T>(...args: any[]): T {
 
         let [component, options, instanceProperties] = args;
@@ -57,7 +71,7 @@ export class ModalService {
 
         const componentRef = modalComponentRef.instance.produce(componentFactory);
 
-        this.modalComponentsRefStack.push(modalComponentRef);
+        this.openModals.push(modalComponentRef);
 
         if (typeof instanceProperties === "object") {
             Object.assign(componentRef.instance, instanceProperties);
@@ -83,7 +97,7 @@ export class ModalService {
 
         modalComponentRef.instance.embed(template);
 
-        this.modalComponentsRefStack.push(modalComponentRef);
+        this.openModals.push(modalComponentRef);
     }
 
     public wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
@@ -92,17 +106,29 @@ export class ModalService {
         }) as Promise<T>;
 
         const outsideClosing = new Promise((resolve, reject) => {
-            this.onClose.first().subscribe(reject);
+            this.onClose.pipe(
+                filter(c => c === undefined),
+                take(1)
+            ).subscribe(reject);
         }) as Promise<T>;
 
         return Promise.race([insideClosing, outsideClosing]) as Promise<T>;
     }
 
-    private cleanComponentRef() {
+    private cleanComponentRef(component?) {
 
-        if (this.modalComponentsRefStack.length) {
-            this.modalComponentsRefStack.pop().destroy();
+        if (!this.openModals.length) {
+            return;
         }
+
+        let componentIndex;
+        if (component && ~(componentIndex = this.openModals.indexOf(component))) {
+            const [componentModal] = this.openModals.splice(componentIndex, 1);
+            componentModal.destroy();
+            return;
+        }
+
+        this.openModals.pop().destroy();
 
     }
 
@@ -110,7 +136,7 @@ export class ModalService {
         title?: string,
         content?: string,
         confirmationLabel?: string,
-        cancellationLabel ?: string
+        cancellationLabel?: string
     }) {
 
         return this.wrapPromise((resolve, reject) => {
@@ -166,7 +192,7 @@ export class ModalService {
         title?: string,
         content?: string,
         confirmationLabel?: string,
-        cancellationLabel ?: string,
+        cancellationLabel?: string,
         formControl?: FormControl,
         minWidth?: string
     }) {
@@ -189,7 +215,7 @@ export class ModalService {
             component.decision.subscribe(accepted => {
                 // If click on Cancel button or Esc on your keyboard then accepted is false
                 accepted === false ? reject() : resolve(true);
-                this.close();
+                this.close(component);
             });
         });
     }

@@ -3,7 +3,6 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
-import {noop} from "../../lib/utils.lib";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {MenuItem} from "../../ui/menu/menu-item";
@@ -194,8 +193,8 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
         this.ipc.watch("accelerator", "CmdOrCtrl+W")
             .filter(() => !this.promptClosingModalOpen)
             .subscribeTracked(this, () => {
-            this.workbox.closeTab();
-        });
+                this.workbox.closeTab();
+            });
 
         // Switch to the tab on the right
         this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
@@ -313,29 +312,37 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             return;
         }
 
-        const component = this.tabComponents[index];
+        const tabComponent = this.tabComponents[index];
 
-        if (component.isDirty) {
+        if (tabComponent.isDirty) {
 
-            this.modal.wrapPromise((resolve) => {
+            this.modal.wrapPromise(endDialog => {
 
                 this.promptClosingModalOpen = true;
 
-                const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
-                    title: "Save changes?"
+                const modalComponent = this.modal.fromComponent(ClosingDirtyAppsModalComponent, "Save changes?", {
+                    confirmationLabel: "Save",
+                    discardLabel: "Close without saving",
+                    onDiscard: () => this.workbox.closeTab(tab, true),
+                    inAnyCase: () => {
+                        this.modal.close(modalComponent);
+                        this.promptClosingModalOpen = false;
+                    },
+                    onConfirm: () => {
+                        const save = tabComponent.save();
+
+                        if (save instanceof Promise) {
+                            save.then(isSaved => {
+                                if (isSaved) {
+                                    this.workbox.closeTab(tab, true)
+                                }
+                            });
+                        }
+                    },
                 });
 
-                modal.confirmationLabel = "Save";
-                modal.discardLabel = "Close without saving";
-
-                modal.decision.take(1).finally(() => {
-                    this.modal.close();
-                    resolve();
-                }).subscribe((result) => {
-                    result ? component.save() : this.workbox.closeTab(tab, true);
-                }, noop);
-
-            }).then(noop, () => {
+            }).catch(() => {
+                this.modal.close();
                 this.promptClosingModalOpen = false;
             });
 

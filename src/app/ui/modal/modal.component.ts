@@ -53,7 +53,7 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
     public closeOnEscape: true;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
-    private nestedComponentRef: ComponentRef<any>;
+    nestedComponentRef: ComponentRef<any>;
 
     @ViewChild("nestedComponent", {read: ViewContainerRef})
     private nestedComponent: ViewContainerRef;
