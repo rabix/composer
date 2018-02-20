@@ -276,22 +276,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 // and notification when switched to an older revision
                 const props             = this.dataModel.customProps || {};
                 const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
+                const isNotWritable     = !this.tabData.isWritable;
+                const isLocal           = this.tabData.dataSource === "local";
 
-                if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
+                if (isNotWritable || isLocal) {
                     this.isUnlockable = false;
                 } else if (hasCopyOfProperty && !unlocked) {
-
                     const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {
-                        type: "info"
-                    });
+                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {type: "info"});
                     this.isUnlockable = true;
                 }
 
                 const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
 
-                if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
+                if (isNotWritable || isUnlockedAndUnlockableCopy) {
                     this.toggleLock(true);
+                }
+
+                if (isNotWritable && !this.isUnlockable) {
+                    this.notificationBar.showNotification(`This app is locked for editing.`, {type: "info"});
                 }
             }, err => console.warn);
         }, (err) => {
