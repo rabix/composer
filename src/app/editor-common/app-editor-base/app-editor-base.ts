@@ -326,6 +326,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     save(): void {
 
+        // Do nothing if app is not local
+        // If we open an app that has no namespaces defined and save it right away,
+        // cwlts will add an sbg namespace and will save it modified,
+        // thus exporting something different than what was initially loaded.
+        // That is not good, so we will just ignore saving if the app is not marked to be dirty
+        // It would be nicer if the save method doesn't even get called, but then
+        if (this.tabData.dataSource === "local" && !this.isDirty) {
+            return;
+        }
+
         const appName = this.tabData.id;
 
         const proc = this.statusBar.startProcess(`Saving ${appName}`);
