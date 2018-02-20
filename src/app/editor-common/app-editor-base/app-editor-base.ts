@@ -42,7 +42,7 @@ import {ExecutorService} from "../../executor-service/executor.service";
 import {ExecutorService2} from "../../execution/services/executor/executor.service";
 import {AuthService} from "../../auth/auth.service";
 import {ExecutionStopAction} from "../../execution/actions/execution.actions";
-import {switchMap, flatMap, finalize, catchError} from "rxjs/operators";
+import {switchMap, flatMap, finalize, catchError, distinctUntilChanged} from "rxjs/operators";
 
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
@@ -166,7 +166,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         // Set this app's ID to the code content service
         this.codeSwapService.appID = this.tabData.id;
 
-        this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
+        const codeEditorContentDistinctChanges = this.codeEditorContent.valueChanges.pipe(distinctUntilChanged());
+
+        codeEditorContentDistinctChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
         /** Replay subject used here because withLatestFrom operator did not work well for validationStateChanges stream */
         const externalCodeChanges = new ReplaySubject(1);
@@ -175,14 +177,14 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
 
         /** On user interactions (changes) set app state to Dirty */
-        this.codeEditorContent.valueChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
+        codeEditorContentDistinctChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
             this.setAppDirtyState(true);
         }, (err) => {
             console.warn("Error on dirty checking stream", err);
         });
 
         /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
+        const codeEditorChanges = codeEditorContentDistinctChanges.debounceTime(300).distinctUntilChanged();
 
         /** Observe all code changes */
         const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
@@ -374,7 +376,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             modal.appID      = this.dataModel.id;
             modal.appContent = this.getModelText(true);
 
-            modal.published.take(1).subscribeTracked(this, (appID) => {
+            modal.published.take(1).subscribeTracked(this, appID => {
 
                 const tab = this.workbox.getOrCreateAppTab({
                     id: AppHelper.getRevisionlessID(appID),
@@ -382,7 +384,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                     label: modal.inputForm.get("id").value,
                     isWritable: true,
                     language: "json"
-
                 });
 
                 this.workbox.openTab(tab);
