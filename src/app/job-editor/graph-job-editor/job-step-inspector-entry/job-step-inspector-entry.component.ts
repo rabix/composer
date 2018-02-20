@@ -45,6 +45,8 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
     @Input() inputRecordFields: InputParameterModel[];
 
+    @Input() relativePathRoot?: string;
+
     /**
      * We might want to show a warning next to a field.
      * This can happen for example if we encounter a mismatch between step value and the input type,
@@ -343,13 +345,16 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     promptFileMetadata() {
-        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata");
-
         const {secondaryFiles, metadata} = this.control.value;
+        const allowDirectories           = this.appModel.cwlVersion.indexOf("draft-2") === -1;
+        const relativePathRoot           = this.relativePathRoot;
 
-        comp.secondaryFiles   = secondaryFiles;
-        comp.metadata         = metadata;
-        comp.allowDirectories = this.appModel.cwlVersion.indexOf("draft-2") === -1;
+        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata", {
+            metadata,
+            secondaryFiles,
+            allowDirectories,
+            relativePathRoot
+        });
 
         comp.submit.take(1).subscribeTracked(this, (data) => {
             this.modal.close();

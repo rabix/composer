@@ -84,7 +84,6 @@ export class ExecutorService2 {
 
     execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath?: string, executionParams: Partial<ExecutorParamsConfig> = {}): Observable<any> {
 
-
         const content  = this.serialize(model);
         const executor = new RabixExecutor(executorPath);
 

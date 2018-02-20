@@ -43,7 +43,9 @@ import {ExecutorService2} from "../../execution/services/executor/executor.servi
 import {AuthService} from "../../auth/auth.service";
 import {ExecutionStopAction} from "../../execution/actions/execution.actions";
 import {switchMap, flatMap, finalize, catchError} from "rxjs/operators";
+import {ensureAbsolutePaths} from "../../job-editor/utilities/path-resolver";
 
+const path = require("path");
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -783,7 +785,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.executionQueue.pipe(
             switchMap(() => this.runOnExecutor().pipe(
                 finalize(() => this.isExecuting = false),
-                catchError(() => Observable.empty())
+                catchError(err => {
+                    console.error(err);
+                    return Observable.empty();
+                })
             ))
         ).subscribeTracked(this, () => void 0);
 
@@ -822,7 +827,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             const outDir = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
 
-            return executor.execute(appID, this.dataModel, job, executorPath, {outDir}).finally(() => {
+            const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
+
+            return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).finally(() => {
                 this.fileRepository.reloadPath(outDir);
             });
         });
