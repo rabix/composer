@@ -7,6 +7,7 @@ import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {ErrorCode} from "cwlts/models/helpers/validation";
 
 @Component({
     selector: "ct-tool-visual-editor",
@@ -54,12 +55,16 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                           [context]="context"
                           [readonly]="readonly">
             </ct-resources>
-
-            <ct-tool-hints [model]="model"
-                           [context]="context"
-                           (update)="dirty.emit()"
-                           [readonly]="readonly">
-            </ct-tool-hints>
+            
+            <ct-form-panel class="hints-section">
+                <div class="tc-header">Hints</div>
+                <div class="tc-body">
+                    <ct-hint-list [cwlVersion]="model.cwlVersion"
+                                  [context]="context"
+                                  [readonly]="readonly"
+                                  [formControl]="form.get('hints')"></ct-hint-list>
+                </div>
+            </ct-form-panel>
 
             <ct-file-def-list [model]="model"
                               [fileRequirement]="model.fileRequirement || {}"
@@ -119,11 +124,43 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     ngOnInit() {
         this.form = new FormGroup({
-            baseCommand: new FormControl(this.model.baseCommand)
+            baseCommand: new FormControl(this.model.baseCommand),
+            hints: new FormControl(this.model.hints)
         });
 
         this.form.get("baseCommand").valueChanges.subscribeTracked(this, (old) => {
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
+        });
+
+        this.form.get("hints").valueChanges.subscribeTracked(this, (hints) => {
+             if (hints.length > this.model.hints.length) {
+
+                 const hint = hints[hints.length - 1];
+                 this.model.addHint({class: "", value: ""});
+
+             } else if (hints.length < this.model.hints.length) {
+
+                 for (let i = 0; i < this.model.hints.length; i++) {
+
+                     if (!hints[i] || hints[i].loc.indexOf(i) === -1) {
+                         this.model.hints[i].clearIssue(ErrorCode.EXPR_ALL);
+                         this.model.hints.splice(i, 1);
+                         break;
+                     }
+                 }
+             } else {
+                 for (let i = 0; i < this.model.hints.length; i++) {
+
+                     if (hints[i]["class"] && hints[i]["value"] &&
+                         (hints[i]["class"] !== this.model.hints[i]["class"] ||
+                         hints[i]["value"].value !== this.model.hints[i]["value"].value)) {
+
+                         this.model.hints[i]["class"] = hints[i]["class"];
+                         this.model.hints[i]["value"].value = hints[i]["value"].value;
+                     }
+                 }
+             }
+
         });
 
         this.form.valueChanges.subscribeTracked(this, (old) => {

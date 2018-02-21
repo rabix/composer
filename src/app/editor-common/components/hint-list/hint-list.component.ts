@@ -1,16 +1,34 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from "@angular/core";
-import {FormArray, FormControl, FormGroup} from "@angular/forms";
-import {CommandLineToolModel, StepModel, WorkflowModel} from "cwlts/models";
+import {
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    forwardRef,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges
+} from "@angular/core";
+import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {CommandLineToolModel, RequirementBaseModel, StepModel, WorkflowModel} from "cwlts/models";
 import {Subscription} from "rxjs/Subscription";
 import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {ErrorCode} from "cwlts/models/helpers/validation";
+import {V1ExpressionModel} from "cwlts/models/v1.0";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 
 @Component({
     selector: "ct-hint-list",
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => HintsComponent),
+        multi: true
+    }],
     template: `
         <!--Blank Tool Screen-->
-        <ct-blank-state *ngIf="!readonly && !model.hints.length" (buttonClick)="addEntry()"
+        <ct-blank-state *ngIf="!readonly && !formControl.length" (buttonClick)="addEntry()"
                         [learnMoreURL]="'http://docs.sevenbridges.com/docs/list-of-execution-hints'"
                         [hasAction]="true">
             <section tc-button-text>Add a Hint</section>
@@ -20,12 +38,12 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
             </section>
         </ct-blank-state>
 
-        <div *ngIf="readonly && !model.hints.length" class="text-xs-center">
+        <div *ngIf="!formControl.enabled && formControl.length === 0" class="text-xs-center">
             No hints are specified for this tool
         </div>
 
         <!--List Header Row-->
-        <div class="editor-list-title" *ngIf="!!model.hints.length">
+        <div class="editor-list-title" *ngIf="formControl.length > 0">
             <div class="col-xs-6">
                 Class
             </div>
@@ -58,7 +76,7 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
         </form>
 
         <!--Add entry link-->
-        <button *ngIf="!readonly && !!model.hints.length"
+        <button *ngIf="!readonly && !!formControl.length"
                 (click)="addEntry()"
                 type="button"
                 class="btn pl-0 btn-link no-outline no-underline-hover"
@@ -69,13 +87,13 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
     `,
     styleUrls: ["./hint-list.component.scss"]
 })
-export class HintsComponent implements OnChanges {
-
-    @Input()
-    model: CommandLineToolModel | WorkflowModel | StepModel;
+export class HintsComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
     classSuggest: string[];
+
+    @Input()
+    cwlVersion: string;
 
     @Input()
     readonly = false;
@@ -88,58 +106,63 @@ export class HintsComponent implements OnChanges {
 
     form: FormGroup;
 
-    @Output()
-    update = new EventEmitter();
+    formControl: FormArray;
+
+    private propagateChange = (hint: RequirementBaseModel) => void 0;
+
+    private propagateTouch = () => void 0;
 
     private sub: Subscription;
 
     constructor(private modal: ModalService, public system: SystemService) {
+        super();
     }
 
-    ngOnChanges(changes: SimpleChanges) {
-        const model = this.model;
-
-        if (!this.form) {
-            this.form = new FormGroup({});
+    writeValue(hints: RequirementBaseModel[]) {
+        if (!hints) {
+            return;
         }
 
-        if (model.hints) {
-            if (this.sub) {
-                this.sub.unsubscribe();
-            }
+        const arrayControls = hints.map(hint => new FormControl(hint));
 
-            this.form.setControl("hints", new FormArray([]));
+        this.formControl = new FormArray(arrayControls);
 
-            model.hints.forEach(h => {
-                (this.form.get("hints") as FormArray)
-                    .push(new FormControl({value: h, disabled: this.readonly}));
-            });
+        this.form = new FormGroup({hints: this.formControl});
 
-            this.sub = this.form.valueChanges.subscribe(form => {
-                setTimeout(() => {
-                    this.update.emit(this.model.hints);
-                });
-            });
-        }
-    }
-
-    removeEntry(i: number) {
-        this.modal.delete("hint").then(() => {
-            this.model.hints[i].clearIssue(ErrorCode.EXPR_ALL);
-            this.model.hints.splice(i, 1);
-            (this.form.get("hints") as FormArray).removeAt(i);
-            this.update.emit(this.model.hints);
-        }, err => {
-            console.warn(err);
+        this.formControl.valueChanges.subscribeTracked(this, (value) => {
+            this.propagateChange(this.formControl.value || {});
         });
     }
 
+    registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    registerOnTouched(fn: any): void {
+        this.propagateTouch = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        isDisabled ? this.formControl.disable({emitEvent: false}) : this.formControl.enable({emitEvent: false});
+    }
+
     addEntry() {
-        const hint = this.model.addHint({class: "", value: ""});
-        (this.form.get("hints") as FormArray).push(new FormControl({
+        const hint = { class: "", value: this.cwlVersion === "v1.0" ? new V1ExpressionModel("") : new SBDraft2ExpressionModel("") };
+
+        this.formControl.push(new FormControl({
             value: hint,
             disabled: this.readonly
         }));
-        this.update.emit(this.model.hints);
+    }
+
+    removeEntry(i: number) {
+        const hints = this.formControl.value;
+
+        this.modal.delete("hint").then(() => {
+            hints.splice(i, 1);
+            this.formControl.removeAt(i);
+        }, err => {
+            console.warn(err);
+        });
     }
 }

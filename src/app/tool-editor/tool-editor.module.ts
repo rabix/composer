@@ -24,7 +24,6 @@ import {DockerRequirementComponent} from "./sections/docker/docker-requirement.c
 import {FileDefInspectorComponent} from "./sections/file-def-list/file-def-inspector.component";
 import {FileDefListComponent} from "./sections/file-def-list/file-def-list.component";
 import {LiteralExpressionInputComponent} from "./sections/file-def-list/literal-expression-input.component";
-import {ToolHintsComponent} from "./sections/hints/tool-hints.component";
 import {ToolInputListComponent} from "./sections/inputs/tool-input-list.component";
 import {ToolInputsComponent} from "./sections/inputs/tool-inputs.component";
 import {ToolCodesComponent} from "./sections/other/codes/tool-codes.component";
@@ -63,7 +62,6 @@ import {JobEditorModule} from "../job-editor/job-editor.module";
         ToolEditorComponent,
         ToolVisualEditorComponent,
         DockerRequirementComponent,
-        ToolHintsComponent,
         ToolStreamsComponent,
         ToolOtherComponent,
         ToolCodesComponent,
