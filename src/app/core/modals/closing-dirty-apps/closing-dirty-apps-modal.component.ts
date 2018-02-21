@@ -1,23 +1,25 @@
 import {Component, Input, Output} from "@angular/core";
-import {Subject} from "rxjs/Subject";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {Observable} from "rxjs/Observable";
+import {last} from "rxjs/operators";
 
 @Component({
     styleUrls: ["closing-dirty-apps-modal.component.scss"],
     selector: "ct-modal-closing-dirty-apps",
     template: `
-        <form (ngSubmit)="decision.next(true)">
+        <form (ngSubmit)="decide('confirm')">
             <div class="body p-1">
                 <span>Do you want to save the changes you've made to the document?<br/>
                     Once you close this tab, your changes will be lost if you don't save them.</span>
             </div>
-            
+
             <div class="modal-footer">
-                <button class="btn btn-secondary discard-button"
-                        (click)="decision.next(false)" data-test="dirty-app-modal-discard-button" type="button">{{ discardLabel }}
+                <button class="btn btn-secondary discard-button" data-test="dirty-app-modal-discard-button" type="button"
+                        (click)="decide('discard')">{{ discardLabel }}
                 </button>
 
-                <button class="btn btn-secondary" data-test="dirty-app-modal-cancel-button" (click)="onCancel()" type="button">{{ cancellationLabel }}
+                <button class="btn btn-secondary" data-test="dirty-app-modal-cancel-button" (click)="decide('cancel')"
+                        type="button">
+                    {{ cancellationLabel }}
                 </button>
                 <button class="btn btn-primary" data-test="dirty-app-modal-save-button" type="submit">{{ confirmationLabel }}</button>
             </div>
@@ -26,29 +28,42 @@ import {ModalService} from "../../../ui/modal/modal.service";
 })
 export class ClosingDirtyAppsModalComponent {
 
-    @Input()
-    public content: string;
+    @Input() content = "Are you sure?";
 
-    @Input()
-    public cancellationLabel: string;
+    @Input() cancellationLabel = "Cancel";
 
-    @Input()
-    public confirmationLabel: string;
+    @Input() confirmationLabel = "Yes";
 
-    @Input()
-    public discardLabel: string;
+    @Input() discardLabel = "Discard";
 
-    @Output()
-    public decision = new Subject<boolean>();
+    @Output() onCancel = () => void 0;
 
-    constructor(private modal: ModalService) {
-        this.content = "Are you sure?";
-        this.cancellationLabel = "Cancel";
-        this.confirmationLabel = "Yes";
-        this.discardLabel = "Don't";
-    }
+    @Output() onDiscard = () => void 0;
 
-    onCancel() {
-        this.decision.error(null);
+    @Output() onConfirm: () => void | Promise<any> | Observable<any> = () => void 0;
+
+    @Output() inAnyCase = () => void 0;
+
+    decide(decision: "confirm" | "discard" | "cancel"): void {
+        let action;
+        switch (decision) {
+            case "confirm":
+                action = this.onConfirm();
+                break;
+            case "discard":
+                action = this.onDiscard();
+                break;
+            default:
+                action = this.onCancel();
+        }
+
+        if (action instanceof Promise) {
+            action.then(() => this.inAnyCase());
+        } else if (action instanceof Observable) {
+            action.pipe(last()).subscribe(() => this.inAnyCase());
+        } else {
+            this.inAnyCase();
+        }
+
     }
 }
