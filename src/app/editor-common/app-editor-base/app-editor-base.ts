@@ -371,25 +371,23 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return;
         }
 
-        this.syncModelAndCode(true).then(() => {
-            const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
-            modal.appID      = this.dataModel.id;
-            modal.appContent = this.getModelText(true);
+        const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
+        modal.appID      = this.dataModel.id;
+        modal.appContent = this.getModelText(true);
 
-            modal.published.take(1).subscribeTracked(this, appID => {
+        modal.published.take(1).subscribeTracked(this, appID => {
 
-                const tab = this.workbox.getOrCreateAppTab({
-                    id: AppHelper.getRevisionlessID(appID),
-                    type: this.dataModel.class,
-                    label: modal.inputForm.get("id").value,
-                    isWritable: true,
-                    language: "json"
-                });
-
-                this.workbox.openTab(tab);
+            const tab = this.workbox.getOrCreateAppTab({
+                id: AppHelper.getRevisionlessID(appID),
+                type: this.dataModel.class,
+                label: modal.inputForm.get("id").value,
+                isWritable: true,
+                language: "json"
             });
 
-        }, err => console.warn);
+            this.workbox.openTab(tab);
+        });
+
     }
 
     provideStatusControls(): TemplateRef<any> {
@@ -557,14 +555,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.executionQueue.next(true);
     }
 
-    /**
-     * Serializes model to text. It also adds sbg:modified flag to indicate
-     * the text has been formatted by the GUI editor.
-     *
-     */
-    protected getModelText(embed?: boolean): string {
+    /** Serializes model to a string. */
+    protected getModelText(embed = false): string {
 
-        const modelObject = this.dataModel.serialize();
+        let modelObject;
+        if (embed && this.dataModel instanceof WorkflowModel) {
+            modelObject = this.dataModel.serializeEmbedded();
+        } else {
+            modelObject = this.dataModel.serialize();
+        }
 
         if (this.tabData.language === "json" || this.tabData.dataSource === "app") {
             return JSON.stringify(modelObject, null, 4);
