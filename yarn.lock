@@ -553,7 +553,7 @@ ajv-keywords@^2.0.0, ajv-keywords@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-2.1.1.tgz#617997fc5f60576894c435f940d819e135b80762"
 
-ajv@^4.8.2, ajv@^4.9.1:
+ajv@^4.9.1:
   version "4.11.8"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
   dependencies:
@@ -565,6 +565,14 @@ ajv@^5.0.0, ajv@^5.1.0, ajv@^5.1.5, ajv@^5.2.2, ajv@^5.5.0, ajv@~5.5.1:
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.2.tgz#73b5eeca3fab653e3d3f9422b341ad42205dc965"
   dependencies:
     co "^4.6.0"
+    fast-deep-equal "^1.0.0"
+    fast-json-stable-stringify "^2.0.0"
+    json-schema-traverse "^0.3.0"
+
+ajv@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.1.1.tgz#978d597fbc2b7d0e5a5c3ddeb149a682f2abfa0e"
+  dependencies:
     fast-deep-equal "^1.0.0"
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.3.0"
@@ -595,9 +603,9 @@ amqplib@^0.5.2:
     readable-stream "1.x >=1.1.9"
     safe-buffer "^5.0.1"
 
-angular2-moment@~1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/angular2-moment/-/angular2-moment-1.6.0.tgz#2be11b63d9cbdff8fee06f575c1beee2d863d62b"
+angular2-moment@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/angular2-moment/-/angular2-moment-1.8.0.tgz#27dd83d98de5d5e0f45412d82c89491a6fa245ca"
   dependencies:
     moment "^2.16.0"
 
@@ -3054,12 +3062,12 @@ cwl-svg@2.0.1:
   dependencies:
     core-js "^2.5.1"
 
-cwlts@1.15.19:
-  version "1.15.19"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.19.tgz#aa2a5d12b8a0c05954af5ac0b58be114491a59e3"
+cwlts@^1.15.21:
+  version "1.15.21"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.21.tgz#501d60fc2b7baef9be0279d8084210c740902c75"
   dependencies:
-    ajv "^4.8.2"
-    js-yaml "^3.9.0"
+    ajv "^6.1.1"
+    js-yaml "^3.10.0"
 
 cyclist@~0.2.2:
   version "0.2.2"
@@ -5547,7 +5555,7 @@ js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
 
-js-yaml@^3.10.0, js-yaml@^3.4.3, js-yaml@^3.7.0, js-yaml@^3.9.0:
+js-yaml@^3.10.0, js-yaml@^3.4.3, js-yaml@^3.7.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
   dependencies:
