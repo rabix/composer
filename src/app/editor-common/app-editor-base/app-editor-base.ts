@@ -43,7 +43,9 @@ import {ExecutorService2} from "../../execution/services/executor/executor.servi
 import {AuthService} from "../../auth/auth.service";
 import {ExecutionStopAction} from "../../execution/actions/execution.actions";
 import {switchMap, flatMap, finalize, catchError, distinctUntilChanged} from "rxjs/operators";
+import {ensureAbsolutePaths} from "../../job-editor/utilities/path-resolver";
 
+const path = require("path");
 
 export abstract class AppEditorBase extends DirectiveBase implements StatusControlProvider, OnInit, AfterViewInit {
 
@@ -276,22 +278,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 // and notification when switched to an older revision
                 const props             = this.dataModel.customProps || {};
                 const hasCopyOfProperty = props["sbg:copyOf"] && (~~props["sbg:revision"] === ~~props["sbg:latestRevision"]);
+                const isNotWritable     = !this.tabData.isWritable;
+                const isLocal           = this.tabData.dataSource === "local";
 
-                if (!this.tabData.isWritable || this.tabData.dataSource === "local") {
+                if (isNotWritable || isLocal) {
                     this.isUnlockable = false;
                 } else if (hasCopyOfProperty && !unlocked) {
-
                     const originalApp = this.dataModel.customProps["sbg:copyOf"];
-                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {
-                        type: "info"
-                    });
+                    this.notificationBar.showNotification(`This app is a read-only copy of ${originalApp}`, {type: "info"});
                     this.isUnlockable = true;
                 }
 
                 const isUnlockedAndUnlockableCopy = this.isUnlockable && hasCopyOfProperty && !unlocked;
 
-                if (!this.tabData.isWritable || isUnlockedAndUnlockableCopy) {
+                if (isNotWritable || isUnlockedAndUnlockableCopy) {
                     this.toggleLock(true);
+                }
+
+                if (isNotWritable && !this.isUnlockable) {
+                    this.notificationBar.showNotification(`This app is locked for editing.`, {type: "info"});
                 }
             }, err => console.warn);
         }, (err) => {
@@ -327,6 +332,16 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     save(): void {
+
+        // Do nothing if app is not local
+        // If we open an app that has no namespaces defined and save it right away,
+        // cwlts will add an sbg namespace and will save it modified,
+        // thus exporting something different than what was initially loaded.
+        // That is not good, so we will just ignore saving if the app is not marked to be dirty
+        // It would be nicer if the save method doesn't even get called, but then
+        if (this.tabData.dataSource === "local" && !this.isDirty) {
+            return;
+        }
 
         const appName = this.tabData.id;
 
@@ -773,7 +788,10 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.executionQueue.pipe(
             switchMap(() => this.runOnExecutor().pipe(
                 finalize(() => this.isExecuting = false),
-                catchError(() => Observable.empty())
+                catchError(err => {
+                    console.error(err);
+                    return Observable.empty();
+                })
             ))
         ).subscribeTracked(this, () => void 0);
 
@@ -812,7 +830,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             const outDir = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
 
-            return executor.execute(appID, this.dataModel, job, executorPath, {outDir}).finally(() => {
+            const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
+
+            return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).finally(() => {
                 this.fileRepository.reloadPath(outDir);
             });
         });
