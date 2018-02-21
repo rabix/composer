@@ -18,13 +18,15 @@
     .radio-container .btn {
         background-color: $input-bg;
         color: $smoke;
+        border: 1px solid $layout-section-border-light;
 
         &.selected {
-            border: 2px solid $brand-primary;
+            background: $editor-panel-selected-background;
+            border-color: $brand-primary;
         }
 
         &:hover {
-            border: 2px solid $brand-primary;
+            border-color: $brand-primary;
         }
     }
 

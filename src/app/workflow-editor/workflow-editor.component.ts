@@ -111,6 +111,11 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
     protected recreateModel(json: Object): void {
         this.dataModel = WorkflowFactory.from(json as any, "document");
+
+        if (!this.dataModel.namespaces.has("sbg")) {
+            this.dataModel.namespaces.set("sbg", "https://www.sevenbridges.com");
+        }
+
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
         this.dataModel.validate().then(this.afterModelValidation.bind(this));
     }

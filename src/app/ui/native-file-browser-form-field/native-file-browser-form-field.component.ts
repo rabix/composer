@@ -1,11 +1,14 @@
-import {ChangeDetectorRef, Component, forwardRef, Input, Renderer2, ViewChild, ElementRef, AfterViewChecked,} from "@angular/core";
+import {ChangeDetectorRef, Component, forwardRef, Input, ViewChild, ElementRef, NgZone, ChangeDetectionStrategy,} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NativeSystemService} from "../../native/system/native-system.service";
+
+const path = require("path");
 
 type SelectionType = "file" | "directory";
 
 @Component({
     selector: "ct-native-file-browser-form-field",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -28,7 +31,7 @@ type SelectionType = "file" | "directory";
     `,
 
 })
-export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor, AfterViewChecked {
+export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor {
 
     /** Title of the modal windows that opens when user clicks on "browse" */
     @Input() modalTitle = "Choose File or Directory";
@@ -42,7 +45,9 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     @Input() selectionType: SelectionType = "file";
 
-    @Input() disableTextInput = false;
+    @Input() disableTextInput = true;
+
+    @Input() relativePathRoot: string;
 
     @Input() dialogOptions: {
         title?: string;
@@ -65,17 +70,16 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     isDisabled = false;
 
+    onTouched: Function;
 
-    onTouched = () => void 0;
-
-    onChange = (value: any) => void 0;
+    onChange: (value: any) => void;
 
     @ViewChild("pathInput")
     pathInputField: ElementRef;
 
     private _value = "";
 
-    constructor(private native: NativeSystemService, private renderer: Renderer2, private cdr: ChangeDetectorRef) {
+    constructor(private native: NativeSystemService, private cdr: ChangeDetectorRef, private zone: NgZone) {
     }
 
     get value(): string {
@@ -84,14 +88,24 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     set value(val: string) {
         this._value = val;
-        this.onChange(val);
+
+        if (typeof this.onChange === "function") {
+            this.onChange(val);
+        }
+
+        if (this.disableTextInput) {
+            this.updateInputScroll();
+        }
+
+        this.cdr.markForCheck();
     }
 
     onBrowse() {
 
-        const params = Object.assign({
+        const defaultPath = this.relativePathRoot || this.value;
+        const params      = Object.assign({
             title: this.modalTitle,
-            defaultPath: this.value
+            defaultPath
         }, this.dialogOptions);
 
         let opener;
@@ -107,9 +121,18 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
                 break;
         }
 
-        opener.then(files => this.value = files[0])
-            .then(() => this.cdr.markForCheck())
-            .catch(() => void 0);
+        opener.then(files => {
+            const [file] = files;
+
+            if (this.relativePathRoot) {
+                const relPath = path.relative(this.relativePathRoot, path.dirname(file)) + path.sep + path.basename(file);
+                this.value    = relPath.startsWith(path.sep) ? relPath.substr(1) : relPath;
+
+            } else {
+                this.value = file;
+            }
+
+        }).then(() => this.cdr.markForCheck()).catch(() => void 0);
     }
 
     writeValue(obj: any): void {
@@ -133,20 +156,23 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
         this.isDisabled = isDisabled;
     }
 
-    ngAfterViewChecked() {
-        this.updateInputScroll();
-    }
-
     private updateInputScroll() {
-        setImmediate(() => {
-            if (!this.pathInputField && !this.pathInputField.nativeElement) {
-                return;
-            }
 
-            const el = this.pathInputField.nativeElement;
-            if (this.isDisabled || this.disableTextInput) {
-                el.scrollLeft = el.scrollWidth;
-            }
+        this.zone.runOutsideAngular(() => {
+
+            setTimeout(() => {
+                if (!this.pathInputField && !this.pathInputField.nativeElement) {
+                    return;
+                }
+
+                const el = this.pathInputField.nativeElement;
+                if (this.isDisabled || this.disableTextInput) {
+                    el.scrollLeft = el.scrollWidth;
+                }
+            });
+
         });
+
+
     }
 }

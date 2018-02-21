@@ -197,6 +197,9 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
     protected recreateModel(json: Object): void {
 
         this.dataModel = CommandLineToolFactory.from(json as any, "document");
+        if (!this.dataModel.namespaces.has("sbg")) {
+            this.dataModel.namespaces.set("sbg", "https://www.sevenbridges.com");
+        }
 
         this.dataModel.onCommandLineResult(cmdResult => {
             this.commandLineParts.next(cmdResult);

@@ -47,9 +47,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                  [type]="type">
             </ct-expression-input>
 
-            <span class="remove-icon"
+            <span *ngIf="!readonly" class="remove-icon"
                   (click)="removeCustom($event, true)">
-                <i *ngIf="!readonly" [ct-tooltip]="'Delete'" data-test="custom-quick-pick-remove-button" class="fa fa-trash clickable"></i>
+                <i [ct-tooltip]="'Delete'" data-test="custom-quick-pick-remove-button"
+                   class="fa fa-trash clickable"></i>
             </span>
         </div>
     `

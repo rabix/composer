@@ -38,6 +38,8 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
 
+    @Input() relativePathRoot?: string;
+
     @Output() change = new EventEmitter();
 
     group = [];

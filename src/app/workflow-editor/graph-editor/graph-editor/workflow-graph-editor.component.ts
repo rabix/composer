@@ -259,7 +259,9 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.model.on("input.remove", changeHandler),
             this.model.on("input.create", changeHandler),
             this.model.on("step.remove", changeHandler),
-            this.model.on("step.update", changeHandler)
+            this.model.on("step.update", changeHandler),
+            this.model.on("step.inPort.show", changeHandler),
+            this.model.on("step.inPort.hide", changeHandler)
             /**
              * because the workflow editor directly causes "step.create" to be emitted
              * and it has to do some work afterward, this.change.emit() is triggered manually

@@ -180,40 +180,33 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 })
 export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnInit {
 
-    @Input()
-    public readonly = false;
+    @Input() readonly = false;
 
-    @Input()
-    public input: WorkflowStepInputModel;
+    @Input() input: WorkflowStepInputModel;
 
-    @Input()
-    public value: any;
+    @Input() value: any;
 
-    @Input()
-    public index = -1;
+    @Input() index = -1;
 
-    @Input()
-    public prefix;
+    @Input() prefix;
 
     // Added (but not used in code) just to call ngChanges() on change detection process when step is updated
-    @Input()
-    public type: string;
+    @Input() type: string;
 
-    @Output()
-    public update = new EventEmitter<any>();
+    @Output() update = new EventEmitter<any>();
 
-    public inputType: string;
+    inputType: string;
 
     /**
      * We might want to show a warning next to a field.
      * This can happen for example if we encounter a mismatch between step value and the input type,
      * for example, an input can by File[], and the step value can be just a plain string.
      */
-    public warning: string;
+    warning: string;
 
-    public arrayModifiedInput;
+    arrayModifiedInput;
 
-    public updateJob(data) {
+    updateJob(data) {
         this.update.emit(data);
     }
 
@@ -233,7 +226,7 @@ export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnIn
         this.updateJob(d);
     }
 
-    public updateArray(index: number, data: any) {
+    updateArray(index: number, data: any) {
         // We need some kind of convention to broadcast information
         // that an array element should be deleted
         if (data === undefined) {

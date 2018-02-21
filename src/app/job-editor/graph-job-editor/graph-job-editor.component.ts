@@ -1,4 +1,17 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Inject,
+    Input,
+    Output,
+    TemplateRef,
+    ViewChild,
+    SimpleChanges,
+    OnChanges,
+    OnDestroy
+} from "@angular/core";
 import {FormControl} from "@angular/forms";
 import {SelectionPlugin, SVGArrangePlugin, SVGEdgeHoverPlugin, SVGNodeMovePlugin, Workflow as WorkflowGraph, ZoomPlugin} from "cwl-svg";
 import {StepModel} from "cwlts/models/generic/StepModel";
@@ -16,13 +29,14 @@ import {SVGRequiredInputMarkup} from "../../workflow-editor/svg-plugins/required
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {Store} from "@ngrx/store";
 import {StepExecution} from "../../execution/models";
+import {findParentInputOfType} from "../utilities/dom";
 
 @Component({
     selector: "ct-graph-job-editor",
     templateUrl: "./graph-job-editor.component.html",
     styleUrls: ["./graph-job-editor.component.scss"]
 })
-export class GraphJobEditorComponent extends DirectiveBase implements OnInit, AfterViewInit {
+export class GraphJobEditorComponent extends DirectiveBase implements AfterViewInit, OnChanges, OnDestroy {
 
     @Input()
     appID: string;
@@ -34,6 +48,8 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
     draw = new EventEmitter<any>();
 
     inspectedNode: StepModel | WorkflowOutputParameterModel | WorkflowInputParameterModel = null;
+
+    relativePathRoot: string;
 
     @ViewChild("canvas")
     private canvas: ElementRef;
@@ -80,39 +96,44 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
 
         const type = data.type === "directory" ? "Directory" : "File";
 
-        const inputEl = this.findParentInputOfType(element, type);
-
-        if (inputEl) {
-
-            const inputID    = inputEl.getAttribute("data-id");
-            const inputModel = this.model.inputs.find(input => input.id === inputID) as WorkflowInputParameterModel;
-
-            const inputTypeIsArray = inputModel.type.type === "array";
-
-            const job           = this.jobControl.value;
-            const inputJobValue = job[inputID];
-
-            const jobValueIsArray = Array.isArray(inputJobValue);
-
-            const newEntry = {class: type, path: data.name};
-
-            const patch = {[inputID]: newEntry} as any;
-
-            if (jobValueIsArray) {
-                patch[inputID] = inputJobValue.concat(newEntry);
-            } else if (inputTypeIsArray) {
-                patch[inputID] = [newEntry];
-            } else {
-                patch[inputID] = newEntry;
-            }
-
-            const newJob = {...job, ...patch};
-
-            this.jobControl.patchValue(newJob);
+        const inputEl = findParentInputOfType(element, type);
+        if (!inputEl) {
+            return;
         }
+
+
+        const inputID    = inputEl.getAttribute("data-id");
+        const inputModel = this.model.inputs.find(input => input.id === inputID) as WorkflowInputParameterModel;
+
+        const inputTypeIsArray = inputModel.type.type === "array";
+
+        const job           = this.jobControl.value;
+        const inputJobValue = job[inputID];
+
+        const jobValueIsArray = Array.isArray(inputJobValue);
+
+        const newEntry = {class: type, path: data.name};
+
+        const patch = {[inputID]: newEntry} as any;
+
+        if (jobValueIsArray) {
+            patch[inputID] = inputJobValue.concat(newEntry);
+        } else if (inputTypeIsArray) {
+            patch[inputID] = [newEntry];
+        } else {
+            patch[inputID] = newEntry;
+        }
+
+        const newJob = {...job, ...patch};
+
+        this.jobControl.patchValue(newJob);
     }
 
-    ngOnInit() {
+    ngOnChanges(changes: SimpleChanges) {
+
+        if (changes["appID"]) {
+            this.relativePathRoot = AppHelper.isLocal(this.appID) ? AppHelper.getDirname(this.appID) : undefined;
+        }
     }
 
     ngAfterViewInit() {
@@ -158,13 +179,13 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
             });
 
         this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
-            this.updateJob(storedJob)
+            this.updateJob(storedJob);
         });
 
         this.store.select("jobEditor", "progress", this.appID, "stepExecution").distinctUntilChanged()
             .subscribeTracked(this, (states: StepExecution[] = []) => {
                 const update = states.reduce((acc, step) => ({...acc, [step.id]: step.state}), {});
-                this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update)
+                this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update);
             });
     }
 
@@ -196,23 +217,6 @@ export class GraphJobEditorComponent extends DirectiveBase implements OnInit, Af
         if (JSON.stringify(normalizedJob) !== JSON.stringify(jobObject)) {
             this.metaManager.patchAppMeta("job", normalizedJob);
         }
-    }
-
-    findParentInputOfType(el: Element, type: string) {
-        while (el) {
-
-            const isInput     = el.classList.contains("input");
-            const isType      = el.classList.contains(`type-${type}`);
-            const isArrayType = el.classList.contains(`type-array`) && el.classList.contains(`items-${type}`);
-
-            if (isInput && (isType || isArrayType)) {
-                return el;
-            }
-
-            el = el.parentElement;
-        }
-
-        return el;
     }
 
     openInspector(ev: Event) {

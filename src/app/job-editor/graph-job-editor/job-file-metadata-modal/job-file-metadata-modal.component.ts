@@ -16,6 +16,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
                         <ct-native-file-browser-form-field class="input-group secondary-file-input"
                                                            [formControl]="group.get('path')"
                                                            [useIcon]="true"
+                                                           [relativePathRoot]="relativePathRoot"
                                                            [browseIcon]="group.get('class').value === 'File' ? 'fa-file' : 'fa-folder'"
                                                            [selectionType]="group.get('class').value === 'File' ? 'file' : 'directory'">
                         </ct-native-file-browser-form-field>
@@ -72,13 +73,15 @@ export class JobFileMetadataModalComponent implements OnInit {
     @Input()
     allowDirectories = true;
 
+    @Input()
+    relativePathRoot: string;
+
     form: FormGroup;
 
     constructor(private modal: ModalService) {
     }
 
     ngOnInit() {
-
 
         this.form = new FormGroup({
             secondaryFiles: new FormArray([]),
@@ -113,7 +116,7 @@ export class JobFileMetadataModalComponent implements OnInit {
     }
 
     applyChanges() {
-        let fVal = this.form.value;
+        const fVal = this.form.value;
 
         fVal.secondaryFiles = fVal.secondaryFiles.filter(entry => entry.path.trim() !== "");
 

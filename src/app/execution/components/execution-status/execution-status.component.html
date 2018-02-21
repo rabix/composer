@@ -12,7 +12,7 @@
     <button *ngIf="fileOpener"
             type="button" class="btn btn-secondary" ct-tooltip="Open Job File"
             (click)="fileOpener.open(jobFilePath, 'yaml')"
-            [disabled]="!jobFilePath || error?.type === 'requirement'">
+            [disabled]="!jobFilePath || execution?.error?.type === 'requirement'">
         <i class="fa fa-indent fa-fw"></i>
     </button>
 
@@ -41,11 +41,15 @@
 <div class="status">
     <div *ngIf="!execution?.stepExecution" #output class="p-1">
         Check here for the progress of your execution.
+        <br/>
         Before executing an analysis, make sure that Docker is running and that you have Java Runtime
-        Environment version 8+ installed.<br/>
-        Check here for the progress of your execution.
+        Environment version 8+ installed.
     </div>
 
+    <div *ngIf="dockerPullTimeoutCountdown" class="docker-pull-timeout">
+        <ng-container *ngIf="isOffline">You are offline.</ng-container>
+        <ng-container>Cannot pull Docker image. Retrying in {{ dockerPullTimeoutCountdown }} seconds.</ng-container>
+    </div>
 
     <div *ngIf="execution?.error" class="execution-failure">
         Execution failed with exit code {{ execution?.error.code }}

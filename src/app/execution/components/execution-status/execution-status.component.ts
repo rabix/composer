@@ -30,6 +30,10 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
     isRunning = false;
 
+    isOffline = false;
+    dockerPullTimeoutCountdown: number;
+    dockerPullTimeoutID;
+
     constructor(private store: Store<AppState>,
                 @DIOptional() @Inject(DirectoryExplorerToken) directoryExplorer: DirectoryExplorer,
                 @DIOptional() @Inject(FileOpenerToken) fileOpener: FileOpener) {
@@ -45,6 +49,9 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
             this.jobFilePath  = this.getJobFilePath();
             this.errorLogPath = this.getErrorLogPath();
             this.isRunning    = this.determineIfRunning();
+
+            this.setupDockerTimeout();
+
         }
     }
 
@@ -60,6 +67,23 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
     stopExecution() {
         this.store.dispatch(new ExecutionStopAction(this.appID));
+    }
+
+    private setupDockerTimeout() {
+        if (this.execution && this.execution.dockerPullTimeout && this.execution.dockerPullTimeout > Date.now()) {
+
+            this.isOffline                  = navigator.onLine === false;
+            this.dockerPullTimeoutCountdown = Math.ceil((this.execution.dockerPullTimeout - Date.now()) / 1000);
+
+            this.dockerPullTimeoutID = setTimeout(() => {
+                this.setupDockerTimeout()
+            }, 1000);
+
+        } else {
+            this.dockerPullTimeoutCountdown = undefined;
+            clearTimeout(this.dockerPullTimeoutID);
+        }
+
     }
 
     private getJobFilePath(): Optional<string> {
