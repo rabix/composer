@@ -44,8 +44,8 @@ import {WorkflowEditorComponent} from "../../workflow-editor.component";
 import {WorkflowEditorService} from "../../workflow-editor.service";
 import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
-import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {AuthService} from "../../../auth/auth.service";
 
 @Component({
     selector: "ct-workflow-graph-editor",
@@ -101,11 +101,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     constructor(private gateway: DataGatewayService,
                 private ipc: IpcService,
+                private auth: AuthService,
                 private inspector: EditorInspectorService,
                 private statusBar: StatusBarService,
                 private notificationBar: NotificationBarService,
                 private appValidator: AppValidatorService,
-                private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
                 private fileRepository: FileRepositoryService,
                 private workflowEditorService: WorkflowEditorService,
@@ -145,7 +145,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SelectionPlugin(),
                 new ZoomPlugin(),
                 new DeletionPlugin(),
-                new UpdatePlugin(this.statusBar, this.localRepository, this.platformRepository, this.notificationBar)
+                new UpdatePlugin(this.statusBar, this.auth, this.platformRepository, this.notificationBar)
             ],
             editingEnabled: !this.readonly
         });
