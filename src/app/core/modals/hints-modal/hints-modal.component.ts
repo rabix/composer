@@ -1,5 +1,12 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {CommandLineToolModel, ExpressionModel, RequirementBaseModel, StepModel, WorkflowModel} from "cwlts/models";
+import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {
+    CommandLineToolModel,
+    ExpressionModel,
+    ProcessRequirementModel,
+    RequirementBaseModel,
+    StepModel,
+    WorkflowModel
+} from "cwlts/models";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {FormControl} from "@angular/forms";
 import {ErrorCode} from "cwlts/models/helpers/validation";
@@ -11,19 +18,14 @@ import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
     selector: "ct-hints-modal",
     template: `
         <div class="body pl-1 pr-1 mt-1">
-
-            <ct-form-panel class="hints-section">
-                <div class="tc-header">Hints</div>
-                <div class="tc-body">
-                    <ct-hint-list [cwlVersion]="cwlVersion"
-                                  [readonly]="readonly"
-                                  [formControl]="formControl"></ct-hint-list>
-                </div>
-            </ct-form-panel>
+            
+            <ct-hint-list [cwlVersion]="cwlVersion"
+                          [readonly]="readonly"
+                          [formControl]="formControl"></ct-hint-list>
 
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
                 <button type="button" class="btn btn-primary" (click)="save()">Save</button>
-                <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
             </div>
         </div>
     `,
@@ -36,6 +38,8 @@ export class HintsModalComponent implements OnInit {
 
     @Input()
     readonly = false;
+
+    @Output() saved = new EventEmitter<ProcessRequirementModel[]>();
 
     cwlVersion: string;
 
@@ -90,6 +94,8 @@ export class HintsModalComponent implements OnInit {
         newHints.forEach(hint => {
             this.model.addHint({class: hint.class, value: hint.value.value});
         });
+
+        this.saved.emit();
 
         this.modal.close();
     }

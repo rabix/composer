@@ -103,7 +103,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </div>
 
         <!--Set Hints-->
-        <button type="button" class="btn btn-secondary" data-test="set-hints-button" (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
+        <button type="button" 
+                class="btn btn-secondary" 
+                data-test="set-hints-button" 
+                (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
 
     `
 })
@@ -222,6 +225,10 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
 
         hints.model = this.step;
         hints.readonly = this.readonly;
+
+        hints.saved.take(1).subscribeTracked(this, () => {
+            this.change.emit();
+        });
     }
 
     setDisabledState(isDisabled: boolean) {
