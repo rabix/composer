@@ -35,4 +35,4 @@ function ensureObject(value) {
     return {};
 }
 
-export const APP_META_MANAGER = new InjectionToken("appMetaManager");
+export const AppMetaManagerToken = new InjectionToken("appMetaManager");

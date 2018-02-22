@@ -7,7 +7,7 @@ import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {AppMetaManager} from "../core/app-meta/app-meta-manager";
-import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
+import {AppMetaManagerToken, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
@@ -55,7 +55,7 @@ export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, moda
             useFactory: appSaverFactory,
             deps: [ToolEditorComponent, IpcService, ModalService, PlatformRepositoryService]
         }, {
-            provide: APP_META_MANAGER,
+            provide: AppMetaManagerToken,
             useFactory: appMetaManagerFactory,
             deps: [ToolEditorComponent, LocalRepositoryService, PlatformRepositoryService]
         },
@@ -177,7 +177,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             });
 
             // set job on the tool to be the actual job, so the command line is the real thing
-            this.jobSubscription = (this.injector.get(APP_META_MANAGER) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
+            this.jobSubscription = (this.injector.get(AppMetaManagerToken) as AppMetaManager).getAppMeta("job").subscribeTracked(this, (job) => {
                 this.dataModel.setJobInputs(job);
             });
         } else {

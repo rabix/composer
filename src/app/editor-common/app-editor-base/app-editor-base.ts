@@ -9,7 +9,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
 import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
-import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManagerToken} from "../../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
@@ -798,7 +798,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
         this.executionQueue.pipe(
             flatMap(() => {
-                const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
+                const metaManager = this.injector.get(AppMetaManagerToken) as AppMetaManager;
                 return metaManager.getAppMeta("job").take(1);
             })
         ).subscribeTracked(this, () => {
@@ -813,7 +813,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private runOnExecutor(): Observable<string | Object> {
 
-        const metaManager    = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const metaManager    = this.injector.get<AppMetaManager>(AppMetaManagerToken);
         const executorConfig = this.localRepository.getExecutorConfig();
         const job            = metaManager.getAppMeta("job");
         const user           = this.auth.getActive().map(user => user ? user.id : "local");
@@ -868,7 +868,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     importJob() {
-        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const metaManager = this.injector.get<AppMetaManager>(AppMetaManagerToken);
         const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
         comp.appID        = this.tabData.id;
         comp.action       = "import";
@@ -885,7 +885,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     }
 
     exportJob() {
-        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const metaManager = this.injector.get<AppMetaManager>(AppMetaManagerToken);
 
         metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
             const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");

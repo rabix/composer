@@ -1,6 +1,6 @@
 import {Observable} from "rxjs/Observable";
 import {
-    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation
+    AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren, ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
@@ -8,6 +8,8 @@ import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.component";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -112,7 +114,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     constructor(private formBuilder: FormBuilder,
                 private modal: ModalService,
-                private appMetaManager: APP_META_MANAGER) {
+                @Inject(AppMetaManagerToken) private appMetaManager: AppMetaManager) {
         super();
     }
 
@@ -173,6 +175,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
+
             }
 
         });
