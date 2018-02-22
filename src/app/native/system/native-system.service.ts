@@ -33,6 +33,7 @@ export class NativeSystemService {
 
     private openDialog(options: Electron.OpenDialogOptions = {}): Promise<string[]> {
         const {app, dialog, getCurrentWindow} = this.electron.getRemote();
+
         const config = Object.assign({
             defaultPath: app.getPath("home"),
         }, options);
