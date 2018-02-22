@@ -110,7 +110,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
+    constructor(private formBuilder: FormBuilder,
+                private modal: ModalService,
+                private appMetaManager: APP_META_MANAGER) {
         super();
     }
 
@@ -146,11 +148,28 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             if (this.input.id !== value) {
                 try {
+
+                    const oldId = this.input.id;
+
                     this.model.changeIOId(this.input, value);
 
                     if (this.isType("enum") || this.isType("record")) {
                         this.input.type.name = value;
                     }
+
+                    // If input id is changed we should migrate related job key
+                    this.appMetaManager.getAppMeta("job").take(1).subscribe((job) => {
+
+                        const jobValue = job[oldId];
+
+                        delete job[oldId];
+
+                        job[value] = jobValue;
+
+                        this.appMetaManager.patchAppMeta("job", job);
+
+                    });
+
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
@@ -185,6 +204,15 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             if (this.isType("enum") || this.isType("record")) {
                 this.input.type.name = this.input.id;
             }
+
+            // If type is changed nullify job value for that input
+            this.appMetaManager.getAppMeta("job").take(1).subscribe((job) => {
+
+                job[this.input.id] = null;
+
+                this.appMetaManager.patchAppMeta("job", job);
+
+            });
 
         });
 
