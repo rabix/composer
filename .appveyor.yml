@@ -17,7 +17,9 @@ install:
   - yarn install --no-progress
 
 build_script:
-  - yarn run build
+  - yarn run compile:electron
+  - node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build -prod -aot -v
+  - yarn run package
 
 test_script:
   - yarn run test:electron
