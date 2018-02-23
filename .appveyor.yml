@@ -22,7 +22,6 @@ build_script:
 test_script:
   - yarn run test:electron
   - yarn run test:angular
-  - yarn run test:spectron
 
 cache:
   - node_modules -> yarn.lock
