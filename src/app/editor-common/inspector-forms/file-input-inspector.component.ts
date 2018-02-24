@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewEncapsulation} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
+import {debounceTime, distinctUntilChanged, map} from "rxjs/operators";
+import {merge} from "rxjs/observable/merge";
 
 interface CWLFile {
     path?: string;
@@ -33,9 +34,9 @@ interface CWLFile {
 
             <!--Secondary Files-->
             <div class="form-group">
-                <label>Secondary Files</label>                
+                <label>Secondary Files</label>
                 <ct-auto-complete formControlName="secondaryFiles" create="true">
-                </ct-auto-complete>                
+                </ct-auto-complete>
             </div>
 
             <!--Metadata-->
@@ -49,7 +50,7 @@ interface CWLFile {
                 <label>Content</label>
                 <textarea rows="10" class="form-control" formControlName="contents"></textarea>
             </div>
-            
+
             <!--Basename-->
             <div class="form-group" *ngIf="formGroup.controls['basename']">
                 <label>Basename</label>
@@ -74,20 +75,20 @@ export class FileInputInspectorComponent implements OnInit, OnChanges {
 
     /** Input data for the component */
     @Input()
-    public input: CWLFile = {};
+    input: CWLFile = {};
 
     @Input()
-    public path: string;
+    path: string;
 
     /** Emits when the form data changed */
     @Output()
-    public update = new EventEmitter();
+    update = new EventEmitter();
 
     /** Paths that will be displayed as tags in the compact list component */
-    public secondaryFilePaths: string[] = [];
+    secondaryFilePaths: string[] = [];
 
     /** Form group that holds all the data */
-    public formGroup: FormGroup;
+    formGroup: FormGroup;
 
     ngOnInit() {
         const controls = {
@@ -114,29 +115,21 @@ export class FileInputInspectorComponent implements OnInit, OnChanges {
         this.formGroup = new FormGroup(controls);
 
         // We need to combine changes from two different sources
-        Observable.merge(
+        merge(
             // Watch for changes of values on the secondaryFiles tag array
-            this.formGroup.get("secondaryFiles").valueChanges
-
-            // We need to compare arrays in order not to feed an array with the same content
-            // back into the loop. This works since elements are plain strings.
-                .distinctUntilChanged((a, b) => a.toString() === b.toString()),
-
-            this.formGroup.valueChanges.debounceTime(300)
-        )
-
-            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-
-            // Take the plain form values
-            .map(() => this.formGroup.getRawValue())
-
+            this.formGroup.get("secondaryFiles").valueChanges.pipe(
+                // We need to compare arrays in order not to feed an array with the same content
+                // back into the loop. This works since elements are plain strings.
+                distinctUntilChanged((a, b) => a.toString() === b.toString())
+            ),
+            this.formGroup.valueChanges.pipe(debounceTime(300))
+        ).pipe(
+            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+            map(() => this.formGroup.getRawValue()),
             // Merge plain form values with the secondaryFiles values map onto their original structure
-            .map(val => ({...val, secondaryFiles: val.secondaryFiles.map(path => ({path}))}))
+            map(val => ({...val, secondaryFiles: val.secondaryFiles.map(path => ({path}))}))
+        ).subscribe(data => this.update.emit(data)); // Then emit gathered data as an update from the component
 
-            // Then emit gathered data as an update from the component
-            .subscribe(data => {
-                this.update.emit(data);
-            });
     }
 
     ngOnChanges() {

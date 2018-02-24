@@ -7,7 +7,7 @@ import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
 import {appSelector} from "../../../execution/reducers/selectors";
 import {AppExecution} from "../../../execution/models";
-import {map} from "rxjs/operators";
+import {map, skip, takeUntil, take, last, withLatestFrom} from "rxjs/operators";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -82,24 +82,23 @@ export class CommonReportPanelComponent extends DirectiveBase implements OnInit,
 
             const originalFlexBasis = this.flexBasis;
 
-            const down = movement.take(1);
-            const up   = movement.last().take(1);
-            const move = movement.skip(1).takeUntil(up);
+            const down = movement.pipe(take(1));
+            const up   = movement.pipe(last(), take(1));
+            const move = movement.pipe(skip(1), takeUntil(up));
 
-            move.withLatestFrom(down, (outer, inner) => inner.clientY - outer.clientY)
-                .subscribeTracked(this, deltaY => {
-                    const update = originalFlexBasis + deltaY;
+            move.pipe(
+                withLatestFrom(down, (outer, inner) => inner.clientY - outer.clientY)
+            ).subscribeTracked(this, deltaY => {
+                const update = originalFlexBasis + deltaY;
 
-                    const isAboveBottomMargin = update > 50;
-                    const isBelowTopMargin    = update < (container.clientHeight - 80);
+                const isAboveBottomMargin = update > 50;
+                const isBelowTopMargin    = update < (container.clientHeight - 80);
 
-                    if (isAboveBottomMargin && isBelowTopMargin) {
-                        this.flexBasis = update;
-                    }
+                if (isAboveBottomMargin && isBelowTopMargin) {
+                    this.flexBasis = update;
+                }
 
-                });
-
-
+            });
         });
     }
 

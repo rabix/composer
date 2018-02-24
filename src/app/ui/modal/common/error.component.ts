@@ -17,13 +17,13 @@ import {Component, Input} from "@angular/core";
 export class ErrorComponent {
 
     @Input()
-    public content: string;
+    content: string;
 
     @Input()
-    public confirmationLabel: string;
+    confirmationLabel: string;
 
     @Input()
-    public onConfirm: Function;
+    onConfirm: Function;
 
     constructor() {
     }

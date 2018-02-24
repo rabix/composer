@@ -62,11 +62,11 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
 export class SecondaryFilesComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any } = {$job: {}};
+    context: { $job: any } = {$job: {}};
 
     @Input()
     port: CommandInputParameterModel | CommandOutputParameterModel;

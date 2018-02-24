@@ -1,5 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {filter, tap, share, flatMap, takeUntil, map, take} from "rxjs/operators";
 
 type ExtendedMouseEvent = MouseEvent & {
     ctName?: string;
@@ -9,29 +11,33 @@ type ExtendedMouseEvent = MouseEvent & {
 @Injectable()
 export class DomEventService {
 
-    public readonly ON_DRAG_ENTER_ZONE_EVENT = "onDragEnterZone";
-    public readonly ON_DRAG_LEAVE_ZONE_EVENT = "onDragLeaveZone";
+    readonly ON_DRAG_ENTER_ZONE_EVENT = "onDragEnterZone";
+    readonly ON_DRAG_LEAVE_ZONE_EVENT = "onDragLeaveZone";
 
-    public readonly ON_DRAG_ENTER_EVENT = "onDragEnter";
-    public readonly ON_DRAG_LEAVE_EVENT = "onDragLeave";
-    public readonly ON_DRAG_OVER_EVENT  = "onDragOver";
+    readonly ON_DRAG_ENTER_EVENT = "onDragEnter";
+    readonly ON_DRAG_LEAVE_EVENT = "onDragLeave";
+    readonly ON_DRAG_OVER_EVENT  = "onDragOver";
 
-    public readonly ON_DROP_SUCCESS_EVENT = "onDropSuccess";
+    readonly ON_DROP_SUCCESS_EVENT = "onDropSuccess";
 
     private registeredShortcuts = new Map<string[], Observable<KeyboardEvent>>();
 
-    public on(eventName: string, component?: Element, preventDefault = false) {
-        return Observable.fromEvent(document, eventName).filter((ev: Event) => {
-            if (component === undefined) {
-                return true;
-            }
+    on(eventName: string, component?: Element, preventDefault = false) {
 
-            return ev.srcElement === component || component.contains(ev.srcElement);
-        }).do((ev: Event) => {
-            if (preventDefault) {
-                ev.preventDefault();
-            }
-        });
+        return fromEvent(document, eventName).pipe(
+            filter((ev: Event) => {
+                if (component === undefined) {
+                    return true;
+                }
+
+                return ev.srcElement === component || component.contains(ev.srcElement);
+            }),
+            tap((ev: Event) => {
+                if (preventDefault) {
+                    ev.preventDefault();
+                }
+            })
+        );
     }
 
     /**
@@ -41,7 +47,7 @@ export class DomEventService {
      * - <code>onShortcut("cmdOrCtrl+w", document.findElementById("someEl"));</code>
      *
      */
-    public onShortcut(shortcut: string, component?: Element): Observable<KeyboardEvent> {
+    onShortcut(shortcut: string, component?: Element): Observable<KeyboardEvent> {
 
         // Split up the key combination and sort it
         const normalized = shortcut.split("+").sort();
@@ -74,23 +80,26 @@ export class DomEventService {
         normalized.filter(k => modifierNames.indexOf(k) !== -1).forEach(mod => modifierValues[mod] = true);
 
         // Create a listener for this key combination
-        const listener = this.on("keyup", component).filter((ev: KeyboardEvent) => {
+        const listener = this.on("keyup", component).pipe(
+            filter((ev: KeyboardEvent) => {
 
-            // Check if the main key is what we are listening for
-            const isMainKey = String.fromCharCode(ev.keyCode) === mainKey;
+                // Check if the main key is what we are listening for
+                const isMainKey = String.fromCharCode(ev.keyCode) === mainKey;
 
-            // Check if the modifiers are what we are listening for
-            const modifiersMatch = modifierNames.reduce((outcome, mod) => {
+                // Check if the modifiers are what we are listening for
+                const modifiersMatch = modifierNames.reduce((outcome, mod) => {
 
-                if (outcome === false) {
-                    return false;
-                }
+                    if (outcome === false) {
+                        return false;
+                    }
 
-                return ev[mod + "Key"] === modifierValues[mod];
-            }, true);
+                    return ev[mod + "Key"] === modifierValues[mod];
+                }, true);
 
-            return isMainKey && modifiersMatch;
-        }).share() as Observable<KeyboardEvent>;
+                return isMainKey && modifiersMatch;
+            }),
+            share()
+        ) as Observable<KeyboardEvent>;
 
         this.registeredShortcuts.set(normalized, listener);
 
@@ -100,58 +109,77 @@ export class DomEventService {
     /**
      * Observes the dragging of an element.
      */
-    public onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
-        const down = Observable.fromEvent(element, "mousedown");
-        const up   = Observable.fromEvent(document, "mouseup");
-        const move = Observable.fromEvent(document, "mousemove");
-        return down.flatMap(_ => move.takeUntil(up)).map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}));
+    onMove(element: Element, ctName = "", ctData = {}): Observable<ExtendedMouseEvent> {
+        const down = fromEvent(element, "mousedown");
+        const up   = fromEvent(document, "mouseup");
+        const move = fromEvent(document, "mousemove");
+
+        return down.pipe(
+            flatMap(_ => move.pipe(
+                takeUntil(up)
+            )),
+            map((ev: MouseEvent) => Object.assign(ev, {ctData}, {ctName}))
+        );
     }
 
-    public onDrag(element: Element, ctName = "", ctData = {}): Observable<Observable<MouseEvent>> {
+    onDrag(element: Element, ctName = "", ctData = {}): Observable<Observable<MouseEvent>> {
 
-        const down = Observable.fromEvent(element, "mousedown").filter((ev: MouseEvent) => ev.button === 0).do((ev: MouseEvent) => {
-            if (ev.stopPropagation) {
-                ev.stopPropagation();
-            }
-            if (ev.preventDefault) {
-                ev.preventDefault();
-            }
-        });
-        const up   = Observable.fromEvent(document, "mouseup");
-        const move = Observable.fromEvent(document, "mousemove");
+        const down = fromEvent(element, "mousedown").pipe(
+            filter((ev: MouseEvent) => ev.button === 0),
+            tap((ev: MouseEvent) => {
+                if (ev.stopPropagation) {
+                    ev.stopPropagation();
+                }
+                if (ev.preventDefault) {
+                    ev.preventDefault();
+                }
+            })
+        );
 
-        return down.map(ev => new Observable(obs => {
+        const up   = fromEvent(document, "mouseup");
+        const move = fromEvent(document, "mousemove");
 
-            const decorate = event => Object.assign(event, {ctData}, {ctName});
+        return down.pipe(
+            map(ev => new Observable(obs => {
 
-            obs.next(decorate(ev));
+                const decorate = event => Object.assign(event, {ctData}, {ctName});
 
-            const moveSub = move.subscribe(moveEv => obs.next(decorate(moveEv)));
+                obs.next(decorate(ev));
 
-            const upSub = up.first().subscribe(upEvent => {
-                obs.next(decorate(upEvent));
-                obs.complete();
-            });
+                const moveSub = move.subscribe(moveEv => obs.next(decorate(moveEv)));
 
-            return () => {
-                moveSub.unsubscribe();
-                upSub.unsubscribe();
-            };
-        }));
+                const upSub = up.pipe(
+                    take(1)
+                ).subscribe(upEvent => {
+                    obs.next(decorate(upEvent));
+                    obs.complete();
+                });
+
+                return () => {
+                    moveSub.unsubscribe();
+                    upSub.unsubscribe();
+                };
+            }))
+        );
     }
 
     /**
      * Some browsers do not fire click events for mouse clicks other than a mouse left button click
      */
-    public onMouseClick(element: Element) {
+    onMouseClick(element: Element) {
 
-        const down = Observable.fromEvent(element, "mousedown");
-        const up = Observable.fromEvent(document, "mouseup");
+        const down = fromEvent(element, "mousedown");
+        const up   = fromEvent(document, "mouseup");
 
-        return down.flatMap(() => up.first().filter((e: MouseEvent) => element.contains(e.target as Node)));
+        return down.pipe(
+            flatMap(() => up.pipe(
+                take(1),
+                filter((e: MouseEvent) => element.contains(e.target as Node))
+            ))
+        );
     }
 
-    public triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
+    triggerCustomEventOnElements(elements: Element [], eventName: string, data?: any) {
         // FIXME: Should be added support for IE
         elements.forEach(element => {
             const event = new CustomEvent(eventName, {
@@ -163,7 +191,7 @@ export class DomEventService {
         });
     }
 
-    public preventDropEventOnDocument() {
+    preventDropEventOnDocument() {
         document.addEventListener("dragover", function (event) {
             event.preventDefault();
             return false;

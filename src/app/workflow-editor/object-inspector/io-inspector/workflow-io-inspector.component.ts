@@ -14,6 +14,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {Workflow} from "cwl-svg";
 import {WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -297,7 +298,9 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             batchType: [this.selectedBatchByOption]
         });
 
-        this.form.valueChanges.debounceTime(500).subscribeTracked(this, () => {
+        this.form.valueChanges.pipe(
+            debounceTime(500)
+        ).subscribeTracked(this, () => {
             this.change.emit();
         });
 
@@ -305,7 +308,9 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             this.port.type.isNullable = !value;
         });
 
-        this.form.controls["id"].valueChanges.debounceTime(1000).subscribeTracked(this, (value) => {
+        this.form.controls["id"].valueChanges.pipe(
+            debounceTime(1000)
+        ).subscribeTracked(this, (value) => {
             try {
                 if (this.port.id === value) {
                     return;

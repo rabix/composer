@@ -13,6 +13,7 @@ import {ErrorWrapper} from "../../helpers/error-wrapper";
 import {TabData} from "../../../../../electron/src/storage/types/tab-data-interface";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {filter, take} from "rxjs/operators";
 
 @Injectable()
 export class AppsPanelService {
@@ -45,15 +46,27 @@ export class AppsPanelService {
                         const savingProcess = new Observable(subscriber => {
                             subscriber.next("Fetching " + node.id);
 
-                            savingUpdate.filter(v => v === "loaded").take(1).subscribe(() => subscriber.next("Saving to " + path));
-                            savingUpdate.filter(v => v === "saved").take(1).subscribe(() => {
+                            savingUpdate.pipe(
+                                filter(v => v === "loaded"),
+                                take(1)
+                            ).subscribe(() => subscriber.next("Saving to " + path));
+
+                            savingUpdate.pipe(
+                                filter(v => v === "saved"),
+                                take(1)
+                            ).subscribe(() => {
                                 subscriber.next(`Saved ${node.id} to ${path}`);
                                 subscriber.complete();
                             });
-                            savingUpdate.filter(v => v === "failed").take(1).subscribe(() => {
+
+                            savingUpdate.pipe(
+                                filter(v => v === "failed"),
+                                take(1)
+                            ).subscribe(() => {
                                 subscriber.next("Saving failed");
                                 subscriber.complete();
                             });
+
                         }) as Observable<string>;
 
                         this.statusBar.enqueue(savingProcess);
@@ -89,7 +102,7 @@ export class AppsPanelService {
                         });
 
                     }
-                }, () => {});
+                }, () => void 0);
             }
         });
     }

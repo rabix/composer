@@ -12,7 +12,7 @@ export class DropDirective extends DirectiveBase {
         }
     }
 
-    public el: Element;
+    el: Element;
 
     constructor(el: ElementRef) {
         super();

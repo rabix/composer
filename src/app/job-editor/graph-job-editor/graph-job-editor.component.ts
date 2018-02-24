@@ -30,6 +30,7 @@ import {EditorInspectorService} from "../../editor-common/inspector/editor-inspe
 import {Store} from "@ngrx/store";
 import {StepExecution} from "../../execution/models";
 import {findParentInputOfType} from "../utilities/dom";
+import {map, distinctUntilChanged, filter, take} from "rxjs/operators";
 
 @Component({
     selector: "ct-graph-job-editor",
@@ -157,36 +158,38 @@ export class GraphJobEditorComponent extends DirectiveBase implements AfterViewI
         this.graph.fitToViewport();
         this.draw.emit(this);
 
-        this.jobControl.valueChanges
-            .map(v => this.normalizeJob(v))
-            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-            .subscribeTracked(this, changes => {
+        this.jobControl.valueChanges.pipe(
+            map(v => this.normalizeJob(v)),
+            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+        ).subscribeTracked(this, changes => {
+            this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
+            this.metaManager.patchAppMeta("job", changes);
+        });
 
-                this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
-                this.metaManager.patchAppMeta("job", changes);
-            });
+        this.metaManager.getAppMeta("job").pipe(
+            filter(Boolean) // job might be empty if we havent modified anything yet
+        ).subscribeTracked(this, job => {
+            const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
 
-        this.metaManager.getAppMeta("job")
-            .filter(v => v) // job might be empty if we havent modified anything yet
-            .subscribeTracked(this, job => {
-                const markupPlugin = this.graph.getPlugin(SVGRequiredInputMarkup);
+            const missingInputConnectionIDs = this.model.inputs
+                .filter(input => !input.type.isNullable && (job[input.id] === null || job[input.id] === undefined))
+                .map(input => input.connectionId);
 
-                const missingInputConnectionIDs = this.model.inputs
-                    .filter(input => !input.type.isNullable && (job[input.id] === null || job[input.id] === undefined))
-                    .map(input => input.connectionId);
+            markupPlugin.markMissing(...missingInputConnectionIDs);
+        });
 
-                markupPlugin.markMissing(...missingInputConnectionIDs);
-            });
-
-        this.metaManager.getAppMeta("job").take(1).subscribeTracked(this, storedJob => {
+        this.metaManager.getAppMeta("job").pipe(
+            take(1)
+        ).subscribeTracked(this, storedJob => {
             this.updateJob(storedJob);
         });
 
-        this.store.select("jobEditor", "progress", this.appID, "stepExecution").distinctUntilChanged()
-            .subscribeTracked(this, (states: StepExecution[] = []) => {
-                const update = states.reduce((acc, step) => ({...acc, [step.id]: step.state}), {});
-                this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update);
-            });
+        this.store.select("jobEditor", "progress", this.appID, "stepExecution").pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, (states: StepExecution[] = []) => {
+            const update = states.reduce((acc, step) => ({...acc, [step.id]: step.state}), {});
+            this.graph.getPlugin(SVGExecutionProgressPlugin).setAllStates(update);
+        });
     }
 
     private normalizeJob(jobObject: Object) {

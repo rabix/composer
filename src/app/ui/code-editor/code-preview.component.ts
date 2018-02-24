@@ -13,6 +13,7 @@ import {
 import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {CodeEditorXComponent} from "./code-editor.component";
+import {of} from "rxjs/observable/of";
 
 @Component({
     selector: "ct-code-preview",
@@ -61,7 +62,7 @@ export class CodePreviewComponent extends DirectiveBase implements OnInit, After
     }
 
     ngOnInit() {
-        this.contentStream = Observable.of(this.content);
+        this.contentStream = of(this.content);
     }
 
     ngAfterViewInit() {

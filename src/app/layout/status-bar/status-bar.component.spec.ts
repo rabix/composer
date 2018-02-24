@@ -2,11 +2,11 @@ import {NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {By} from "@angular/platform-browser";
 import {TimeAgoPipe} from "angular2-moment";
-import {Observable} from "rxjs/Observable";
 
 import {LayoutService} from "../../core/layout/layout.service";
 import {StatusBarComponent} from "./status-bar.component";
 import {StatusBarService} from "./status-bar.service";
+import {of} from "rxjs/observable/of";
 
 describe("StatusBarComponent", () => {
     let component: StatusBarComponent;
@@ -21,8 +21,8 @@ describe("StatusBarComponent", () => {
     };
 
     const statusBarServiceStub = {
-        status: Observable.of([]),
-        queueSize: Observable.of([]),
+        status: of([]),
+        queueSize: of([]),
         controls: {
             subscribe: (expr) => {
             }

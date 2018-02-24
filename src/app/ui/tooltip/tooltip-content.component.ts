@@ -79,7 +79,7 @@ export class TooltipContentComponent implements AfterViewInit {
         this.cdr.detectChanges();
     }
 
-    public show(): void {
+    show(): void {
         if (!this.hostElement) {
             return;
         }
@@ -99,7 +99,7 @@ export class TooltipContentComponent implements AfterViewInit {
 
     }
 
-    public hide(): void {
+    hide(): void {
 
         // Timeout is needed because if this tooltip becomes shown and hidden in the same tick,
         // setTimeout from showing it will actually bring it back after it was hidden

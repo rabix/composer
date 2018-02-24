@@ -59,24 +59,24 @@ export class ToolOutputInspectorComponent extends DirectiveBase implements OnCha
     }
 
     @Input()
-    public inputs: CommandInputParameterModel[] = [];
+    inputs: CommandInputParameterModel[] = [];
 
     @Input()
-    public output: CommandOutputParameterModel;
+    output: CommandOutputParameterModel;
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: any = {};
+    context: any = {};
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
-    public inputList: CommandInputParameterModel[] = [];
+    inputList: CommandInputParameterModel[] = [];
 
-    public form: FormGroup;
+    form: FormGroup;
 
     @Output()
-    public save = new EventEmitter<CommandOutputParameterModel>();
+    save = new EventEmitter<CommandOutputParameterModel>();
 
     constructor(private formBuilder: FormBuilder) {
         super();

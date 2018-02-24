@@ -100,7 +100,7 @@ export class ModalService {
         this.openModals.push(modalComponentRef);
     }
 
-    public wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
+    wrapPromise<T>(handler: (resolve, reject) => void): Promise<T> {
         const insideClosing = new Promise((resolve, reject) => {
             handler(resolve, reject);
         }) as Promise<T>;
@@ -113,23 +113,6 @@ export class ModalService {
         }) as Promise<T>;
 
         return Promise.race([insideClosing, outsideClosing]) as Promise<T>;
-    }
-
-    private cleanComponentRef(component?) {
-
-        if (!this.openModals.length) {
-            return;
-        }
-
-        let componentIndex;
-        if (component && ~(componentIndex = this.openModals.indexOf(component))) {
-            const [componentModal] = this.openModals.splice(componentIndex, 1);
-            componentModal.destroy();
-            return;
-        }
-
-        this.openModals.pop().destroy();
-
     }
 
     confirm(params: {
@@ -218,5 +201,22 @@ export class ModalService {
                 this.close(component);
             });
         });
+    }
+
+    private cleanComponentRef(component?) {
+
+        if (!this.openModals.length) {
+            return;
+        }
+
+        let componentIndex;
+        if (component && ~(componentIndex = this.openModals.indexOf(component))) {
+            const [componentModal] = this.openModals.splice(componentIndex, 1);
+            componentModal.destroy();
+            return;
+        }
+
+        this.openModals.pop().destroy();
+
     }
 }

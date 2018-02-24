@@ -76,18 +76,18 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class BasicOutputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     /** Context in which expression should be evaluated */
-    public context: { $job?: any, $self?: any } = {};
+    context: { $job?: any, $self?: any } = {};
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
+
+    form: FormGroup;
 
     /** The currently displayed property */
     private output: CommandOutputParameterModel;
-
-    public form: FormGroup;
 
     private onTouched = noop;
 

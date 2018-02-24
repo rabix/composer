@@ -18,16 +18,16 @@ import {Subject} from "rxjs/Subject";
 })
 export class RadioButtonComponent<T> {
     @Input()
-    public icon: string;
+    icon: string;
 
     @Input()
-    public name: string;
+    name: string;
 
     @Input()
-    public value: T;
+    value: T;
 
     @Output()
-    public onClick: Observable<RadioButtonComponent<T>>;
+    onClick: Observable<RadioButtonComponent<T>>;
 
     constructor() {
         this.icon = "";
@@ -37,7 +37,7 @@ export class RadioButtonComponent<T> {
     }
 
     @HostListener("click")
-    public onHostClick() {
+    onHostClick() {
         (this.onClick as Subject<RadioButtonComponent<T>>).next(this);
     }
 }

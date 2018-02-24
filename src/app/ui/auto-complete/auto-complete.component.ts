@@ -3,6 +3,7 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {SelectComponent} from "./select/select.component";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-auto-complete",
@@ -29,7 +30,7 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
 
     // Specify the return type of a value that will be propagated
     @Input()
-    public type: "string" | "number" = "string";
+    type: "string" | "number" = "string";
 
     private update          = new Subject();
     private onTouched       = noop;
@@ -42,7 +43,9 @@ export class AutoCompleteComponent extends SelectComponent implements ControlVal
             this.hideSelected = false;
         }
 
-        this.update.distinctUntilChanged().subscribe((value) => {
+        this.update.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, (value) => {
             this.propagateChange(value);
         });
     }

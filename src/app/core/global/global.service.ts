@@ -10,13 +10,14 @@ import {IpcService} from "../../services/ipc.service";
 import {GitHubRelease} from "../../../../electron/src/github-api-client/interfaces/github-release";
 import {noop} from "../../lib/utils.lib";
 import {AboutPageModalComponent} from "../modals/about-page-modal/about-page-modal.component";
+import {withLatestFrom, take} from "rxjs/operators";
 
 @Injectable()
 export class GlobalService {
 
     private checkForPlatformUpdatePromise: Promise<any> = null;
 
-    public platformIsOutdated = false;
+    platformIsOutdated = false;
 
     private showModal = false;
 
@@ -54,8 +55,10 @@ export class GlobalService {
 
             const process = this.statusBar.startProcess("Checking for Platform updates...");
 
-            this.ipc.request("checkForPlatformUpdates").withLatestFrom(this.localRepository.getIgnoredUpdateVersion())
-                .take(1).subscribe((result: [GitHubRelease, string]) => {
+            this.ipc.request("checkForPlatformUpdates").pipe(
+                withLatestFrom(this.localRepository.getIgnoredUpdateVersion()),
+                take(1)
+            ).subscribe((result: [GitHubRelease, string]) => {
 
                 this.checkForPlatformUpdatePromise = null;
                 this.statusBar.stopProcess(process, "");

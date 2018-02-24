@@ -23,14 +23,14 @@ import {FormControl, FormGroup} from "@angular/forms";
 export class DirectoryInputInspectorComponent implements OnInit, OnChanges {
     /** Input data for the component */
     @Input()
-    public input: any = {};
+    input: any = {};
 
     /** Emits when the form data changed */
     @Output()
-    public update = new EventEmitter();
+    update = new EventEmitter();
 
     @Input()
-    public path: string;
+    path: string;
 
     formGroup: FormGroup;
 

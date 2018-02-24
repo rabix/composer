@@ -55,7 +55,7 @@ import {AppHelper} from "../../../../core/helpers/AppHelper";
 })
 export class WorkflowStepInspectorTabInfo {
     @Input()
-    public step: StepModel;
+    step: StepModel;
 
     getSource() {
 

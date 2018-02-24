@@ -17,7 +17,7 @@ import {
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
 import {Actions} from "@ngrx/effects";
-import {filter} from "rxjs/operators";
+import {filter, take} from "rxjs/operators";
 import {AppType} from "../../types";
 
 const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
@@ -193,8 +193,9 @@ export class ExecutorService2 {
             };
 
             this.actions.ofType(EXECUTION_STOP).pipe(
-                filter((action: ExecutionStopAction) => action.appID === appID)
-            ).take(1).subscribe(() => cleanup());
+                filter((action: ExecutionStopAction) => action.appID === appID),
+                take(1)
+            ).subscribe(() => cleanup());
 
             /** @name executionUnsubscribe */
             return () => cleanup();

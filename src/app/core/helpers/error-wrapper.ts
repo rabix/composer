@@ -68,7 +68,7 @@ export class ErrorWrapper {
         return this.err.message;
     }
 
-    public isOffline() {
+    isOffline() {
         return this.err.error && this.err.error.syscall === "getaddrinfo" && !navigator.onLine;
     }
 }
