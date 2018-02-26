@@ -39,7 +39,7 @@ export class InputComponent implements AfterViewInit {
     name: string;
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @ViewChild("inputField")
     inputField: ElementRef;

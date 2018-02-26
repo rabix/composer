@@ -1,6 +1,7 @@
 import {Directive, ElementRef, Input} from "@angular/core";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take, skip, last} from "rxjs/operators";
 
 @Directive({selector: "[ct-drag-enabled]"})
 export class DragDirective extends DirectiveBase {
@@ -12,12 +13,12 @@ export class DragDirective extends DirectiveBase {
     private dragImageClass: string;
 
     @Input("ct-drag-transfer-data")
-    public dragTransferData: any;
+    dragTransferData: any;
 
     @Input("ct-drag-image-caption")
-    public dragImageCaption: string;
+    dragImageCaption: string;
 
-    public el: Element;
+    el: Element;
 
     constructor(el: ElementRef, private domEvents: DomEventService) {
         super();
@@ -35,7 +36,9 @@ export class DragDirective extends DirectiveBase {
             }).subscribe(drag => {
 
                 // On Drag Start
-                const first = drag.first().subscribe((ev: any) => {
+                const first = drag.pipe(
+                    take(1)
+                ).subscribe((ev: any) => {
                     // Create drag image
                     ev.ctData.dragImage = this.createDragImage(this.dragImageClass, this.dragImageCaption);
                     document.body.appendChild(ev.ctData.dragImage);
@@ -43,7 +46,9 @@ export class DragDirective extends DirectiveBase {
 
                 // On Drag (Mouse Move)
                 // Skip first 6 mouse move events in order to distinguish mouse click and drag
-                const mid = drag.skip(6).subscribe((ev: any) => {
+                const mid = drag.pipe(
+                    skip(6)
+                ).subscribe((ev: any) => {
 
                     const dragImage           = ev.ctData.dragImage;
                     const preEnteredDropZones = ev.ctData.preEnteredDropZones;
@@ -110,7 +115,7 @@ export class DragDirective extends DirectiveBase {
                 });
 
                 // On Drag End
-                drag.last().subscribe((ev: any) => {
+                drag.pipe(last()).subscribe((ev: any) => {
 
                     // Remove drag image from DOM
                     try {

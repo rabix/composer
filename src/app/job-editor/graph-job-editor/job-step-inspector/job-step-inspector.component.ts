@@ -17,6 +17,7 @@ import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputPar
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {map} from "rxjs/operators";
 
 @Component({
     selector: "ct-job-step-inspector",
@@ -89,8 +90,8 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     ngAfterViewInit(): void {
         super.ngAfterViewInit();
 
-        this.jobGroup.valueChanges
-            .map(changes => {
+        this.jobGroup.valueChanges.pipe(
+            map(changes => {
                 const out = {...this.jobValue, ...changes};
 
                 for (const cname in this.jobGroup.controls) {
@@ -101,7 +102,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
                 return out;
             })
-            .subscribeTracked(this, changes => this.propagateChange(changes));
+        ).subscribeTracked(this, changes => this.propagateChange(changes));
     }
 
     /**

@@ -100,19 +100,19 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit,
     }
 
     @Input()
-    public argument: CommandArgumentModel;
+    argument: CommandArgumentModel;
 
-    public form: FormGroup;
+    form: FormGroup;
 
     /** Context in which expression should be evaluated */
     @Input()
-    public context: { $job: any };
+    context: { $job: any };
 
     @ViewChild("useCommandLineBinding")
     private useCommandLineBinding: ToggleSliderComponent;
 
     @Output()
-    public save = new Subject<FormGroup>();
+    save = new Subject<FormGroup>();
 
     constructor(private formBuilder: FormBuilder, private modal: ModalService) {
         super();

@@ -1,7 +1,6 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
-import "rxjs/Rx";
 import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
 import {MainComponent} from "./components/main/main.component";
 import {PlatformConnectionService} from "./core/auth/platform-connection.service";
@@ -18,7 +17,6 @@ import {PlatformRepositoryService} from "./repository/platform-repository.servic
 import {DomEventService} from "./services/dom/dom-event.service";
 import {IpcService} from "./services/ipc.service";
 import {JavascriptEvalService} from "./services/javascript-eval/javascript-eval.service";
-import {SettingsService} from "./services/settings/settings.service";
 import {ToolEditorModule} from "./tool-editor/tool-editor.module";
 import {ModalService} from "./ui/modal/modal.service";
 import {UIModule} from "./ui/ui.module";
@@ -32,6 +30,9 @@ import {NativeSystemService} from "./native/system/native-system.service";
 import {WorkboxService} from "./core/workbox/workbox.service";
 import {directoryExplorerFactory, fileOpenerFactory} from "./factories/execution";
 import {credentialsRegistryFactory} from "./factories/auth";
+import {LinkOpenerToken, linkOpenerFactory} from "./factories/link-opener.factory";
+import {SystemService} from "./platform-providers/system.service";
+import {modalManagerFactory, ModalManagerToken} from "./factories/modal.factory";
 
 @NgModule({
     providers: [
@@ -49,11 +50,12 @@ import {credentialsRegistryFactory} from "./factories/auth";
         OpenExternalFileService,
         PlatformConnectionService,
         PlatformRepositoryService,
-        SettingsService,
         StatusBarService,
         {provide: CREDENTIALS_REGISTRY, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},
         {provide: DirectoryExplorerToken, useFactory: directoryExplorerFactory, deps: [NativeSystemService]},
-        {provide: FileOpenerToken, useFactory: fileOpenerFactory, deps: [WorkboxService]}
+        {provide: FileOpenerToken, useFactory: fileOpenerFactory, deps: [WorkboxService]},
+        {provide: LinkOpenerToken, useFactory: linkOpenerFactory, deps: [SystemService]},
+        {provide: ModalManagerToken, useFactory: modalManagerFactory, deps: [ModalService]},
     ],
     declarations: [
         MainComponent,

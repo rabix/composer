@@ -16,6 +16,7 @@ import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.component";
 import {PublicAppsPanelService} from "./public-apps-panel.service";
+import {filter, debounceTime, switchMap, map, take} from "rxjs/operators";
 
 @Component({
     selector: "ct-public-apps-panel",
@@ -30,9 +31,9 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
             </label>
 
             <ct-generic-dropdown-menu [ct-menu]="menu" #groupByDropdown>
-                <button type="button" 
-                        class="btn btn-unstyled" 
-                        data-test="group-by-dropdown-button" 
+                <button type="button"
+                        class="btn btn-unstyled"
+                        data-test="group-by-dropdown-button"
                         (click)="groupByDropdown.toggleMenu()">
                     {{ grouping }}
                     <i class="fa fa-chevron-down fa-fw settings-icon"> </i>
@@ -42,7 +43,7 @@ import {PublicAppsPanelService} from "./public-apps-panel.service";
 
             <ng-template #menu class="mr-1">
                 <ul class="list-unstyled" (click)="groupByDropdown.hide()">
-                    <li *ngFor="let c of groupByOptions" 
+                    <li *ngFor="let c of groupByOptions"
                         class="group-by-item"
                         data-test="group-by-option"
                         [attr.data-option]="c.value"
@@ -157,7 +158,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     ngOnInit() {
 
-        this.localRepository.getPublicAppsGrouping().take(1).subscribeTracked(this, (grouping) => {
+        this.localRepository.getPublicAppsGrouping().pipe(
+            take(1)
+        ).subscribeTracked(this, (grouping) => {
             this.grouping = grouping;
         });
 
@@ -184,32 +187,34 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
     }
 
     private search(term): Observable<any[]> {
-        return this.platformRepository.searchPublicApps(term).map(apps => {
-            return apps.map(app => {
+        return this.platformRepository.searchPublicApps(term).pipe(
+            map(apps => {
+                return apps.map(app => {
 
-                return {
-                    id: AppHelper.getRevisionlessID(app.id),
-                    icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                    title: app.name,
-                    label: app.id.split("/").join(" → "),
-                    relevance: 1.5,
-
-                    tabData: {
+                    return {
                         id: AppHelper.getRevisionlessID(app.id),
-                        isWritable: false,
-                        label: app.name,
-                        language: "json",
-                        type: app.raw["class"],
-                    } as TabData<any>,
+                        icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                        title: app.name,
+                        label: app.id.split("/").join(" → "),
+                        relevance: 1.5,
 
-                    dragEnabled: true,
-                    dragTransferData: {name: app.id, type: "cwl"},
-                    dragLabel: app.name,
-                    dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
-                    dragDropZones: ["graph-editor"]
-                };
-            });
-        });
+                        tabData: {
+                            id: AppHelper.getRevisionlessID(app.id),
+                            isWritable: false,
+                            label: app.name,
+                            language: "json",
+                            type: app.raw["class"],
+                        } as TabData<any>,
+
+                        dragEnabled: true,
+                        dragTransferData: {name: app.id, type: "cwl"},
+                        dragLabel: app.name,
+                        dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                        dragDropZones: ["graph-editor"]
+                    };
+                });
+            })
+        );
     }
 
 
@@ -217,16 +222,15 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
         const searchValueChanges = this.searchContent.valueChanges;
 
-        searchValueChanges
-            .subscribeTracked(this, () => this.searchResults = undefined);
+        searchValueChanges.subscribeTracked(this, () => this.searchResults = undefined);
 
-        searchValueChanges
-            .debounceTime(250)
-            .filter(term => term.trim().length !== 0)
-            .switchMap(term => this.search(term))
-            .subscribe(results => {
-                this.searchResults = results;
-            });
+        searchValueChanges.pipe(
+            debounceTime(250),
+            filter(term => term.trim().length !== 0),
+            switchMap(term => this.search(term))
+        ).subscribe(results => {
+            this.searchResults = results;
+        });
     }
 
     private attachExpansionStateSaving() {
@@ -240,7 +244,9 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
     private listenForAppOpening() {
 
-        const appOpening = this.tree.open.filter(n => n.type === "app");
+        const appOpening = this.tree.open.pipe(
+            filter(n => n.type === "app")
+        );
 
         appOpening.subscribeTracked(this, (node: TreeNode<App>) => {
 

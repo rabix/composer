@@ -17,7 +17,7 @@ export class FormAsyncValidator {
         };
     }
 
-    public static debounceValidator(validator: (control: AbstractControl) => Promise<ValidationErrors | null>, time = 300) {
+    static debounceValidator(validator: (control: AbstractControl) => Promise<ValidationErrors | null>, time = 300) {
         return FormAsyncValidator._debounce(validator, time);
     }
 

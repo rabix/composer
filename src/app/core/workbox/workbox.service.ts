@@ -12,6 +12,9 @@ import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
 import {Store} from "@ngrx/store";
 import {TabCloseAction} from "../actions/core.actions";
+import {switchMap, take, map, filter} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
+import {combineLatest} from "rxjs/observable/combineLatest";
 
 
 @Injectable()
@@ -39,17 +42,19 @@ export class WorkboxService {
                 private platformRepository: PlatformRepositoryService) {
 
         // Whenever a user gets changed, we should restore their tabs
-        this.auth.getActive()
-            .switchMap(() => this.getStoredTabs().take(1))
+        this.auth.getActive().pipe(
+            switchMap(() => this.getStoredTabs().pipe(
+                take(1)
+            )),
             // If we have no active tabs, add a "new file"
-            .map(tabDataList => tabDataList.length ? tabDataList : [this.homeTabData])
-            .map(tabDataList => tabDataList.map(tabData => {
+            map(tabDataList => tabDataList.length ? tabDataList : [this.homeTabData]),
+            map(tabDataList => tabDataList.map(tabData => {
                 return this.isUtilityTab(tabData) ? tabData : this.getOrCreateAppTab(tabData, true);
             }))
-            .subscribe(tabList => {
-                this.tabs.next(tabList);
-                this.ensureActiveTab();
-            });
+        ).subscribe(tabList => {
+            this.tabs.next(tabList);
+            this.ensureActiveTab();
+        });
     }
 
 
@@ -57,14 +62,17 @@ export class WorkboxService {
 
 
         const local    = this.localRepository.getOpenTabs();
-        const platform = this.auth.getActive().switchMap(user => {
-            if (!user) {
-                return Observable.of([]);
-            }
-            return this.platformRepository.getOpenTabs();
-        }).filter(v => v !== null);
+        const platform = this.auth.getActive().pipe(
+            switchMap(user => {
+                if (!user) {
+                    return of([]);
+                }
+                return this.platformRepository.getOpenTabs();
+            }),
+            filter(v => v !== null)
+        );
 
-        return Observable.combineLatest(local, platform,
+        return combineLatest(local, platform,
             (local, platform) => [...local, ...platform].sort((a, b) => a.position - b.position)
         );
     }
@@ -268,12 +276,14 @@ export class WorkboxService {
         const isWritable = data.isWritable;
 
 
-        const fileContent = Observable.of(1).switchMap(() => {
-            if (dataSource === "local") {
-                return this.fileRepository.fetchFile(id, forceFetch);
-            }
-            return this.platformRepository.getAppContent(id, forceFetch);
-        });
+        const fileContent = of(1).pipe(
+            switchMap(() => {
+                if (dataSource === "local") {
+                    return this.fileRepository.fetchFile(id, forceFetch);
+                }
+                return this.platformRepository.getAppContent(id, forceFetch);
+            })
+        );
 
         const resolve = (fcontent: string) => this.dataGateway.resolveContent(fcontent, id);
 

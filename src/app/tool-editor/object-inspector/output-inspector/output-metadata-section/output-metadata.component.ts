@@ -7,6 +7,7 @@ import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/mod
 import {SBDraft2CommandOutputParameterModel, SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
     selector: "ct-output-metadata-section",
@@ -116,9 +117,9 @@ export class OutputMetaDataSectionComponent extends DirectiveBase implements Con
     }
 
     private listenToFormChanges(): void {
-        this.tracked = this.metadataForm.valueChanges
-            .debounceTime(300)
-            .subscribe(change => {
+        this.metadataForm.valueChanges.pipe(
+            debounceTime(300)
+        ).subscribeTracked(this, change => {
                 let hasChanged = false;
 
                 if (change.metadataList) {

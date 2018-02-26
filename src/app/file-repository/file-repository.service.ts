@@ -2,6 +2,9 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {IpcService} from "../services/ipc.service";
+import {merge} from "rxjs/observable/merge";
+import {of} from "rxjs/observable/of";
+import {filter, flatMap} from "rxjs/operators";
 
 @Injectable()
 export class FileRepositoryService {
@@ -18,12 +21,14 @@ export class FileRepositoryService {
 
             this.watchedPaths.push(path);
 
-            const sub = Observable.merge(
-                Observable.of(path),
-                this.directoryReloads.filter(dir => dir === path)
-            ).flatMap((path) => {
-                return this.ipc.request("readDirectory", path);
-            }).subscribe(data => {
+            const sub = merge(
+                of(path),
+                this.directoryReloads.pipe(
+                    filter(dir => dir === path)
+                )
+            ).pipe(
+                flatMap(path => this.ipc.request("readDirectory", path))
+            ).subscribe(data => {
                 observer.next(data);
             }, err => observer.error(err));
 
@@ -47,20 +52,6 @@ export class FileRepositoryService {
             this.directoryReloads.next(path);
         });
 
-    }
-
-    readDirectory(path): Observable<{
-        dirname: string,
-        isDir: boolean,
-        isFile: boolean,
-        isReadable: boolean,
-        isWritable: boolean,
-        language: string,
-        name: boolean,
-        path: string,
-        type: string
-    }> {
-        return this.ipc.request("readDirectory", path);
     }
 
     saveFile(path: string, content: string): Promise<any> {

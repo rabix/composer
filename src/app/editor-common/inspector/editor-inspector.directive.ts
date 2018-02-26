@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Directive, HostBinding, HostListener, Input, OnInit, TemplateRef} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {EditorInspectorService} from "./editor-inspector.service";
+import {map} from "rxjs/operators";
 
 @Directive({
     selector: "[ct-editor-inspector]",
@@ -8,13 +9,13 @@ import {EditorInspectorService} from "./editor-inspector.service";
 export class EditorInspectorDirective extends DirectiveBase implements OnInit {
 
     @Input("ct-editor-inspector")
-    public content: TemplateRef<any>;
+    content: TemplateRef<any>;
 
     @Input("ct-editor-inspector-target")
-    public target: any = this;
+    target: any = this;
 
     @Input("ct-editor-inspector-readonly")
-    public readonly = false;
+    readonly = false;
 
     @HostBinding("class.ct-inspected")
     private isInspected = false;
@@ -23,22 +24,22 @@ export class EditorInspectorDirective extends DirectiveBase implements OnInit {
                 cdRef: ChangeDetectorRef) {
         super();
 
-        this.tracked = this.inspector.inspectedObject.map(obj => obj === this.target)
-            .subscribe(selected => {
-                this.isInspected = selected;
-
-                cdRef.markForCheck();
-            });
+        this.inspector.inspectedObject.pipe(
+            map(obj => obj === this.target)
+        ).subscribeTracked(this, selected => {
+            this.isInspected = selected;
+            cdRef.markForCheck();
+        });
     }
 
-    ngOnInit(){
-        if(this.target && this.inspector.isInspecting(this.target)){
+    ngOnInit() {
+        if (this.target && this.inspector.isInspecting(this.target)) {
             this.inspector.show(this.content, this.target, true);
         }
     }
 
     @HostListener("click", ["$event"])
-    public open(event: any) {
+    open(event: any) {
         event.stopPropagation();
         this.inspector.show(this.content, this.target);
     }

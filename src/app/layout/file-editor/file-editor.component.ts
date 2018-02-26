@@ -10,6 +10,7 @@ import {StatusBarService} from "../status-bar/status-bar.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {ErrorWrapper} from "../../core/helpers/error-wrapper";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
+import {take, distinctUntilChanged, skip, startWith, switchMap} from "rxjs/operators";
 
 @Component({
     selector: "ct-file-editor",
@@ -84,7 +85,10 @@ export class FileEditorComponent extends DirectiveBase implements OnInit, AfterV
 
 
         // Subscribe editor content to tabData code changes
-        this.codeReload.startWith(1).switchMap(() => this.tabData.fileContent).subscribeTracked(this, (code: string) => {
+        this.codeReload.pipe(
+            startWith(1),
+            switchMap(() => this.tabData.fileContent)
+        ).subscribeTracked(this, (code: string) => {
             this.isLoading = false;
             this.fileContent.setValue(code);
             this.setAppDirtyState(false);
@@ -96,14 +100,14 @@ export class FileEditorComponent extends DirectiveBase implements OnInit, AfterV
         // Set this app's ID to the code content service
         this.codeSwapService.appID = this.tabData.id;
 
-        const codeChanges = this.fileContent.valueChanges.distinctUntilChanged();
+        const codeChanges = this.fileContent.valueChanges.pipe(distinctUntilChanged());
 
         /** Save to swap all code changes*/
         codeChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
-        codeChanges.skip(1).subscribeTracked(this, () => {
-            this.setAppDirtyState(true);
-        });
+        codeChanges.pipe(
+            skip(1)
+        ).subscribeTracked(this, () => this.setAppDirtyState(true));
 
         this.localRepository.getAppMeta(this.tabData.id, "isDirty").subscribeTracked(this, (isModified) => {
             this.isDirty = !!isModified;
@@ -112,7 +116,9 @@ export class FileEditorComponent extends DirectiveBase implements OnInit, AfterV
     }
 
     reloadContent() {
-        this.codeSwapService.discardSwapContent().take(1).subscribe(() => {
+        this.codeSwapService.discardSwapContent().pipe(
+            take(1)
+        ).subscribe(() => {
             this.codeReload.emit();
         });
     }

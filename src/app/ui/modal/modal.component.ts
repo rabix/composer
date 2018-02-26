@@ -14,10 +14,12 @@ import {
     ViewChild,
     ViewContainerRef
 } from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ModalOptions} from "./modal-options";
 import {ModalService} from "./modal.service";
+import {of} from "rxjs/observable/of";
+import {merge, debounceTime, filter, map} from "rxjs/operators";
+import {fromEvent} from "rxjs/observable/fromEvent";
 
 @Component({
     selector: "ct-modal",
@@ -26,12 +28,12 @@ import {ModalService} from "./modal.service";
             <div #header class="pl-1 ui-modal-header">
                 <div class="ui-modal-title">
                     {{ title }}
-                </div>  
-                
+                </div>
+
                 <div class="ui-modal-close-icon">
                     <i class="fa fa-times pr-1 clickable" (click)="close()"></i>
                 </div>
-                
+
             </div>
             <div #nestedComponent></div>
         </div>
@@ -41,16 +43,16 @@ import {ModalService} from "./modal.service";
 export class ModalComponent extends DirectiveBase implements AfterViewInit {
 
     @HostBinding("class.backdrop")
-    public backdrop = false;
+    backdrop = false;
 
     /** Should the modal clouse when you click on the area outside of it? */
-    public closeOnOutsideClick = false;
+    closeOnOutsideClick = false;
 
     /** Title of the modal window */
-    public title: string;
+    title: string;
 
     /** When you press the "ESC" key, should the modal be closed? */
-    public closeOnEscape: true;
+    closeOnEscape: true;
 
     /** Holds the ComponentRef object of a component that is injected and rendered inside the modal */
     nestedComponentRef: ComponentRef<any>;
@@ -66,21 +68,22 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
 
     constructor(@Inject(forwardRef(() => ModalService))
                 private service: ModalService,
-                // private domEvents: DomEventsService,
                 private renderer: Renderer,
                 private hostElement: ElementRef,
                 private injector: Injector) {
         super();
 
-        this.tracked = Observable.fromEvent(document, "keyup")
-            .filter(() => this.closeOnEscape)
-            .map((ev: KeyboardEvent) => ev.which)
-            .filter(key => key === 27)
-            .subscribe(() => this.service.close());
+        fromEvent(document, "keyup").pipe(
+            filter(() => this.closeOnEscape),
+            map((ev: KeyboardEvent) => ev.which),
+            filter(key => key === 27)
+        ).subscribeTracked(this, () => {
+            this.service.close()
+        });
     }
 
     /** When click on X icon */
-    public close() {
+    close() {
         this.service.close();
     }
 
@@ -110,21 +113,10 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
     }
 
     ngAfterViewInit() {
-
-        // this.tracked = this.domEvents.onDrag(this.headerElement.nativeElement).subscribe(dragObs => {
-        //   dragObs.pairwise().map((moves: [MouseEvent, MouseEvent]) => ({
-        //     dx: moves[1].clientX - moves[0].clientX,
-        //     dy: moves[1].clientY - moves[0].clientY
-        //   })).subscribe((ev) => {
-        //     this.reposition({left: ev.dx, top: ev.dy});
-        //   });
-        // });
-
         this.reposition();
-
     }
 
-    public configure(config: ModalOptions) {
+    configure(config: ModalOptions) {
 
         Object.assign(this, config);
         if (typeof config.title === "string") {
@@ -132,18 +124,22 @@ export class ModalComponent extends DirectiveBase implements AfterViewInit {
         }
     }
 
-    public produce<T>(factory: ComponentFactory<T>): ComponentRef<T> {
+    produce<T>(factory: ComponentFactory<T>): ComponentRef<T> {
 
         this.nestedComponentRef = this.nestedComponent.createComponent(factory, 0, this.injector);
 
-        this.tracked = Observable.of(1).merge(Observable.fromEvent(window, "resize").debounceTime(50)).subscribe(() => {
+        of(1).pipe(
+            merge(fromEvent(window, "resize").pipe(
+                debounceTime(50)
+            ))
+        ).subscribeTracked(this, () => {
             this.reposition();
         });
 
         return this.nestedComponentRef;
     }
 
-    public embed<T>(template: TemplateRef<T>): void {
+    embed<T>(template: TemplateRef<T>): void {
 
         this.tracked = this.nestedComponent.createEmbeddedView(template);
         this.reposition();

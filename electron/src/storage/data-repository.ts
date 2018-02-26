@@ -5,8 +5,7 @@ import {LocalRepository} from "./types/local-repository";
 import {RepositoryType} from "./types/repository-type";
 import {UserRepository} from "./types/user-repository";
 
-const fs     = require("fs-extra");
-const logger = require("../logger").Log;
+const fs = require("fs-extra");
 
 type UpdateChange = {
     newValue: any;

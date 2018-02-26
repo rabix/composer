@@ -8,10 +8,10 @@ interface MenuItemUpdates {
 }
 
 export class MenuItem {
-    public isDisabled: any;
-    public readonly name: string;
-    public readonly updates: MenuItemUpdates;
-    public readonly children: MenuItem[];
+    isDisabled: any;
+    readonly name: string;
+    readonly updates: MenuItemUpdates;
+    readonly children: MenuItem[];
 
     constructor(name: string,
                 streams?: MenuItemUpdates,

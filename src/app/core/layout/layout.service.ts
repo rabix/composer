@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 
 @Injectable()
 export class LayoutService {
-    public sidebarHidden = false;
+    sidebarHidden = false;
 
     constructor() {
     }

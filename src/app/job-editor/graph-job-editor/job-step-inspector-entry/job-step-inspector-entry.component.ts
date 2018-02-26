@@ -21,6 +21,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {take, filter} from "rxjs/operators";
 
 @Component({
     selector: "ct-job-step-inspector-entry",
@@ -179,9 +180,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             this.recalculateSecondaryFilesAndMetadataCounts();
         });
 
-        this.control.valueChanges
-            .filter(v => this.control.status !== "DISABLED")
-            .subscribeTracked(this, change => {
+        this.control.valueChanges.pipe(
+            filter(v => this.control.status !== "DISABLED")
+        ).subscribeTracked(this, change => {
 
                 let typecheckedChange = change;
 
@@ -356,7 +357,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             relativePathRoot
         });
 
-        comp.submit.take(1).subscribeTracked(this, (data) => {
+        comp.submit.pipe(
+            take(1)
+        ).subscribeTracked(this, (data) => {
             this.modal.close();
             this.control.patchValue(data);
             this.cdr.markForCheck();

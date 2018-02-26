@@ -4,6 +4,7 @@ import {ExpressionModel} from "cwlts/models";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {ModelExpressionEditorComponent} from "../../expression-editor/model-expression-editor.component";
+import {take} from "rxjs/operators";
 
 @Component({
     selector: "ct-expression-input",
@@ -152,7 +153,9 @@ export class ExpressionInputComponent extends DirectiveBase implements ControlVa
             context: this.context,
         });
 
-        expressionEditor.submit.take(1).subscribeTracked(this, action => {
+        expressionEditor.submit.pipe(
+            take(1)
+        ).subscribeTracked(this, () => {
             const val = expressionEditor.model.serialize();
 
             if (!val) {

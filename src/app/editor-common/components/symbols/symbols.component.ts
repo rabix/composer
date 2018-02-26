@@ -2,6 +2,7 @@ import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,8 +53,8 @@ export class SymbolsComponent extends DirectiveBase implements ControlValueAcces
 
     private listenToFormChanges(): void {
 
-        this.tracked = this.symbolsForm.valueChanges
-            .debounceTime(300)
-            .subscribe(symbols => this.propagateChange(symbols));
+        this.symbolsForm.valueChanges.pipe(
+            debounceTime(300)
+        ).subscribeTracked(this, symbols => this.propagateChange(symbols));
     }
 }

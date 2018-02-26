@@ -7,6 +7,7 @@ import {AuthCredentials} from "../auth/model/auth-credentials";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
 import {AppMeta, AppMetaEntry} from "../../../electron/src/storage/types/app-meta";
+import {take, flatMap, map} from "rxjs/operators";
 
 @Injectable()
 export class LocalRepositoryService {
@@ -25,6 +26,7 @@ export class LocalRepositoryService {
 
     constructor(private ipc: IpcService) {
 
+        this.listen("appMeta").subscribe(this.appMeta);
         this.listen("openTabs").subscribe(this.openTabs);
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
@@ -32,10 +34,16 @@ export class LocalRepositoryService {
         this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
-        this.listen("activeCredentials").map(cred => AuthCredentials.from(cred)).subscribe(this.activeCredentials);
-        this.listen("credentials").map(creds => creds.map(c => AuthCredentials.from(c))).subscribe(this.credentials);
         this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
-        this.listen("appMeta").subscribe(this.appMeta);
+
+        this.listen("activeCredentials").pipe(
+            map(cred => AuthCredentials.from(cred))
+        ).subscribe(this.activeCredentials);
+
+        this.listen("credentials").pipe(
+            map(creds => creds.map(c => AuthCredentials.from(c)))
+        ).subscribe(this.credentials);
+
     }
 
     getIgnoredUpdateVersion(): Observable<string> {
@@ -92,43 +100,47 @@ export class LocalRepositoryService {
 
     setCredentials(credentials: AuthCredentials[]): Promise<any> {
 
-        return this.activeCredentials.take(1).flatMap(activeCredentials => {
-            const updateContainsActive = credentials.findIndex(c => c.equals(activeCredentials)) !== -1;
+        return this.activeCredentials.pipe(
+            take(1),
+            flatMap(activeCredentials => {
+                const updateContainsActive = credentials.findIndex(c => c.equals(activeCredentials)) !== -1;
 
-            const update = {credentials} as { credentials: AuthCredentials[], activeCredentials?: AuthCredentials };
+                const update = {credentials} as { credentials: AuthCredentials[], activeCredentials?: AuthCredentials };
 
-            if (!updateContainsActive) {
-                update.activeCredentials = null;
-            }
+                if (!updateContainsActive) {
+                    update.activeCredentials = null;
+                }
 
-            return this.ipc.request("patchLocalRepository", update);
-        }).toPromise();
+                return this.ipc.request("patchLocalRepository", update);
+            })
+        ).toPromise();
     }
 
     setFolderExpansion(foldersToExpand: string | string [], isExpanded: boolean): void {
-        this.expandedFolders.take(1)
-            .subscribe(expandedFolders => {
+        this.expandedFolders.pipe(
+            take(1)
+        ).subscribe(expandedFolders => {
 
-                const patch = new Set(expandedFolders);
-                let modified = false;
+            const patch  = new Set(expandedFolders);
+            let modified = false;
 
-                [].concat(foldersToExpand).forEach((item) => {
-                    const oldSize = patch.size;
+            [].concat(foldersToExpand).forEach((item) => {
+                const oldSize = patch.size;
 
-                    isExpanded ? patch.add(item) : patch.delete(item);
+                isExpanded ? patch.add(item) : patch.delete(item);
 
-                    if (oldSize !== patch.size) {
-                        modified = true;
-                    }
-                });
-
-                if (modified) {
-                    this.patch({
-                        expandedNodes: Array.from(patch)
-                    });
+                if (oldSize !== patch.size) {
+                    modified = true;
                 }
-
             });
+
+            if (modified) {
+                this.patch({
+                    expandedNodes: Array.from(patch)
+                });
+            }
+
+        });
     }
 
     private listen(key: string) {
@@ -140,7 +152,9 @@ export class LocalRepositoryService {
     }
 
     addLocalFolders(folders, expandFolders: boolean = false): Promise<any> {
-        return this.getLocalFolders().take(1).toPromise().then(existingFolders => {
+        return this.getLocalFolders().pipe(
+            take(1)
+        ).toPromise().then(existingFolders => {
             const missing = folders.filter(folder => existingFolders.indexOf(folder) === -1);
 
             if (missing.length === 0) {
@@ -159,7 +173,9 @@ export class LocalRepositoryService {
     }
 
     removeLocalFolders(...folders): Promise<any> {
-        return this.getLocalFolders().take(1).toPromise().then(existing => {
+        return this.getLocalFolders().pipe(
+            take(1)
+        ).toPromise().then(existing => {
             const update = existing.filter(path => folders.indexOf(path) === -1);
 
             if (update.length === existing.length) {
@@ -174,7 +190,9 @@ export class LocalRepositoryService {
 
     pushRecentApp(recentTabData: RecentAppTab, limit = 20): Promise<any> {
 
-        return this.getRecentApps().take(1).toPromise().then((entries) => {
+        return this.getRecentApps().pipe(
+            take(1)
+        ).toPromise().then((entries) => {
             const update = [recentTabData].concat(entries).filter((val, idx, arr) => {
                 const duplicateIndex = arr.findIndex(el => el.id === val.id);
                 return duplicateIndex === idx;
@@ -193,11 +211,14 @@ export class LocalRepositoryService {
     }
 
     setExecutorConfig(executorConfig: ExecutorConfig): Promise<any> {
-        return this.patch({executorConfig}).take(1).toPromise();
+        return this.patch({executorConfig}).pipe(
+            take(1)
+        ).toPromise();
     }
 
     getAppMeta<T>(appID: string, key?: keyof AppMeta): Observable<AppMeta> {
-        return this.appMeta.map(meta => {
+        return this.appMeta.pipe(
+            map(meta => {
                 const data = meta[appID];
 
                 if (key && data) {
@@ -206,7 +227,8 @@ export class LocalRepositoryService {
 
                 return data;
 
-            });
+            })
+        );
     }
 
     patchAppMeta(appID: string, key: keyof AppMetaEntry, value: any): Promise<any> {

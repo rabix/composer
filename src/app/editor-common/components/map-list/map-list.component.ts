@@ -2,6 +2,7 @@ import {AfterViewInit, Component, EventEmitter, forwardRef, Input, OnInit, Outpu
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {map, distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-map-list",
@@ -29,7 +30,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                 <input class="form-control value-input" [formControl]="ctrl.get('value')" data-test="value-field" placeholder="value"/>
 
-                <div *ngIf="!readonly" 
+                <div *ngIf="!readonly"
                      class="remove-icon"
                      ct-tooltip="Delete"
                      data-test="remove-entry-button"
@@ -105,12 +106,12 @@ export class MapListComponent extends DirectiveBase implements ControlValueAcces
 
     ngAfterViewInit() {
 
-        this.controls.valueChanges
-            .map(() => this.makeMap())
-            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-            .subscribeTracked(this, val => {
-                this.propagateChange(val);
-            });
+        this.controls.valueChanges.pipe(
+            map(() => this.makeMap()),
+            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+        ).subscribeTracked(this, val => {
+            this.propagateChange(val);
+        });
     }
 
     registerOnChange(fn: any): void {

@@ -2,6 +2,8 @@ import {Injectable} from "@angular/core";
 import {Issue} from "cwlts/models/helpers/validation";
 import {Observable} from "rxjs/Observable";
 import {CwlSchemaValidationWorkerService} from "../cwl-schema-validation-worker/cwl-schema-validation-worker.service";
+import {switchMap} from "rxjs/operators";
+import {fromPromise} from "rxjs/observable/fromPromise";
 
 export interface AppValidityState {
     isValidCWL: boolean,
@@ -29,9 +31,9 @@ export class AppValidatorService {
         const subs          = [];
         const preValidation = contentStream;
 
-        const validation = preValidation.switchMap(content => {
-            return Observable.fromPromise(this.cwlWorker.validate(content));
-        });
+        const validation = preValidation.pipe(
+            switchMap(content => fromPromise(this.cwlWorker.validate(content)))
+        );
 
         return new Observable(obs => {
             subs.push(

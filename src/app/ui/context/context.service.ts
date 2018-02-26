@@ -1,7 +1,8 @@
 import {ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {MenuItem} from "../menu/menu-item";
 import {MenuComponent} from "../menu/menu.component";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {take} from "rxjs/operators";
 
 @Injectable()
 export class ContextService {
@@ -12,7 +13,7 @@ export class ContextService {
 
     }
 
-    public showAt(container: ViewContainerRef, menuItems: MenuItem[], coordinates: { x: number, y: number }) {
+    showAt(container: ViewContainerRef, menuItems: MenuItem[], coordinates: { x: number, y: number }) {
         this.close();
         const factory = this.resolver.resolveComponentFactory(MenuComponent);
         this.embeddedComponent = container.createComponent<MenuComponent>(factory);
@@ -25,17 +26,19 @@ export class ContextService {
         nEl.style.left = x + "px";
         nEl.style.top = y + "px";
 
-        Observable.fromEvent(nEl, "contextmenu").subscribe((ev: MouseEvent) => {
+        fromEvent(nEl, "contextmenu").subscribe((ev: MouseEvent) => {
             ev.stopPropagation();
         });
 
-        Observable.fromEvent(document, "click").first().subscribe(() => {
+        fromEvent(document, "click").pipe(
+            take(1)
+        ).subscribe(() => {
             this.close();
         });
     }
 
 
-    public close() {
+    close() {
         if (this.embeddedComponent) {
             this.embeddedComponent.destroy();
         }

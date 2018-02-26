@@ -1,6 +1,6 @@
 import {Observable} from "rxjs/Observable";
 import {
-    AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren, ViewEncapsulation
+    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
@@ -8,6 +8,9 @@ import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.component";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {merge} from "rxjs/observable/merge";
+import {of} from "rxjs/observable/of";
+import {map, distinctUntilChanged, filter} from "rxjs/operators";
 import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-factory";
 import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
@@ -175,7 +178,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
-
             }
 
         });
@@ -288,10 +290,16 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     }
 
     ngAfterViewInit() {
-        Observable.merge(Observable.of(this.includeInCommandLine.length), this.includeInCommandLine.changes.map(l => l.length))
-            .distinctUntilChanged().filter(a => !!a)
-            .subscribeTracked(this, () => {
-                this.addIncludeInCommandLineToggleDecorator();
-            });
+        merge(
+            of(this.includeInCommandLine.length),
+            this.includeInCommandLine.changes.pipe(
+                map(l => l.length)
+            )
+        ).pipe(
+            distinctUntilChanged(),
+            filter(a => !!a)
+        ).subscribeTracked(this, () => {
+            this.addIncludeInCommandLineToggleDecorator();
+        });
     }
 }

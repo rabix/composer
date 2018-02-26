@@ -1,17 +1,17 @@
 import {Injectable} from "@angular/core";
 import * as YAML from "js-yaml";
 import {Observable} from "rxjs/Observable";
-import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {PlatformRepositoryService} from "../../repository/platform-repository.service";
 import {LocalRepositoryService} from "../../repository/local-repository.service";
 import {IpcService} from "../../services/ipc.service";
 import {AppHelper} from "../helpers/AppHelper";
+import {empty} from "rxjs/observable/empty";
+import {concat, map, take} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
 
 @Injectable()
 export class DataGatewayService {
-
-    cacheInvalidation = new Subject<string>();
 
     /**
      * @depreceated Can check AppHelper.isLocal directly
@@ -59,17 +59,18 @@ export class DataGatewayService {
 
         if (source === "local") {
 
-            const fetch = Observable.empty().concat(this.ipc.request("getLocalFileContent", almostID)) as Observable<string>;
+            const fetch = empty().pipe(concat(this.ipc.request("getLocalFileContent", almostID)));
 
             if (parse) {
-                return fetch
-                    .map(content => {
+                return fetch.pipe(
+                    map(content => {
                         try {
                             return YAML.safeLoad(content, {json: true, onWarning: noop} as any);
                         } catch (err) {
                             return new Error(err);
                         }
-                    });
+                    })
+                );
             }
 
             return fetch;
@@ -77,12 +78,14 @@ export class DataGatewayService {
 
         if (source === "app" || source === "public") {
 
-            const fetch = Observable.empty().concat(this.ipc.request("getPlatformApp", {
-                id: almostID
-            }));
+            const fetch = empty().pipe(
+                concat(this.ipc.request("getPlatformApp", {id: almostID}))
+            );
 
             if (parse) {
-                return fetch.map(content => JSON.parse(content));
+                return fetch.pipe(
+                    map(content => JSON.parse(content))
+                );
             }
             return fetch;
         }
@@ -90,25 +93,12 @@ export class DataGatewayService {
 
     resolveContent(content, path): Observable<Object | any> {
         if (AppHelper.isLocal(path)) {
-            return this.ipc.request("resolveContent", ({content, path})).take(1);
+            return this.ipc.request("resolveContent", ({content, path})).pipe(take(1));
         }
 
-        return Observable.of(content).map(txt => YAML.safeLoad(txt, {json: true} as any));
-    }
-
-
-    /**
-     * @deprecated use FileRepository.saveFile
-     */
-    saveLocalFileContent(path, content) {
-        return this.ipc.request("saveFileContent", {path, content});
-    }
-
-    /**
-     * @deprecated use FileRepository.saveFile
-     */
-    saveFile(fileID, content): Observable<string> {
-        return this.saveLocalFileContent(fileID, content).map(() => content);
+        return of(content).pipe(
+            map(txt => YAML.safeLoad(txt, {json: true} as any))
+        );
     }
 
     /**

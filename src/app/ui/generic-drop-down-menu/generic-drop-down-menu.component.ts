@@ -4,6 +4,8 @@ import {
 } from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {skip, filter} from "rxjs/operators";
 
 /**
  *  Example usage: {@link SettingsMenuComponent}
@@ -116,9 +118,10 @@ export class GenericDropDownMenuComponent extends DirectiveBase implements OnIni
 
         this.cdr.markForCheck();
 
-        const sub = Observable.fromEvent(document, "click").filter((ev: MouseEvent) => {
-            return !this.dropdownContainer.element.nativeElement.contains(ev.target as Node);
-        }).skip(1).subscribe(() => {
+        const sub = fromEvent(document, "click").pipe(
+            filter((ev: MouseEvent) => !this.dropdownContainer.element.nativeElement.contains(ev.target as Node)),
+            skip(1)
+        ).subscribe(() => {
             this.toggleMenu(false);
             sub.unsubscribe();
         });

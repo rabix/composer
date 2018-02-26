@@ -2,6 +2,8 @@ image: Visual Studio 2017
 
 environment:
   nodejs_version: "8"
+  appveyor_rdp_password:
+    secure: gkQbBWeeUvlT+qC72N3jRA==
   amazon_id:
     secure: XJasHnFGjZfUM5D+HTOsw0PDwusr8qbt/17iLCe3mXY=
   amazon_bucket:
@@ -12,17 +14,21 @@ environment:
 platform:
   - x64
 
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 install:
   - ps: Install-Product node $env:nodejs_version
   - yarn install --no-progress
 
 build_script:
-  - yarn run build
+  - yarn run compile:electron
+  - node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build -prod -aot -v
+  - yarn run package
 
 test_script:
   - yarn run test:electron
   - yarn run test:angular
-  - yarn run test:spectron
 
 cache:
   - node_modules -> yarn.lock

@@ -16,6 +16,7 @@ import {StepModel, WorkflowModel} from "cwlts/models";
 import {HintsModalComponent} from "../../../../core/modals/hints-modal/hints-modal.component";
 import {ModalService} from "../../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -50,8 +51,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     data-test="scatter-method-select"
                     [formControl]="form.controls['scatterMethod']">
                 <option value=""
-                        [disabled]="readonly">-- none --</option>
-                <option *ngFor="let method of scatterMethodOptions" 
+                        [disabled]="readonly">-- none --
+                </option>
+                <option *ngFor="let method of scatterMethodOptions"
                         [disabled]="readonly"
                         [value]="method.value">
                     {{method.caption}}
@@ -70,7 +72,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                     data-test="scatter-select"
                     [formControl]="form.controls['scatter']">
                 <option value=""
-                        [disabled]="readonly">-- none --</option>
+                        [disabled]="readonly">-- none --
+                </option>
                 <option *ngFor="let input of step.in"
                         [disabled]="readonly"
                         [value]="input.id">
@@ -103,7 +106,9 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
         </div>
 
         <!--Set Hints-->
-        <button type="button" class="btn btn-secondary" data-test="set-hints-button" (click)="setHints()">{{ this.readonly ? "View" : "Set" }} Hints</button>
+        <button type="button" class="btn btn-secondary" data-test="set-hints-button" (click)="setHints()">{{ this.readonly ? "View" : "Set"
+            }} Hints
+        </button>
 
     `
 })
@@ -124,18 +129,18 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
     }
 
     @Input()
-    public step: StepModel;
+    step: StepModel;
 
     @Input()
-    public workflowModel: WorkflowModel;
+    workflowModel: WorkflowModel;
 
     @Input()
-    public graph: Workflow;
+    graph: Workflow;
 
     @Output()
-    public change = new EventEmitter();
+    change = new EventEmitter();
 
-    public scatterMethodOptions = [
+    scatterMethodOptions = [
         {
             value: "dotproduct",
             caption: "Dot Product"
@@ -150,7 +155,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
         }
     ];
 
-    public form: FormGroup;
+    form: FormGroup;
 
     constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef, private modal: ModalService) {
         super();
@@ -179,11 +184,11 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             scatter: [this.step.scatter || ""]
         });
 
-        this.tracked = this.form.valueChanges.debounceTime(200).subscribe(() => {
-           this.change.emit();
+        this.tracked = this.form.valueChanges.pipe(debounceTime(200)).subscribe(() => {
+            this.change.emit();
         });
 
-        this.tracked = this.form.controls["id"].valueChanges.debounceTime(1000).subscribe((value) => {
+        this.tracked = this.form.controls["id"].valueChanges.pipe(debounceTime(1000)).subscribe((value) => {
             try {
                 // Change id on workflow model so canvas can interact with it
                 this.workflowModel.changeStepId(this.step, value);
@@ -199,7 +204,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             this.step.description = description;
         });
 
-        this.tracked = this.form.controls["label"].valueChanges.debounceTime(1000).subscribe((label) => {
+        this.tracked = this.form.controls["label"].valueChanges.pipe(debounceTime(1000)).subscribe((label) => {
             this.step.label = label;
         });
 
@@ -220,7 +225,7 @@ export class WorkflowStepInspectorTabStep extends DirectiveBase implements OnIni
             closeOnEscape: true
         });
 
-        hints.model = this.step;
+        hints.model    = this.step;
         hints.readonly = this.readonly;
     }
 

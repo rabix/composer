@@ -4,6 +4,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
+import {filter} from "rxjs/operators";
 
 
 @Component({
@@ -156,7 +157,9 @@ export class SendFeedbackModalComponent extends DirectiveBase {
             }]]
         });
 
-        this.form.valueChanges.filter(() => this.errorMessage !== undefined).subscribeTracked(this, () => this.errorMessage = undefined);
+        this.form.valueChanges.pipe(
+            filter(() => this.errorMessage !== undefined)
+        ).subscribeTracked(this, () => this.errorMessage = undefined);
 
     }
 
@@ -164,7 +167,7 @@ export class SendFeedbackModalComponent extends DirectiveBase {
         this.form.patchValue({type});
     }
 
-    public onSendFeedback() {
+    onSendFeedback() {
 
         const {type, text} = this.form.getRawValue();
         this.errorMessage  = undefined;

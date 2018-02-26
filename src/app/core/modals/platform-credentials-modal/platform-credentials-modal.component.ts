@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
 import {User} from "../../../../../electron/src/sbg-api-client/interfaces/user";
 import {AuthService} from "../../../auth/auth.service";
 import {AuthCredentials} from "../../../auth/model/auth-credentials";
@@ -10,6 +9,8 @@ import {SystemService} from "../../../platform-providers/system.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {GlobalService} from "../../global/global.service";
+import {fromPromise} from "rxjs/observable/fromPromise";
+import {withLatestFrom, take} from "rxjs/operators";
 
 @Component({
     selector: "ct-platform-credentials-modal",
@@ -150,12 +151,12 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
         const activeCredentials = this.auth.getActive();
         const allCredentials    = this.auth.getCredentials();
-        const credentialsUpdate = Observable.fromPromise(this.auth.addCredentials(credentials));
+        const credentialsUpdate = fromPromise(this.auth.addCredentials(credentials));
 
-        credentialsUpdate
-            .withLatestFrom(activeCredentials, allCredentials, (_, active, all) => [active, all])
-            .take(1)
-            .subscribe((results: [AuthCredentials | undefined, AuthCredentials[]]) => {
+        credentialsUpdate.pipe(
+            withLatestFrom(activeCredentials, allCredentials, (_, active, all) => [active, all]),
+            take(1)
+        ).subscribe((results: [AuthCredentials | undefined, AuthCredentials[]]) => {
 
                 const [active, all] = results;
 
@@ -182,7 +183,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     component.environment = AuthCredentials.getPlatformLabel(url);
                     component.username    = user.username;
 
-                    component.dismiss.take(1).subscribe(() => {
+                    component.dismiss.pipe(
+                        take(1)
+                    ).subscribe(() => {
                         this.notificationBarService.dismissDynamicNotification(component);
                     });
                 }
@@ -254,7 +257,9 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
                 const {url, token} = form.getRawValue();
 
-                return this.data.getUserWithToken(url, token).take(1).toPromise().then(user => {
+                return this.data.getUserWithToken(url, token).pipe(
+                    take(1)
+                ).toPromise().then(user => {
                     form.get("user").setValue(user, {emitEvent: false, onlySelf: true});
 
                     if (this.tokenOnly && user.username !== this.user.username) {

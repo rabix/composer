@@ -3,6 +3,7 @@ import {ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@
 import {ExpressionModel, RequirementBaseModel} from "cwlts/models";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-requirement-input",
@@ -28,7 +29,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
             </ct-auto-complete>
 
             <!--Regular input if no autocomplete for classes provided-->
-            <input type="text" 
+            <input type="text"
                    class="form-control"
                    data-test="requirement-input-class-field"
                    *ngIf="!classSuggest"
@@ -51,9 +52,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                    data-test="requirement-input-class-field"
                    [formControl]="form.controls['class']">
             <ct-expression-input
-                    [context]="context"
-                    [readonly]="readonly"
-                    [formControl]="form.controls['value']"
+                [context]="context"
+                [readonly]="readonly"
+                [formControl]="form.controls['value']"
             ></ct-expression-input>
         </div>
 
@@ -101,7 +102,7 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
                 this.form.controls["value"].setValue(obj.value, {onlySelf: true, emitEvent: false});
             } else {
                 this.editType = "half";
-                this.value = JSON.stringify(obj.value);
+                this.value    = JSON.stringify(obj.value);
             }
 
         } else if (obj.class !== undefined && obj.value === undefined) {
@@ -131,7 +132,9 @@ export class RequirementInputComponent extends DirectiveBase implements ControlV
     constructor() {
         super();
 
-        this.tracked = this.form.valueChanges.distinctUntilChanged().subscribe(form => {
+        this.form.valueChanges.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, form => {
             if (this.req) {
                 this.req.value = form.value;
                 this.req.class = form.class;

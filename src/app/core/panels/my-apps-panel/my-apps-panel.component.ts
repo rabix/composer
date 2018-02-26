@@ -22,6 +22,9 @@ import {NavSearchResultComponent} from "../nav-search-result/nav-search-result.c
 import {MyAppsPanelService} from "./my-apps-panel.service";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {FileRepositoryService} from "../../../file-repository/file-repository.service";
+import {filter, take, tap, debounceTime, distinctUntilChanged, flatMap} from "rxjs/operators";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {zip} from "rxjs/observable/zip";
 
 @Component({
     selector: "ct-my-apps-panel",
@@ -101,11 +104,10 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 this.fileRepository.reloadPath(folder);
             });
         });
-        this.localRepository.getActiveCredentials().take(1).subscribeTracked(this, (creds) => {
-            if (creds) {
-                this.service.reloadPlatformData();
-            }
-        });
+        this.localRepository.getActiveCredentials().pipe(
+            take(1),
+            filter(Boolean)
+        ).subscribeTracked(this, () => this.service.reloadPlatformData());
     }
 
     private attachSearchObserver() {
@@ -149,8 +151,9 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
         });
 
         const projectSearch = (term) =>
-            Observable.combineLatest(this.platformRepository.getOpenProjects(), this.platformRepository.searchAppsFromOpenProjects(term))
-                .take(1).toPromise().then(result => {
+            combineLatest(this.platformRepository.getOpenProjects(), this.platformRepository.searchAppsFromOpenProjects(term)).pipe(
+                take(1)
+            ).toPromise().then(result => {
                 const [projects, apps] = result;
 
                 return apps.map(app => {
@@ -183,22 +186,19 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
                 });
             });
 
-        this.searchContent.valueChanges
-            .do(term => this.searchResults = undefined)
-            .debounceTime(250)
-            .distinctUntilChanged()
-            .filter(term => term.trim().length !== 0)
-            .flatMap(term => Observable.zip(
-                localFileSearch(term),
-                projectSearch(term)
-            ))
-            .subscribeTracked(this, datasets => {
-                const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
-                this.searchResults = combined;
+        this.searchContent.valueChanges.pipe(
+            tap(() => this.searchResults = undefined),
+            debounceTime(250),
+            distinctUntilChanged(),
+            filter(term => term.trim().length !== 0),
+            flatMap(term => zip(localFileSearch(term), projectSearch(term))),
+        ).subscribeTracked(this, datasets => {
+            const combined     = [].concat(...datasets).sort((a, b) => b.relevance - a.relevance);
+            this.searchResults = combined;
 
-                this.cdr.markForCheck();
-                this.cdr.detectChanges();
-            });
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+        });
     }
 
     /**
@@ -221,8 +221,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
     private listenForAppOpening() {
 
-        const appOpening  = this.tree.open.filter(n => n.type === "app");
-        const fileOpening = this.tree.open.filter(n => n.type === "file");
+        const appOpening  = this.tree.open.pipe(filter(n => n.type === "app"));
+        const fileOpening = this.tree.open.pipe(filter(n => n.type === "file"));
 
         appOpening.subscribe(node => {
 
@@ -262,12 +262,11 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
     private listenForContextMenu() {
 
         // Context streams
-        const localRoot           = this.tree.contextMenu.filter(data => data.node.type === "source" && data.node.id === "local");
-        const platformRoot        = this.tree.contextMenu.filter(data => data.node.type === "source" && data.node.id !== "local");
-        const userProject         = this.tree.contextMenu.filter((data) => data.node.type === "project");
-        const topLevelLocalFolder = this.tree.contextMenu.filter((data) => data.node.type === "folder" && data.node.level === 2);
-        const nestedLocalFolder   = this.tree.contextMenu.filter(data => data.node.type === "folder" && data.node.level > 2);
-        const platformApp         = this.tree.contextMenu.filter(data => data.node.type === "app");
+        const localRoot           = this.tree.contextMenu.pipe(filter(data => data.node.type === "source" && data.node.id === "local"));
+        const platformRoot        = this.tree.contextMenu.pipe(filter(data => data.node.type === "source" && data.node.id !== "local"));
+        const userProject         = this.tree.contextMenu.pipe(filter((data) => data.node.type === "project"));
+        const topLevelLocalFolder = this.tree.contextMenu.pipe(filter((data) => data.node.type === "folder" && data.node.level === 2));
+        const nestedLocalFolder   = this.tree.contextMenu.pipe(filter(data => data.node.type === "folder" && data.node.level > 2));
 
         const platformRootMenuItems = [
             new MenuItem("Open a Project", {

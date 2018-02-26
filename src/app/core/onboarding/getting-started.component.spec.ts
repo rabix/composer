@@ -8,6 +8,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 
 import {GettingStartedComponent} from "./getting-started.component";
 import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-feedback.modal.component";
+import {of} from "rxjs/observable/of";
 
 describe("GettingStartedComponent", () => {
     let component: GettingStartedComponent;
@@ -101,7 +102,7 @@ describe("GettingStartedComponent", () => {
     it("should open mail client when click on 'Get support' button if there is no active user", () => {
 
         const auth = fixture.debugElement.injector.get(AuthService);
-        spyOn(auth, "getActive").and.returnValue(Observable.of(undefined));
+        spyOn(auth, "getActive").and.returnValue(of(undefined));
 
         const system   = fixture.debugElement.injector.get(SystemService);
         const mailLink = spyOn(system, "openLink");
@@ -119,7 +120,7 @@ describe("GettingStartedComponent", () => {
     it("should open a feedback modal when click on 'Get support' if there is an active user", () => {
 
         const auth         = fixture.debugElement.injector.get(AuthService);
-        spyOn(auth, "getActive").and.returnValue(Observable.of({}));
+        spyOn(auth, "getActive").and.returnValue(of({}));
 
         const modal    = fixture.debugElement.injector.get(ModalService);
         const modalSpy = spyOn(modal, "fromComponent");

@@ -9,7 +9,7 @@ export class ObjectHelper {
      * @param path dot-delimited path, ex. "foo.bar.baz"
      * @param value value to add to the "baz" key
      */
-    public static addProperty(target: Object, path: string[] | string, value: any): void {
+    static addProperty(target: Object, path: string[] | string, value: any): void {
         // Ensure that path is an array of path elements
         const resolvedPath = typeof path === "string" ? path.split(ObjectHelper.pathDelimiter).filter(v => v.length) : path;
 
@@ -47,7 +47,7 @@ export class ObjectHelper {
         }, target);
     }
 
-    public static getProperty<T, R>(target: T, path: string, defaultReturn?: R): R | any {
+    static getProperty<T, R>(target: T, path: string, defaultReturn?: R): R | any {
         const parts = path.split(this.pathDelimiter).filter(v => v.length);
         if (!target) {
             return defaultReturn;
@@ -81,7 +81,7 @@ export class ObjectHelper {
      * @returns {Object}
      * @link ObjectHelper-addEnumerablesTest
      */
-    public static addEnumerables(target: Object, source: Object): void {
+    static addEnumerables(target: Object, source: Object): void {
         for (const key of Object.keys(source)) {
             if (target.propertyIsEnumerable(key)) {
                 target[key] = source[key];
@@ -94,7 +94,7 @@ export class ObjectHelper {
      * @param arg
      * @returns boolean
      */
-    public static isPrimitiveValue(arg: any) {
+    static isPrimitiveValue(arg: any) {
         const type = typeof arg;
         return arg == null || (type !== "object" && type !== "function");
     }

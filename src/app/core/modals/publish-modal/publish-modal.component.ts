@@ -10,6 +10,7 @@ import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
 import {ErrorWrapper} from "../../helpers/error-wrapper";
 import {App} from "../../../../../electron/src/sbg-api-client/interfaces/app";
 import * as unidecode from "unidecode";
+import {map, take, flatMap, filter} from "rxjs/operators";
 
 @Component({
     selector: "ct-publish-modal",
@@ -95,7 +96,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
 
     isPublishing = false;
 
-    revision: number = 0;
+    revision = 0;
 
     inputForm: FormGroup;
 
@@ -135,28 +136,28 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
             content: new FormControl(this.appContent)
         });
 
-        this.inputForm.statusChanges.filter(() => this.inputForm.valid).subscribe(() => {
+        this.inputForm.statusChanges.pipe(
+            filter(() => this.inputForm.valid)
+        ).subscribe(() => {
             const {id, project} = this.inputForm.getRawValue();
             this.outputForm.patchValue({
                 appID: `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`
             });
         });
 
-        this.platformRepository.getOpenProjects()
-            .map(projects => projects || [])
-            .take(1)
-            .subscribeTracked(this, (projects) => this.projectOptions = projects.map(project => ({
-                value: project.id,
-                text: project.name
-            })));
+        this.platformRepository.getOpenProjects().pipe(
+            map(projects => projects || []),
+            take(1)
+        ).subscribeTracked(this, (projects) => this.projectOptions = projects.map(project => ({
+            value: project.id,
+            text: project.name
+        })));
 
-        this.inputForm.controls["project"].valueChanges
-            .flatMap(val =>  {
-                return this.platformRepository.getAppsForProject(val);
-            })
-            .subscribeTracked(this, (apps: App[]) => {
-                this.appOptions = apps.map(app => ({value: app.id.split("/")[2], text: app.id.split("/")[2]}));
-            });
+        this.inputForm.controls["project"].valueChanges.pipe(
+            flatMap(val => this.platformRepository.getAppsForProject(val))
+        ).subscribeTracked(this, (apps: App[]) => {
+            this.appOptions = apps.map(app => ({value: app.id.split("/")[2], text: app.id.split("/")[2]}));
+        });
     }
 
     onSubmit() {
@@ -188,7 +189,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
          * All special characters should be replaced with hyphens,
          * and leading and trailing hyphens should then be removed
          */
-        return unidecode(id).replace(/[^a-z1-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+        return unidecode(id).replace(/[^a-z1-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
     }
 
     close() {
