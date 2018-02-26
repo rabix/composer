@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from "@angula
 import {FormControl, FormGroup} from "@angular/forms";
 import {CommandLineToolModel} from "cwlts/models";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-tool-codes",
@@ -12,8 +13,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="code">
                 <label class="form-control-label">Success Codes</label>
                 <ct-auto-complete data-test="success-codes"
-                                  [formControl]="form.controls['successCodes']" 
-                                  [type]="'number'" 
+                                  [formControl]="form.controls['successCodes']"
+                                  [type]="'number'"
                                   [readonly]="readonly"
                                   [create]="allowIntegersOnly"></ct-auto-complete>
             </div>
@@ -22,7 +23,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="code">
                 <label class="form-control-label">Temporary Fail Codes</label>
                 <ct-auto-complete data-test="temporary-fail-codes"
-                                  [formControl]="form.controls['temporaryFailCodes']" 
+                                  [formControl]="form.controls['temporaryFailCodes']"
                                   [type]="'number'"
                                   [readonly]="readonly"
                                   [create]="allowIntegersOnly"></ct-auto-complete>
@@ -32,7 +33,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
             <div class="code">
                 <label class="form-control-label">Permanent Fail Codes</label>
                 <ct-auto-complete data-test="permanent-fail-codes"
-                                  [formControl]="form.controls['permanentFailCodes']" 
+                                  [formControl]="form.controls['permanentFailCodes']"
                                   [type]="'number'"
                                   [readonly]="readonly"
                                   [create]="allowIntegersOnly"></ct-auto-complete>
@@ -70,12 +71,12 @@ export class ToolCodesComponent extends DirectiveBase implements OnInit, OnChang
 
     ngOnInit(): void {
 
-        this.tracked = this.form.valueChanges.distinctUntilChanged().subscribe((form) => {
-
-            this.model.successCodes = form["successCodes"];
+        this.form.valueChanges.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, form => {
+            this.model.successCodes       = form["successCodes"];
             this.model.temporaryFailCodes = form["temporaryFailCodes"];
             this.model.permanentFailCodes = form["permanentFailCodes"];
-
             this.update.emit(form);
         });
     }

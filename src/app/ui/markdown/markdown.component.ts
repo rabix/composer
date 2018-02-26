@@ -13,7 +13,7 @@ import {SystemService} from "../../platform-providers/system.service";
 })
 export class MarkdownComponent {
 
-    public value = "";
+    value = "";
 
     @Input("value")
     set md(value: string) {

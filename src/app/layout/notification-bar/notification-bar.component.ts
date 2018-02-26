@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Component} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {Notification, NotificationBarService} from "./notification-bar.service";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-notification-bar",
@@ -30,17 +31,16 @@ import {Notification, NotificationBarService} from "./notification-bar.service";
 })
 export class NotificationBarComponent extends DirectiveBase {
 
-    public notifications: Notification [];
+    notifications: Notification [];
 
     constructor(public notificationBarService: NotificationBarService, public cdr: ChangeDetectorRef) {
         super();
-        this.notificationBarService.displayedNotifications.distinctUntilChanged()
-            .subscribeTracked(this, (notifications) => {
-             this.notifications = notifications;
-        });
+        this.notificationBarService.displayedNotifications.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, notifications => this.notifications = notifications);
     }
 
-    public close(notification: Notification) {
+    close(notification: Notification) {
         this.notificationBarService.dismissNotification(notification);
     }
 }

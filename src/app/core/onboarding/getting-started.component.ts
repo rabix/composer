@@ -3,6 +3,7 @@ import {AuthService} from "../../auth/auth.service";
 import {SystemService} from "../../platform-providers/system.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {SendFeedbackModalComponent} from "../modals/send-feedback-modal/send-feedback.modal.component";
+import {take} from "rxjs/operators";
 
 @Component({
     styleUrls: ["getting-started.component.scss"],
@@ -80,7 +81,7 @@ export class GettingStartedComponent {
 
     initiateFeedbackDialog() {
 
-        this.auth.getActive().take(1).subscribe(credentials => {
+        this.auth.getActive().pipe(take(1)).subscribe(credentials => {
             if (credentials) {
                 this.modal.fromComponent(SendFeedbackModalComponent, "Send Feedback");
                 return;

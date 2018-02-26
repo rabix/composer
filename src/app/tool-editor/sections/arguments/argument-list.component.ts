@@ -3,6 +3,7 @@ import {CommandLineToolModel} from "cwlts/models";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take, delay, map} from "rxjs/operators";
 
 @Component({
     selector: "ct-argument-list",
@@ -62,9 +63,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     </span>
 
                                     <ct-code-preview
-                                            *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
-                                            (viewReady)="ctt.show()"
-                                            [content]="entry.toString()"></ct-code-preview>
+                                        *ngIf="ctt.isIn && entry.valueFrom && entry.valueFrom.isExpression"
+                                        (viewReady)="ctt.show()"
+                                        [content]="entry.toString()"></ct-code-preview>
                                 </ct-tooltip-content>
 
                                 <!--Value Column-->
@@ -111,10 +112,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                     <div class="tc-header">{{ entry.loc || "Argument"}}</div>
                                     <div class="tc-body">
                                         <ct-argument-inspector
-                                                (save)="update.emit(model.arguments)"
-                                                [argument]="entry"
-                                                [readonly]="readonly"
-                                                [context]="context">
+                                            (save)="update.emit(model.arguments)"
+                                            [argument]="entry"
+                                            [readonly]="readonly"
+                                            [context]="context">
                                         </ct-argument-inspector>
                                     </div>
                                 </ct-editor-inspector-content>
@@ -178,12 +179,12 @@ export class ArgumentListComponent extends DirectiveBase {
         const newEntry = this.model.addArgument({});
         this.update.emit(this.model.arguments);
 
-        this.inspectorTemplate.changes
-            .take(1)
-            .delay(1)
-            .map(list => list.last)
-            .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry.loc);
-            });
+        this.inspectorTemplate.changes.pipe(
+            take(1),
+            delay(1),
+            map(list => list.last)
+        ).subscribe(templateRef => {
+            this.inspector.show(templateRef, newEntry.loc);
+        });
     }
 }

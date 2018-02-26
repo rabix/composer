@@ -4,6 +4,7 @@ import {CommandInputParameterModel} from "cwlts/models";
 import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -53,7 +54,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class StageInputSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     input: CommandInputParameterModel;
 
@@ -88,10 +89,10 @@ export class StageInputSectionComponent extends DirectiveBase implements Control
             this.form.addControl("stageInput", new FormControl(this.input.customProps["sbg:stageInput"] || null));
         }
 
-        this.tracked = this.form.valueChanges
-            .distinctUntilChanged()
-            .subscribe(value => {
-                if (!!value.stageInput) {
+        this.form.valueChanges.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, value => {
+                if (Boolean(value.stageInput)) {
                     this.input.customProps["sbg:stageInput"] = value.stageInput;
                 } else if (this.input.customProps["sbg:stageInput"]) {
                     delete this.input.customProps["sbg:stageInput"];

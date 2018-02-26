@@ -297,7 +297,7 @@ export class AppInfoComponent implements OnChanges {
     ];
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Input()
     model: WorkflowModel | CommandLineToolModel;
@@ -305,16 +305,15 @@ export class AppInfoComponent implements OnChanges {
     @Output()
     change = new EventEmitter();
 
-    public createdBy: string;
-    public createdOn: number;
-    public editedBy: string;
-    public editedOn: number;
-    public revisionNote: string;
-    public inputs: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
-    public appSettings: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
+    createdBy: string;
+    createdOn: number;
+    editedBy: string;
+    editedOn: number;
+    revisionNote: string;
+    inputs: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
+    appSettings: Array<CommandInputParameterModel | WorkflowInputParameterModel>;
 
     constructor(private system: SystemService) {
-
     }
 
     ngOnChanges(changes: SimpleChanges) {

@@ -31,13 +31,13 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 })
 export class DockerRequirementComponent extends DirectiveBase {
     @Input()
-    public docker = new DockerRequirementModel();
+    docker = new DockerRequirementModel();
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
     @Output()
-    public update = new EventEmitter<DockerRequirement>();
+    update = new EventEmitter<DockerRequirement>();
 
     updateDockerPull(event) {
         this.docker.dockerPull = event;

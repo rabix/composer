@@ -2,6 +2,7 @@ import {Component, ElementRef, HostBinding, ViewChild} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {take, last, takeUntil, skip, withLatestFrom} from "rxjs/operators";
 
 @Component({
     selector: "ct-editor-inspector",
@@ -40,22 +41,23 @@ export class EditorInspectorComponent extends DirectiveBase {
 
             const initialWidth = this.flexBasis;
 
-            const down = movement.take(1);
-            const up   = movement.last().take(1);
-            const move = movement.skip(1).takeUntil(up);
+            const down = movement.pipe(take(1));
+            const up   = movement.pipe(last(), take(1));
+            const move = movement.pipe(skip(1), takeUntil(up));
 
-            move.withLatestFrom(down, (outer, inner) => inner.clientX - outer.clientX)
-                .subscribeTracked(this, deltaX => {
-                    const update = initialWidth + deltaX;
+            move.pipe(
+                withLatestFrom(down, (outer, inner) => inner.clientX - outer.clientX)
+            ).subscribeTracked(this, deltaX => {
+                const update = initialWidth + deltaX;
 
-                    const isBeyondLeftMargin  = update > (hostContainer.clientWidth - this.resizeBoundaries.left);
-                    const isBeyondRightMargin = update < this.resizeBoundaries.right;
+                const isBeyondLeftMargin  = update > (hostContainer.clientWidth - this.resizeBoundaries.left);
+                const isBeyondRightMargin = update < this.resizeBoundaries.right;
 
-                    if (!isBeyondLeftMargin && !isBeyondRightMargin) {
-                        this.flexBasis = update;
-                    }
+                if (!isBeyondLeftMargin && !isBeyondRightMargin) {
+                    this.flexBasis = update;
+                }
 
-                });
+            });
 
 
         });

@@ -6,13 +6,16 @@ import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {App} from "../../../electron/src/sbg-api-client/interfaces/app";
-import {Project} from "../../../electron/src/sbg-api-client/interfaces/project";
+import {Project} from "../../../electron/src/sbg-api-client/interfaces";
 import {RawApp} from "../../../electron/src/sbg-api-client/interfaces/raw-app";
 import {AppMeta} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
 import {AuthService} from "../auth/auth.service";
+import {map, take, flatMap} from "rxjs/operators";
+import {combineLatest} from "rxjs/observable/combineLatest";
+
 
 @Injectable()
 export class PlatformRepositoryService {
@@ -43,10 +46,12 @@ export class PlatformRepositoryService {
     }
 
     getAppsForProject(projectID): Observable<App[]> {
-        return this.apps.map(apps => {
+        return this.apps.pipe(
             // Apps may not be present, fallback to an empty array
-            return (apps || []).filter(app => app.project === projectID);
-        });
+            map(apps => {
+                return (apps || []).filter(app => app.project === projectID);
+            })
+        );
     }
 
     getProjects(): Observable<Project[]> {
@@ -70,10 +75,8 @@ export class PlatformRepositoryService {
     }
 
     getOpenProjects(): Observable<Project[]> {
-        return Observable
-            .combineLatest(this.projects, this.openProjects)
-            .map(data => {
-
+        return combineLatest(this.projects, this.openProjects).pipe(
+            map(data => {
                 // If either of them is null, then we don't know which projects are open
                 if (~data.indexOf(null)) {
                     return null;
@@ -86,12 +89,13 @@ export class PlatformRepositoryService {
 
                 const mapped = all.reduce((acc, item) => ({...acc, [item.id]: item}), {});
                 return open.map(id => mapped[id] || undefined).filter(v => v);
-            });
+            })
+        );
     }
 
     getClosedProjects(): Observable<Project[]> {
-        return Observable.combineLatest(this.projects, this.openProjects)
-            .map(data => {
+        return combineLatest(this.projects, this.openProjects).pipe(
+            map(data => {
 
                 // If either of them is null, then we don't know which projects are closed
                 if (~data.indexOf(null)) {
@@ -105,7 +109,8 @@ export class PlatformRepositoryService {
                 }
 
                 return all.filter(p => open.indexOf(p.id) === -1);
-            });
+            })
+        );
     }
 
     private listen(key: string) {
@@ -117,9 +122,11 @@ export class PlatformRepositoryService {
     }
 
     setNodeExpansion(nodesToExpand: string | string [], isExpanded: boolean): void {
-        this.expandedNodes.take(1).subscribe(expandedNodes => {
+        this.expandedNodes.pipe(
+            take(1)
+        ).subscribe(expandedNodes => {
 
-            const patch = new Set(expandedNodes);
+            const patch  = new Set(expandedNodes);
             let modified = false;
 
             [].concat(nodesToExpand).forEach((item) => {
@@ -142,7 +149,9 @@ export class PlatformRepositoryService {
     }
 
     addOpenProjects(projectIDs: string[], expandNodes: boolean = false) {
-        return this.openProjects.take(1).toPromise().then(openProjects => {
+        return this.openProjects.pipe(
+            take(1)
+        ).toPromise().then(openProjects => {
 
             const missing = projectIDs.filter(id => openProjects.indexOf(id) === -1);
 
@@ -151,7 +160,9 @@ export class PlatformRepositoryService {
             }
 
             if (expandNodes) {
-                this.auth.getActive().take(1).subscribe((active) => {
+                this.auth.getActive().pipe(
+                    take(1)
+                ).subscribe((active) => {
                     // Expand added projects
                     this.setNodeExpansion(missing.concat(active.getHash()), true);
                 });
@@ -163,7 +174,9 @@ export class PlatformRepositoryService {
     }
 
     removeOpenProjects(...projectIDs: string[]) {
-        return this.openProjects.take(1).toPromise().then(openProjects => {
+        return this.openProjects.pipe(
+            take(1)
+        ).toPromise().then(openProjects => {
 
             const update = openProjects.filter(id => projectIDs.indexOf(id) === -1);
 
@@ -202,7 +215,10 @@ export class PlatformRepositoryService {
     }
 
     pushRecentApp(recentTabData: RecentAppTab, limit = 20): Promise<any> {
-        return this.getRecentApps().map(apps => apps || []).take(1).toPromise().then((entries) => {
+        return this.getRecentApps().pipe(
+            map(apps => apps || []),
+            take(1)
+        ).toPromise().then((entries) => {
             const update = [recentTabData].concat(entries).filter((val, idx, arr) => {
                 const duplicateIndex = arr.findIndex(el => el.id === val.id);
                 return duplicateIndex === idx;
@@ -242,53 +258,59 @@ export class PlatformRepositoryService {
 
         const term = substring.toLowerCase();
 
-        return this.getOpenProjects()
-            .map(projects => projects || [])
-            .flatMap(openProjects => {
+        return this.getOpenProjects().pipe(
+            map(projects => projects || []),
+            flatMap(openProjects => {
 
                 const openProjectIDs = openProjects.map(project => project.id);
 
-                return this.getPrivateApps().map(apps => {
+                return this.getPrivateApps().pipe(
+                    map(apps => {
 
-                    return (apps || []).filter(app => {
+                        return (apps || []).filter(app => {
 
-                        if (openProjectIDs.indexOf(app.project) === -1) {
-                            return false;
-                        }
+                            if (openProjectIDs.indexOf(app.project) === -1) {
+                                return false;
+                            }
 
-                        if (!substring) {
-                            return true;
-                        }
+                            if (!substring) {
+                                return true;
+                            }
 
-                        const appID   = app.id.toLowerCase();
-                        const appName = app.name.toLowerCase();
+                            const appID   = app.id.toLowerCase();
+                            const appName = app.name.toLowerCase();
 
-                        return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
-                    });
-                });
-            });
+                            return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
+                        });
+                    })
+                );
+            })
+        );
     }
 
     searchPublicApps(substring?: string): Observable<App[]> {
         const term = substring.toLowerCase();
 
-        return this.getPublicApps().map(apps => {
-            return (apps || []).filter(app => {
+        return this.getPublicApps().pipe(
+            map(apps => {
+                return (apps || []).filter(app => {
 
-                if (!substring) {
-                    return true;
-                }
+                    if (!substring) {
+                        return true;
+                    }
 
-                const appID   = app.id.toLowerCase();
-                const appName = app.name.toLowerCase();
+                    const appID   = app.id.toLowerCase();
+                    const appName = app.name.toLowerCase();
 
-                return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
-            });
-        });
+                    return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
+                });
+            })
+        );
     }
 
     getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
-        return this.appMeta.map(meta => {
+        return this.appMeta.pipe(
+            map(meta => {
 
                 if (meta === null) {
                     return meta;
@@ -302,7 +324,8 @@ export class PlatformRepositoryService {
 
                 return data;
 
-            });
+            })
+        );
     }
 
     patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {

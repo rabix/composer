@@ -5,6 +5,7 @@ import {Subject} from "rxjs/Subject";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take, delay, map} from "rxjs/operators";
 
 @Component({
     selector: "ct-file-def-list",
@@ -31,8 +32,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
                         <!--In case that tool is not draft2 then show dropdown for adding items-->
                         <ct-generic-dropdown-menu [ct-menu]="menu" #addItemDropDown>
-                            <button class="btn btn-primary" type="button" data-test="file-requirement-add-button"  
-                                    (click)="addItemDropDown.toggleMenu()">Add</button>
+                            <button class="btn btn-primary" type="button" data-test="file-requirement-add-button"
+                                    (click)="addItemDropDown.toggleMenu()">Add
+                            </button>
                         </ct-generic-dropdown-menu>
 
                         <!--Template for add item dropdown -->
@@ -196,13 +198,13 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
         const newEntry = this.fileRequirement.addDirent({});
         this.update.next(this.fileRequirement.listing);
 
-        this.inspectorTemplate.changes
-            .take(1)
-            .delay(1)
-            .map(list => list.last)
-            .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry.loc);
-            });
+        this.inspectorTemplate.changes.pipe(
+            take(1),
+            delay(1),
+            map(list => list.last)
+        ).subscribe(templateRef => {
+            this.inspector.show(templateRef, newEntry.loc);
+        });
     }
 
     addExpression() {

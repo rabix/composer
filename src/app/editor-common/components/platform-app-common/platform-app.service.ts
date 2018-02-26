@@ -3,6 +3,7 @@ import {Injectable} from "@angular/core";
 import {AuthService} from "../../../auth/auth.service";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {SystemService} from "../../../platform-providers/system.service";
+import {take} from "rxjs/operators";
 
 @Injectable()
 export class PlatformAppService {
@@ -13,7 +14,9 @@ export class PlatformAppService {
     }
 
     openOnPlatform(appID: string) {
-        this.auth.getActive().take(1).subscribe(credentials => {
+        this.auth.getActive().pipe(
+            take(1)
+        ).subscribe(credentials => {
 
             if (!credentials) {
                 this.notificationBar.showNotification(`Unable to open ${appID}, it seems that you are not connected to any platform.`);

@@ -1,8 +1,8 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandInputParameterModel, CommandOutputParameterModel} from "cwlts/models";
-import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
+import {distinctUntilChanged, debounceTime} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -39,7 +39,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                               data-test="desc-field"
                               [formControl]="form.controls['description']"></textarea>
                 </div>
-                
+
                 <!--Input only below-->
                 <!--Alternative Prefix-->
                 <div *ngIf="isInputPort()" class="form-group">
@@ -81,15 +81,13 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 export class DescriptionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
-    public port: CommandOutputParameterModel | CommandInputParameterModel;
+    port: CommandOutputParameterModel | CommandInputParameterModel;
+    form: FormGroup;
 
-    private onTouched = noop;
-
-    private propagateChange = noop;
-
-    public form: FormGroup;
+    private onTouched       = () => void 0;
+    private propagateChange = (val?: any) => void 0;
 
     constructor(private formBuilder: FormBuilder) {
         super();
@@ -107,28 +105,28 @@ export class DescriptionComponent extends DirectiveBase implements ControlValueA
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}]
         });
 
-        this.tracked = this.form.valueChanges
-            .distinctUntilChanged()
-            .debounceTime(300)
-            .subscribe(value => {
+        this.form.valueChanges.pipe(
+            distinctUntilChanged(),
+            debounceTime(300)
+        ).subscribeTracked(this, value => {
 
-                if (this.isInputPort()) {
-                    this.setTextProperty("sbg:altPrefix", value.altPrefix, true);
-                    this.setTextProperty("sbg:category", value.category, true);
-                    if (!this.isFileType()) {
-                        this.setTextProperty("sbg:toolDefaultValue", value.toolDefaults, true);
-                    }
+            if (this.isInputPort()) {
+                this.setTextProperty("sbg:altPrefix", value.altPrefix, true);
+                this.setTextProperty("sbg:category", value.category, true);
+                if (!this.isFileType()) {
+                    this.setTextProperty("sbg:toolDefaultValue", value.toolDefaults, true);
                 }
+            }
 
-                if (value.fileTypes) {
-                    this.setFileTypes(value.fileTypes);
-                }
+            if (value.fileTypes) {
+                this.setFileTypes(value.fileTypes);
+            }
 
-                this.setTextProperty("label", value.label);
-                this.setTextProperty("description", value.description);
+            this.setTextProperty("label", value.label);
+            this.setTextProperty("description", value.description);
 
-                this.propagateChange(this.port);
-            });
+            this.propagateChange(this.port);
+        });
     }
 
     private setTextProperty(propertyName: string, newValue: string, custom?: boolean): void {

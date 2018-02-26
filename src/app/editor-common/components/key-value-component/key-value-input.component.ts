@@ -3,6 +3,7 @@ import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_AC
 import {SBDraft2ExpressionModel} from "cwlts/models/d2sb";
 import {noop} from "../../../lib/utils.lib";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {distinctUntilChanged} from "rxjs/operators";
 
 /**
  * @deprecated
@@ -136,9 +137,9 @@ export class KeyValueInputComponent extends DirectiveBase implements ControlValu
             valueForm: [input.value]
         });
 
-        this.tracked = this.form.valueChanges
-            .distinctUntilChanged()
-            .subscribe(() => {
+        this.form.valueChanges.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, () => {
                 const key = this.form.controls["keyForm"].valid ? this.form.controls["keyForm"].value : "";
 
                 this.propagateChange({

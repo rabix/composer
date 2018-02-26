@@ -1,8 +1,7 @@
-import {
-    AfterViewInit, Component, ComponentRef, Input, ViewChild, ViewContainerRef
-} from "@angular/core";
+import {AfterViewInit, Component, ComponentRef, Input, ViewChild, ViewContainerRef} from "@angular/core";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {Observable} from "rxjs/Observable";
+import {of} from "rxjs/observable/of";
+import {delay} from "rxjs/operators";
 
 @Component({
     selector: "ct-notification",
@@ -32,7 +31,9 @@ export class NotificationComponent extends DirectiveBase implements AfterViewIni
             return;
         }
 
-        Observable.of(1).delay(1).subscribe(() => {
+        of(1).pipe(
+            delay(1)
+        ).subscribeTracked(this, () => {
             this.componentView.insert(this.component.hostView);
         });
 

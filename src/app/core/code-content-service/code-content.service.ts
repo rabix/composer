@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {IpcService} from "../../services/ipc.service";
 import {AppHelper} from "../helpers/AppHelper";
+import {debounceTime, filter, take} from "rxjs/operators";
 
 
 @Injectable()
@@ -14,13 +15,12 @@ export class CodeSwapService {
 
     constructor(private ipc: IpcService) {
 
-        this.codeContent.debounceTime(500)
-            .filter(() => this.appID !== undefined)
-            .subscribe(content => {
-                this.patchSwap(content);
-            });
+        this.codeContent.pipe(
+            debounceTime(500),
+            filter(() => this.appID !== undefined)
+        ).subscribe(content => this.patchSwap(content));
 
-        this.codeContent.take(1).subscribe(this.originalCodeContent);
+        this.codeContent.pipe(take(1)).subscribe(this.originalCodeContent);
     }
 
     discardSwapContent() {

@@ -31,19 +31,19 @@ import {Subject} from "rxjs/Subject";
 export class CheckboxPromptComponent {
 
     @Input()
-    public content: string;
+    content: string;
 
     @Input()
-    public cancellationLabel: string;
+    cancellationLabel: string;
 
     @Input()
-    public confirmationLabel: string;
+    confirmationLabel: string;
 
     @Input()
-    public checkboxLabel: string;
+    checkboxLabel: string;
 
     @Output()
-    public decision = new Subject<boolean>();
+    decision = new Subject<boolean>();
 
     constructor() {
 

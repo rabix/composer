@@ -7,7 +7,7 @@ export class BrowserSystemService extends SystemService {
     boot(): void {
     }
 
-    public openLink(url: string, event?: MouseEvent) {
+    openLink(url: string, event?: MouseEvent) {
         const win = window.open(url, "_blank");
         win.focus();
     }

@@ -6,11 +6,12 @@ import {AppHelper} from "../core/helpers/AppHelper";
 import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
+import {distinctUntilChanged, switchMap, take, takeWhile, map} from "rxjs/operators";
 
 @Injectable()
 export class ExecutorService {
 
-    private config        = new ReplaySubject<ExecutorConfig>(1);
+    private config = new ReplaySubject<ExecutorConfig>(1);
 
     constructor(private ipc: IpcService,
                 private localRepository: LocalRepositoryService,
@@ -20,7 +21,9 @@ export class ExecutorService {
     }
 
     getConfig<T extends keyof ExecutorConfig>(key: T): Observable<ExecutorConfig[T]> {
-        return this.config.map(c => c[key]);
+        return this.config.pipe(
+            map(c => c[key])
+        );
     }
 
     /**
@@ -28,9 +31,10 @@ export class ExecutorService {
      * Returns a message in the format “Version: #” if successful, or a description why it failed
      */
     getVersion(): Observable<string> {
-        return this.getConfig("path")
-            .distinctUntilChanged()
-            .switchMap(path => this.ipc.request("probeExecutorVersion"));
+        return this.getConfig("path").pipe(
+            distinctUntilChanged(),
+            switchMap(path => this.ipc.request("probeExecutorVersion"))
+        );
     }
 
     /**
@@ -38,19 +42,25 @@ export class ExecutorService {
      */
     run(appID: string, content: string, options = {}): Observable<string> {
 
-        const isLocal = AppHelper.isLocal(appID);
+        const isLocal   = AppHelper.isLocal(appID);
         const appSource = isLocal ? "local" : "user";
 
-        return this.config.take(1).switchMap((config) => {
-            return this.ipc.watch("executeApp", {
-                appID,
-                content,
-                appSource,
-                options,
-                config
-            }).takeWhile(val => val !== null);
-        });
+        return this.config.pipe(
+            take(1),
+            switchMap(config => {
+                return this.ipc.watch("executeApp", {
+                    appID,
+                    content,
+                    appSource,
+                    options,
+                    config
+                }).pipe(
+                    takeWhile(val => val !== null)
+                );
+            })
+        );
     }
+
     /**
      * Gets the configuration parameters for the execution context of a specific app
      */

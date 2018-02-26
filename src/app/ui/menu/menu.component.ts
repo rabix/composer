@@ -20,7 +20,7 @@ export class MenuComponent implements AfterViewInit {
         this.el = el.nativeElement;
     }
 
-    public setItems(items: MenuItem[]) {
+    setItems(items: MenuItem[]) {
         this.items = items;
     }
 

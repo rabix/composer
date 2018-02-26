@@ -7,6 +7,7 @@ import {LocalRepositoryService} from "../../../repository/local-repository.servi
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NotificationBarService} from "../../notification-bar/notification-bar.service";
 import {ElectronProxyService} from "../../../native/proxy/electron-proxy.service";
+import {debounceTime, combineLatest, map, take} from "rxjs/operators";
 
 @Component({
     selector: "ct-executor-config",
@@ -81,7 +82,9 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
         const showErr = (err) => this.notificationBar.showNotification(new ErrorWrapper(err).toString());
 
-        this.localRepository.getExecutorConfig().take(1).subscribeTracked(this, config => {
+        this.localRepository.getExecutorConfig().pipe(
+            take(1)
+        ).subscribeTracked(this, config => {
 
             this.form = new FormGroup({
                 path: new FormControl(config.path, [Validators.required]),
@@ -91,16 +94,21 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
             const changes = this.form.valueChanges;
 
-            this.outDirExistsInTree = this.localRepository
-                .getLocalFolders().combineLatest(this.localRepository.getExecutorConfig().map(config => config.outDir))
-                .map(result => {
+            this.outDirExistsInTree = this.localRepository.getLocalFolders().pipe(
+                combineLatest(this.localRepository.getExecutorConfig().pipe(
+                    map(config => config.outDir)
+                )),
+                map(result => {
                     const [folders, outDir] = result;
                     return !~folders.indexOf(outDir);
-                });
+                })
+            );
 
             this.form.get("path").valueChanges.subscribeTracked(this, () => this.versionMessage = "checking...");
 
-            changes.debounceTime(300).subscribeTracked(this, () => {
+            changes.pipe(
+                debounceTime(300)
+            ).subscribeTracked(this, () => {
                 this.localRepository.setExecutorConfig(this.form.getRawValue());
             }, showErr);
 
@@ -126,7 +134,8 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
         this.electronProxy.getRemote().require("fs-extra").ensureDir((this.form.get("outDir").value))
             .then(() => {
                 this.localRepository.addLocalFolders([this.form.get("outDir").value], true)
-                    .then(() => {});
+                    .then(() => {
+                    });
             }).catch((err) => console.warn(err));
     }
 }

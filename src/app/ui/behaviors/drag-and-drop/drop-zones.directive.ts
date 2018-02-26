@@ -9,7 +9,7 @@ export class DropZones extends DirectiveBase {
         this.el.setAttribute("ct-drop-zones", (zones || []).toString());
     }
 
-    public el: Element;
+    el: Element;
 
     constructor(el: ElementRef) {
         super();

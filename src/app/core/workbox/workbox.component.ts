@@ -10,7 +10,7 @@ import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ClosingDirtyAppsModalComponent} from "../modals/closing-dirty-apps/closing-dirty-apps-modal.component";
 import {WorkboxService} from "./workbox.service";
-
+import {startWith, delay, filter, map, switchMap} from "rxjs/operators";
 
 @Component({
     selector: "ct-workbox",
@@ -190,42 +190,40 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
         // FIXME: this needs to be handled in a system-specific way
         // Listen for a shortcut that should close the active tab
-        this.ipc.watch("accelerator", "CmdOrCtrl+W")
-            .filter(() => !this.promptClosingModalOpen)
-            .subscribeTracked(this, () => {
-                this.workbox.closeTab();
-            });
+        this.ipc.watch("accelerator", "CmdOrCtrl+W").pipe(
+            filter(() => !this.promptClosingModalOpen)
+        ).subscribeTracked(this, () => {
+            this.workbox.closeTab();
+        });
 
         // Switch to the tab on the right
-        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]")
-            .filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
-            .subscribeTracked(this, () => {
-                this.workbox.activateNext();
-            });
+        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+]").pipe(
+            filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
+        ).subscribeTracked(this, () => {
+            this.workbox.activateNext();
+        });
 
         // Switch to the tab on the left
-        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[")
-            .filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
-            .subscribeTracked(this, () => {
-                this.workbox.activatePrevious();
-            });
+        this.ipc.watch("accelerator", "CmdOrCtrl+Shift+[").pipe(
+            filter(_ => this.activeTab && this.tabs.length > 1 && !this.promptClosingModalOpen)
+        ).subscribeTracked(this, () => this.workbox.activatePrevious());
 
-        this.ipc.watch("accelerator", "CmdOrCtrl+S")
-            .filter(_ => this.activeTab !== undefined && !this.promptClosingModalOpen)
-            .map(() => {
+        this.ipc.watch("accelerator", "CmdOrCtrl+S").pipe(
+            filter(() => this.activeTab !== undefined && !this.promptClosingModalOpen),
+            map(() => {
                 const activeTabIndex = this.tabs.indexOf(this.activeTab);
                 return this.tabComponents[activeTabIndex];
-            })
-            .filter(c => c)
-            .subscribeTracked(this, (component) => {
-                if (typeof component.save === "function") {
-                    try {
-                        component.save();
-                    } catch (ex) {
-                        console.warn("Unable to save.", ex);
-                    }
+            }),
+            filter(Boolean)
+        ).subscribeTracked(this, (component) => {
+            if (typeof component.save === "function") {
+                try {
+                    component.save();
+                } catch (ex) {
+                    console.warn("Unable to save.", ex);
                 }
-            });
+            }
+        });
 
         this.workbox.tabs.subscribeTracked(this, tabs => {
             this.tabs = tabs;
@@ -250,34 +248,36 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
             this.statusBar.removeControls();
         });
 
-        this.workbox.activeTab.delay(1).switchMap(tab => replayComponents.filter((list: QueryList<any>) => {
-            return list.find((item) => item.tab === tab);
-        }), (tab) => tab)
-            .subscribeTracked(this, (tab) => {
+        this.workbox.activeTab.pipe(
+            delay(1),
+            switchMap(tab => replayComponents.pipe(
+                filter((list: QueryList<any>) => list.find((item) => item.tab === tab))
+            ), tab => tab)
+        ).subscribeTracked(this, (tab) => {
 
-                // activeTab has to be set in the next tick, otherwise we will have ExpressionChangedAfterItHadBeenCheckedError in some cases
+            // activeTab has to be set in the next tick, otherwise we will have ExpressionChangedAfterItHadBeenCheckedError in some cases
+            setTimeout(() => this.activeTab = tab);
+
+            const idx = this.tabs.findIndex(t => t === tab);
+
+            const component = this.tabComponentContainers.find((item, index) => index === idx);
+
+            if (component) {
+
+                this.statusBar.setControls(component.provideStatusControls());
+
                 setTimeout(() => {
-                    this.activeTab = tab;
+                    component.onTabActivation();
                 });
+            }
+        });
 
-                const idx = this.tabs.findIndex(t => t === tab);
-
-                const component = this.tabComponentContainers.find((item, index) => index === idx);
-
-                if (component) {
-
-                    this.statusBar.setControls(component.provideStatusControls());
-
-                    setTimeout(() => {
-                        component.onTabActivation();
-                    });
-                }
-            });
-
-        this.tabComponentContainers.changes.startWith(this.tabComponentContainers).delay(1)
-            .subscribeTracked(this, (components) => {
-                this.tabComponents = components.toArray().map((c) => c.tabComponent);
-            });
+        this.tabComponentContainers.changes.pipe(
+            startWith(this.tabComponentContainers),
+            delay(1)
+        ).subscribeTracked(this, components => {
+            this.tabComponents = components.toArray().map((c) => c.tabComponent);
+        });
     }
 
     getTabComponent(tab) {
@@ -288,7 +288,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
     /**
      * When you click on a tab
      */
-    onTabClick(event: MouseEvent, tab, component) {
+    onTabClick(event: MouseEvent, tab) {
         // Middle click
         if (event.button === 0) {
             this.workbox.openTab(tab);
@@ -316,7 +316,7 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
 
         if (tabComponent.isDirty) {
 
-            this.modal.wrapPromise(endDialog => {
+            this.modal.wrapPromise(() => {
 
                 this.promptClosingModalOpen = true;
 
@@ -356,17 +356,6 @@ export class WorkBoxComponent extends DirectiveBase implements OnInit, AfterView
      */
     openNewFileTab() {
         this.workbox.openTab(this.workbox.homeTabData, false);
-    }
-
-    /**
-     * Opens a welcome tab
-     */
-    openWelcomeTab() {
-        this.workbox.openTab({
-            id: "?welcome",
-            label: "Welcome",
-            type: "Welcome"
-        }, false);
     }
 
     createContextMenu(tab): MenuItem[] {

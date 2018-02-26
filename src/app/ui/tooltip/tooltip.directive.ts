@@ -1,8 +1,9 @@
 import {ComponentFactoryResolver, ComponentRef, Directive, HostListener, Input, ViewContainerRef} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TooltipContentComponent} from "./tooltip-content.component";
 import {TooltipPlacement} from "./types";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {first} from "rxjs/operators";
 
 
 @Directive({
@@ -11,16 +12,16 @@ import {TooltipPlacement} from "./types";
 export class TooltipDirective extends DirectiveBase {
 
     @Input("ct-tooltip")
-    public content: string | TooltipContentComponent;
+    content: string | TooltipContentComponent;
 
     @Input()
-    public tooltipDisabled = false;
+    tooltipDisabled = false;
 
     @Input()
-    public tooltipAnimation = false;
+    tooltipAnimation = false;
 
     @Input()
-    public tooltipPlacement: TooltipPlacement = "top";
+    tooltipPlacement: TooltipPlacement = "top";
 
     private tooltip: ComponentRef<TooltipContentComponent>;
 
@@ -35,7 +36,7 @@ export class TooltipDirective extends DirectiveBase {
 
     @HostListener("focusin")
     @HostListener("mouseenter")
-    public show(): void {
+    show(): void {
         if (this.tooltipDisabled || this.visible) {
             return;
         }
@@ -59,16 +60,14 @@ export class TooltipDirective extends DirectiveBase {
 
         instance.show();
 
-        this.tracked = Observable.fromEvent(window, "wheel").first().subscribe(_ => {
-            this.hide();
-        });
-
-        return;
+        fromEvent(window, "wheel").pipe(
+            first()
+        ).subscribeTracked(this, () => this.hide());
     }
 
     @HostListener("focusout")
     @HostListener("mouseleave")
-    public hide(): void {
+    hide(): void {
         if (!this.visible) {
             return;
         }
