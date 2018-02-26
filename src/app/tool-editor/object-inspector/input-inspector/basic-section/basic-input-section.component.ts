@@ -1,6 +1,5 @@
-import {Observable} from "rxjs/Observable";
 import {
-    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation
+    AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren, ViewEncapsulation
 } from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
@@ -10,7 +9,7 @@ import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.
 import {ModalService} from "../../../../ui/modal/modal.service";
 import {merge} from "rxjs/observable/merge";
 import {of} from "rxjs/observable/of";
-import {map, distinctUntilChanged, filter} from "rxjs/operators";
+import {map, distinctUntilChanged, filter, take} from "rxjs/operators";
 import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-factory";
 import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
@@ -163,7 +162,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                     }
 
                     // If input id is changed we should migrate related job key
-                    this.appMetaManager.getAppMeta("job").take(1).subscribe((job) => {
+                    this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
 
                         const jobValue = job[oldId];
 
@@ -211,7 +210,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             }
 
             // If type is changed nullify job value for that input
-            this.appMetaManager.getAppMeta("job").take(1).subscribe((job) => {
+            this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
 
                 job[this.input.id] = null;
 
