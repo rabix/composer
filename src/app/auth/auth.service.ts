@@ -3,6 +3,8 @@ import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {CredentialsRegistry} from "./credentials-registry";
 import {AuthCredentials} from "./model/auth-credentials";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {distinctUntilChanged, take} from "rxjs/operators";
 
 export const CREDENTIALS_REGISTRY = new InjectionToken<CredentialsRegistry>("auth.credentials-registry");
 
@@ -13,7 +15,7 @@ export class AuthService {
 
     constructor(@Inject(CREDENTIALS_REGISTRY) private registry: CredentialsRegistry) {
 
-        Observable.combineLatest(
+        combineLatest(
             this.registry.getCredentials(),
             this.registry.getActiveCredentials(),
             (all, active) => {
@@ -23,12 +25,9 @@ export class AuthService {
 
                 return all.find(c => c.equals(active));
             }
-        ).distinctUntilChanged((a, b) => {
-            if (a) {
-                return a.equals(b);
-            }
-            return a === b;
-        }).subscribe(this.active);
+        ).pipe(
+            distinctUntilChanged((a, b) => a ? a.equals(b) : (a === b))
+        ).subscribe(this.active);
     }
 
     getActive(): ReplaySubject<AuthCredentials | undefined> {
@@ -49,7 +48,7 @@ export class AuthService {
             return this.registry.setActiveCredentials(undefined);
         }
 
-        return this.getCredentials().take(1).toPromise().then(all => {
+        return this.getCredentials().pipe(take(1)).toPromise().then(all => {
             const val = all.find(c => c.equals(credentials));
 
             if (!val) {
@@ -70,7 +69,7 @@ export class AuthService {
     addCredentials(addedCredentials: AuthCredentials): Promise<any> {
 
         // Take up-to-date credentials array as a promise
-        const currentCredentials = this.getCredentials().take(1).toPromise();
+        const currentCredentials = this.getCredentials().pipe(take(1)).toPromise();
 
         return currentCredentials.then(current => {
 
@@ -92,7 +91,7 @@ export class AuthService {
 
     removeCredentials(credentials: AuthCredentials): Promise<any> {
 
-        return this.getCredentials().take(1).toPromise().then(current => {
+        return this.getCredentials().pipe(take(1)).toPromise().then(current => {
             const index = current.findIndex(c => c.equals(credentials));
 
             if (index !== -1) {

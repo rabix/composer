@@ -13,6 +13,8 @@ import {Action} from "@ngrx/store";
 import {ExecutionState} from "../../models";
 import {extractStepProgress, extractDockerTimeout} from "./log-parser";
 import {flatMap, map, filter} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
+import {empty} from "rxjs/observable/empty";
 
 @Injectable()
 export class ExecutorOutputParser {
@@ -34,10 +36,10 @@ export class ExecutorOutputParser {
                 updates.forEach((state, stepID) => list.push({appID, stepID, state}));
 
                 if (list.length === 0) {
-                    return Observable.empty();
+                    return empty();
                 }
 
-                return Observable.of(...list);
+                return of(...list);
             }),
             flatMap(data => {
                 const {appID, stepID, state} = data;
@@ -45,16 +47,16 @@ export class ExecutorOutputParser {
                 switch (state as ExecutionState) {
 
                     case "failed":
-                        return Observable.of(new ExecutionStepFailedAction(appID, stepID));
+                        return of(new ExecutionStepFailedAction(appID, stepID));
 
                     case "completed":
-                        return Observable.of(new ExecutionStepCompletedAction(appID, stepID));
+                        return of(new ExecutionStepCompletedAction(appID, stepID));
 
                     case "started":
-                        return Observable.of(new ExecutionStepStartedAction(appID, stepID));
+                        return of(new ExecutionStepStartedAction(appID, stepID));
 
                     default:
-                        return Observable.empty();
+                        return empty();
                 }
 
             })

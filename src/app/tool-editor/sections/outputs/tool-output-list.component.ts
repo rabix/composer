@@ -3,6 +3,7 @@ import {CommandInputParameterModel, CommandLineToolModel, CommandOutputParameter
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take, delay, map} from "rxjs/operators";
 
 @Component({
     selector: "ct-tool-output-list",
@@ -49,7 +50,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             <!--ID Column-->
                             <div class="col-xs-4 ellipsis" [title]="entry.id">
                                 <ct-validation-preview
-                                        [entry]="entry"></ct-validation-preview>
+                                    [entry]="entry"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
 
@@ -66,9 +67,9 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 </span>
 
                                 <ct-code-preview
-                                        *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
-                                        (viewReady)="ctt.show()"
-                                        [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
+                                    *ngIf="ctt.isIn && entry.outputBinding.glob && entry.outputBinding.glob?.isExpression"
+                                    (viewReady)="ctt.show()"
+                                    [content]="entry.outputBinding.glob.toString()"></ct-code-preview>
                             </ct-tooltip-content>
 
                             <!--Glob Column-->
@@ -89,12 +90,12 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.id || entry.loc || "Output" }}</div>
                                 <div class="tc-body">
                                     <ct-tool-output-inspector
-                                            (save)="updateOutput(entry)"
-                                            [context]="context"
-                                            [model]="model"
-                                            [output]="entry"
-                                            [inputs]="inputs"
-                                            [readonly]="readonly">
+                                        (save)="updateOutput(entry)"
+                                        [context]="context"
+                                        [model]="model"
+                                        [output]="entry"
+                                        [inputs]="inputs"
+                                        [readonly]="readonly">
                                     </ct-tool-output-inspector>
                                 </div>
                             </ct-editor-inspector-content>
@@ -199,18 +200,18 @@ export class ToolOutputListComponent extends DirectiveBase {
         } else {
             newEntry = (this.parent as CommandLineToolModel).addOutput({});
         }
-        newEntry.isField       = this.isField;
-        newEntry.type.type     = "File";
+        newEntry.isField   = this.isField;
+        newEntry.type.type = "File";
 
         this.update.emit(this.model.outputs);
 
-        this.inspectorTemplate.changes
-            .take(1)
-            .delay(1)
-            .map(list => list.last)
-            .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry.loc);
-            });
+        this.inspectorTemplate.changes.pipe(
+            take(1),
+            delay(1),
+            map(list => list.last)
+        ).subscribe(templateRef => {
+            this.inspector.show(templateRef, newEntry.loc);
+        });
     }
 
     getFieldsLocation(index: number) {

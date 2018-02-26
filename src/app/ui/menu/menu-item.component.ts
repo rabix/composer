@@ -13,8 +13,9 @@ import {
 } from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
-import {Subscription} from "rxjs/Subscription";
 import {MenuItem} from "./menu-item";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -38,7 +39,7 @@ import {MenuItem} from "./menu-item";
 
     `
 })
-export class MenuItemComponent implements OnDestroy, AfterViewInit, OnInit {
+export class MenuItemComponent extends DirectiveBase implements OnDestroy, AfterViewInit, OnInit {
     @Input()
     item: MenuItem;
 
@@ -50,12 +51,10 @@ export class MenuItemComponent implements OnDestroy, AfterViewInit, OnInit {
 
     menuWidth: string;
 
-    subscriptions: Subscription[];
-
     constructor(private el: ElementRef) {
+        super();
         this.hover         = false;
         this.isDisabled    = false;
-        this.subscriptions = [];
     }
 
     ngOnInit() {
@@ -64,9 +63,12 @@ export class MenuItemComponent implements OnDestroy, AfterViewInit, OnInit {
         if (typeof isEnabled === "boolean") {
             this.isDisabled = !isEnabled;
         } else if (isEnabled instanceof Observable) {
-            this.subscriptions.push(isEnabled.distinctUntilChanged().subscribe(enabled => {
+
+            isEnabled.pipe(
+                distinctUntilChanged()
+            ).subscribeTracked(this, enabled => {
                 this.isDisabled = !enabled;
-            }));
+            });
         }
     }
 
@@ -93,10 +95,5 @@ export class MenuItemComponent implements OnDestroy, AfterViewInit, OnInit {
         } else if (typeof click === "function") {
             click(this.item);
         }
-    }
-
-
-    ngOnDestroy() {
-        this.subscriptions.forEach(sub => sub.unsubscribe);
     }
 }

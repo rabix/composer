@@ -16,6 +16,8 @@ import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {map, take, startWith, switchMap} from "rxjs/operators";
+import {empty} from "rxjs/observable/empty";
+import {combineLatest} from "rxjs/observable/combineLatest";
 
 @Component({
     selector: "ct-create-app-modal",
@@ -183,7 +185,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         this.toggleShowingAllProjects.pipe(
             startWith(false),
-            switchMap(() => Observable.combineLatest(
+            switchMap(() => combineLatest(
                 this.platformRepository.getOpenProjects(),
                 this.platformRepository.getProjects(),
             ), (shouldShowAll, projects) => ({shouldShowAll, projects})),
@@ -290,12 +292,15 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
 
         this.platformRepository.createApp(newAppID, JSON.stringify(app, null, 4)).then(() => {
 
-            this.platformRepository.getOpenProjects().switchMap(projects => {
-                if (~projects.indexOf(project)) {
-                    return Observable.empty();
-                }
-                return this.platformRepository.addOpenProjects([project], true);
-            }).take(1).toPromise();
+            this.platformRepository.getOpenProjects().pipe(
+                switchMap(projects => {
+                    if (~projects.indexOf(project)) {
+                        return empty();
+                    }
+                    return this.platformRepository.addOpenProjects([project], true);
+                }),
+                take(1)
+            ).toPromise();
 
             const tab = this.workbox.getOrCreateAppTab({
                 id: AppHelper.getRevisionlessID(newAppID),
@@ -320,7 +325,7 @@ export class CreateAppModalComponent extends DirectiveBase implements OnInit {
             return Promise.resolve(this.defaultFolder);
         }
 
-        return Observable.combineLatest(
+        return combineLatest(
             this.localRepository.getExpandedFolders(),
             this.localRepository.getLocalFolders()
         ).pipe(

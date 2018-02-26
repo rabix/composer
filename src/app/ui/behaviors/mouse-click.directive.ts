@@ -9,7 +9,7 @@ export class MouseClickDirective extends DirectiveBase implements OnInit {
     @Output("onMouseClick")
     clickEvent: EventEmitter<any> = new EventEmitter();
 
-    public el: Element;
+    el: Element;
 
     constructor(el: ElementRef, private domEvents: DomEventService) {
         super();

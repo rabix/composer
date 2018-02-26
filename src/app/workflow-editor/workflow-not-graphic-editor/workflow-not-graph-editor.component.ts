@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, Input, OnDestroy} from "@angular/core";
 import {WorkflowModel} from "cwlts/models";
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
-import {noop} from "../../lib/utils.lib";
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -196,9 +195,7 @@ export class WorkflowNotGraphEditorComponent implements OnDestroy {
     @Input()
     model: WorkflowModel;
 
-    public mockGraph = {
-        redraw: noop
-    };
+    mockGraph = {redraw: () => void 0};
 
     constructor(public inspector: EditorInspectorService) {
     }

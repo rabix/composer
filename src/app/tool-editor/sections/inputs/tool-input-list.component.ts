@@ -4,6 +4,7 @@ import {noop} from "rxjs/util/noop";
 import {EditorInspectorService} from "../../../editor-common/inspector/editor-inspector.service";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take, delay, map} from "rxjs/operators";
 
 @Component({
     selector: "ct-tool-input-list",
@@ -50,7 +51,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                             <!--ID Column-->
                             <div class="col-xs-4 ellipsis">
                                 <ct-validation-preview
-                                        [entry]="entry"></ct-validation-preview>
+                                    [entry]="entry"></ct-validation-preview>
                                 {{ entry.id }}
                             </div>
 
@@ -71,10 +72,10 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
                                 <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                 <div class="tc-body">
                                     <ct-tool-input-inspector
-                                            [model]="model"
-                                            [input]="entry"
-                                            (save)="updateInput($event, 'inspector')"
-                                            [readonly]="readonly">
+                                        [model]="model"
+                                        [input]="entry"
+                                        (save)="updateInput($event, 'inspector')"
+                                        [readonly]="readonly">
                                     </ct-tool-input-inspector>
                                 </div>
                             </ct-editor-inspector-content>
@@ -181,13 +182,13 @@ export class ToolInputListComponent extends DirectiveBase {
 
         this.update.emit(this.model.inputs);
 
-        this.inspectorTemplate.changes
-            .take(1)
-            .delay(1)
-            .map(list => list.last)
-            .subscribe(templateRef => {
-                this.inspector.show(templateRef, newEntry.loc);
-            });
+        this.inspectorTemplate.changes.pipe(
+            take(1),
+            delay(1),
+            map(list => list.last)
+        ).subscribe(templateRef => {
+            this.inspector.show(templateRef, newEntry.loc);
+        });
     }
 
     getFieldsLocation(index: number) {

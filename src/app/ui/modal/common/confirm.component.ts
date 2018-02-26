@@ -19,16 +19,16 @@ import {Subject} from "rxjs/Subject";
 export class ConfirmComponent {
 
     @Input()
-    public content: string;
+    content: string;
 
     @Input()
-    public cancellationLabel: string;
+    cancellationLabel: string;
 
     @Input()
-    public confirmationLabel: string;
+    confirmationLabel: string;
 
     @Output()
-    public decision = new Subject<boolean>();
+    decision = new Subject<boolean>();
 
     constructor() {
 

@@ -25,7 +25,7 @@ import {Component, Input} from "@angular/core";
 export class FormPanelComponent {
 
     @Input()
-    public collapsed = false;
+    collapsed = false;
 
     toggle() {
         this.collapsed = !this.collapsed;

@@ -3,7 +3,6 @@ import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {AuthCredentials} from "../../auth/model/auth-credentials";
 import {SystemService} from "../../platform-providers/system.service";
-import {SettingsService} from "../../services/settings/settings.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {GlobalService} from "../global/global.service";
@@ -65,8 +64,6 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     private rabixDocLink = "http://docs.rabix.io/rabix-composer-home";
 
-    hasWarning = false;
-
     active: AuthCredentials;
 
     userLabel: string;
@@ -75,13 +72,10 @@ export class SettingsMenuComponent extends DirectiveBase {
 
     constructor(public global: GlobalService,
                 private workbox: WorkboxService,
-                private settings: SettingsService,
                 private modal: ModalService,
                 private system: SystemService,
                 private auth: AuthService) {
         super();
-
-        settings.validity.subscribeTracked(this, isValid => this.hasWarning = !isValid);
 
         // Store the stream locally so we don't have a auth.getCredentials function call in the template
         this.credentials = auth.getCredentials();

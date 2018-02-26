@@ -5,6 +5,7 @@ import {PlatformRepositoryService} from "../repository/platform-repository.servi
 import {IpcService} from "../services/ipc.service";
 
 import {ExecutorService} from "./executor.service";
+import {of} from "rxjs/observable/of";
 
 describe("ExecutorService2", () => {
     beforeEach(() => {
@@ -19,7 +20,7 @@ describe("ExecutorService2", () => {
                 {
                     provide: LocalRepositoryService,
                     useValue: {
-                        getExecutorConfig: () => Observable.of({
+                        getExecutorConfig: () => of({
                             path: "/usr/local/bin/rabix"
                         })
                     }

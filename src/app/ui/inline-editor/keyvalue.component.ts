@@ -1,7 +1,8 @@
-import {Component, EventEmitter, forwardRef, Input, NgZone, Output, ViewEncapsulation} from "@angular/core";
+import {Component, EventEmitter, forwardRef, Input, Output, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {noop} from "../../lib/utils.lib";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {map, tap, distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -28,7 +29,7 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
                     <span class="input-group-addon">:</span>
                     <input class="form-control col-xs-5" formControlName="value" data-test="value-field" [placeholder]="valueLabel"/>
                     <span class="input-group-btn">
-                        <button (click)="remove(i)" 
+                        <button (click)="remove(i)"
                                 type="button"
                                 class="input-group-addon btn btn-secondary"
                                 data-test="remove-entry-button">
@@ -56,9 +57,9 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
     @Input()
     valueLabel = "value";
 
-    public list: { key: string, value: string }[] = [];
+    list: { key: string, value: string }[] = [];
 
-    public formGroup = new FormGroup({
+    formGroup = new FormGroup({
         pairs: new FormArray([])
     });
 
@@ -67,11 +68,7 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
     private onChangeCallback = noop;
 
     @Output()
-    public change = new EventEmitter();
-
-    constructor(private zone: NgZone) {
-        super();
-    }
+    change = new EventEmitter();
 
     add() {
         this.list = this.list.concat({key: "", value: ""});
@@ -96,16 +93,17 @@ export class KeyvalueComponent extends DirectiveBase implements ControlValueAcce
     }
 
     ngAfterViewInit() {
-        this.formGroup.valueChanges
-            .map(ch => ch.pairs)
-            .do(pairs => this.list = pairs)
-            .distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
-            .map(pairs => pairs
+        this.formGroup.valueChanges.pipe(
+            map(ch => ch.pairs),
+            tap(pairs => this.list = pairs),
+            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+            map(pairs => pairs
                 .filter(i => i.key.trim())
-                .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.toString().trim()}}), {}))
-            .subscribe(val => {
-                this.onChangeCallback(Object.keys(val).map((keys) => ({"id": keys, "label": val[keys]})));
-            });
+                .reduce((acc, item) => ({...acc, ...{[item.key.trim()]: item.value.toString().trim()}}), {})
+            )
+        ).subscribeTracked(this, val => {
+            this.onChangeCallback(Object.keys(val).map((keys) => ({"id": keys, "label": val[keys]})));
+        });
     }
 
     writeValue(obj: any): void {

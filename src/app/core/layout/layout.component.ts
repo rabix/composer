@@ -4,8 +4,7 @@ import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {LayoutService} from "./layout.service";
-
-import {PANEL_LOCAL_FILES, PANEL_PUBLIC_APPS, PANEL_STRUCTURE, PANEL_USER_PROJECTS, PanelGroup, PanelStatus} from "./layout.types";
+import {map} from "rxjs/operators";
 
 @Component({
     selector: "ct-layout",
@@ -43,11 +42,11 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
 
     /** Flex ratio of the left part of the layout */
     @Input()
-    public treeSize = 1;
+    treeSize = 1;
 
     /** Flex ratio of the document part of the layout */
     @Input()
-    public tabsSize = 4;
+    tabsSize = 4;
 
     /** Draggable column separator, handled via it's native element reference */
     @ViewChild("handle")
@@ -65,24 +64,14 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
         super();
 
         this.el = el.nativeElement;
-
-        const top = new PanelGroup([
-            new PanelStatus(PANEL_LOCAL_FILES, "1: Local Files", "folder", false, "alt+1"),
-            new PanelStatus(PANEL_USER_PROJECTS, "2: Projects", "folder", false, "alt+2"),
-            new PanelStatus(PANEL_PUBLIC_APPS, "3: Public Apps", "code", false, "alt+3"),
-        ]);
-
-        const bottom = new PanelGroup([
-            new PanelStatus(PANEL_STRUCTURE, "7: Structure", "list", false, "alt+7")
-        ]);
     }
 
     ngOnInit() {
         this.statusBar.host = this.statusBarComponent;
 
         // Layout is resizable, so we need to react when user drags the handle
-        this.tracked = this.domEvents.onMove(this.handle.nativeElement)
-            .map(ev => {
+        this.domEvents.onMove(this.handle.nativeElement).pipe(
+            map(ev => {
                 const x = ev.clientX;
 
                 // You can't make the left column narrower than 200px
@@ -100,7 +89,8 @@ export class LayoutComponent extends DirectiveBase implements OnInit {
 
                 // Otherwise, return how wide the left column should be
                 return x;
-            }).subscribe(x => {
+            })
+        ).subscribeTracked(this, x => {
                 // Take the width of the window
                 const docWidth = document.body.clientWidth;
                 // Set tree width to the given x

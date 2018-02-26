@@ -1,5 +1,4 @@
 import {Component, ViewContainerRef, ViewEncapsulation} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {AuthService} from "../../auth/auth.service";
 import {GlobalService} from "../../core/global/global.service";
 import {OpenExternalFileService} from "../../core/open-external-file/open-external-file.service";
@@ -9,8 +8,8 @@ import {IpcService} from "../../services/ipc.service";
 import {JavascriptEvalService} from "../../services/javascript-eval/javascript-eval.service";
 import {ContextService} from "../../ui/context/context.service";
 import {ModalService} from "../../ui/modal/modal.service";
-import {UrlValidator} from "../../validators/url.validator";
 import {DomEventService} from "../../services/dom/dom-event.service";
+import {filter, take} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -18,18 +17,13 @@ import {DomEventService} from "../../services/dom/dom-event.service";
     selector: "ct-cottontail",
     template: `
         <ct-layout data-test="layout"></ct-layout>
-        <div id="runnix" [class.active]="runnix | async"></div>
-
     `,
     styleUrls: ["./main.component.scss"],
     providers: [
-        UrlValidator,
         ContextService
     ],
 })
 export class MainComponent {
-
-    public runnix: Observable<boolean>;
 
     constructor(modal: ModalService,
                 domService: DomEventService,
@@ -51,11 +45,14 @@ export class MainComponent {
         openExternalFileService.watchDeepLinks();
 
         // When we first get active credentials (might be undefined if no user is active), sync data with the platform
-        auth.getActive().take(1).filter(creds => {
-            // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
-            // The cli arg is a useful testing facility.
-            return creds && electron.getRemote().process.argv.indexOf("--no-fetch-on-start") === -1;
-        }).subscribe(() => {
+        auth.getActive().pipe(
+            take(1),
+            filter(creds => {
+                // Stop if there are either no credentials, or we have the --no-fetch-on-start argument passed to the chromium cli
+                // The cli arg is a useful testing facility.
+                return creds && electron.getRemote().process.argv.indexOf("--no-fetch-on-start") === -1;
+            })
+        ).subscribe(() => {
             global.reloadPlatformData();
         });
 
@@ -79,10 +76,5 @@ export class MainComponent {
         ipc.watch("accelerator", "showAboutPageModal").subscribe(() => {
             global.showAboutPageModal();
         });
-
-        this.runnix = Observable.fromEvent(document, "keyup").map((e: KeyboardEvent) => e.keyCode).bufferCount(10, 1)
-            .filter(seq => seq.toString() === [38, 38, 40, 40, 37, 39, 37, 39, 66, 65].toString())
-            .map(seq => Observable.of(true).concat(Observable.of(false).delay(3000)))
-            .concatAll();
     }
 }

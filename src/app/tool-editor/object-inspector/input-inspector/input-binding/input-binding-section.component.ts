@@ -4,6 +4,7 @@ import {CommandInputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {V1CommandInputParameterModel} from "cwlts/models/v1.0";
+import {distinctUntilChanged, debounceTime} from "rxjs/operators";
 
 @Component({
     selector: "ct-input-binding-section",
@@ -152,10 +153,10 @@ export class InputBindingSectionComponent extends DirectiveBase implements Contr
     }
 
     listenToInputBindingFormChanges(): void {
-        this.tracked = this.form.valueChanges
-            .distinctUntilChanged()
-            .debounceTime(300)
-            .subscribe(form => {
+        this.form.valueChanges.pipe(
+            distinctUntilChanged(),
+            debounceTime(300)
+        ).subscribeTracked(this, form => {
                 if (form.position !== undefined) {
                     this.input.inputBinding.position = parseInt(form.position, 10) || 0;
                 }

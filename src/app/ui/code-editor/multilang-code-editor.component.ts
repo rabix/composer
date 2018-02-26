@@ -37,11 +37,11 @@ import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
 })
 export class MultilangCodeEditorComponent {
     @Output()
-    public action = new Subject<"close" | "save">();
+    action = new Subject<"close" | "save">();
 
-    public content = new BehaviorSubject<string>("");
+    content = new BehaviorSubject<string>("");
 
-    public language = new BehaviorSubject<string>("text");
+    language = new BehaviorSubject<string>("text");
 
     languages = Object.keys(ACE_MODE_MAP)
         .map(key => ACE_MODE_MAP[key])

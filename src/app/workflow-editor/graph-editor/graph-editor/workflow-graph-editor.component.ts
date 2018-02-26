@@ -27,7 +27,6 @@ import {
 
 import {StepModel, WorkflowFactory, WorkflowInputParameterModel, WorkflowModel, WorkflowOutputParameterModel} from "cwlts/models";
 import {Process} from "cwlts/models/generic/Process";
-import {Observable} from "rxjs/Observable";
 import {DataGatewayService} from "../../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../../core/helpers/AppHelper";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
@@ -46,6 +45,8 @@ import {SvgDumper} from "../svg-dumper/svg-dumper";
 import {UpdatePlugin} from "../update-plugin/update-plugin";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {filter, take} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
 
 @Component({
     selector: "ct-workflow-graph-editor",
@@ -185,29 +186,29 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.selectedElement = ev;
         });
 
-        this.tracked = this.ipc.watch("accelerator", "CmdOrCtrl+Z")
-            .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canUndo())
-            .subscribe(() => {
+        this.ipc.watch("accelerator", "CmdOrCtrl+Z").pipe(
+            filter(() => this.canvasIsInFocus() && this.workflowEditorService.canUndo())
+        ).subscribeTracked(this, () => {
 
-                this.modelChangedFromHistory = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
+            this.modelChangedFromHistory = WorkflowFactory.from(this.workflowEditorService.historyUndo(this.model));
 
-                // Resets the reference of inspected node (reference is lost after model serialization)
-                this.resetInspectedNodeReference();
+            // Resets the reference of inspected node (reference is lost after model serialization)
+            this.resetInspectedNodeReference();
 
-                this.modelChange.next(this.modelChangedFromHistory);
-            });
+            this.modelChange.next(this.modelChangedFromHistory);
+        });
 
-        this.tracked = this.ipc.watch("accelerator", "Shift+CmdOrCtrl+Z")
-            .filter(() => this.canvasIsInFocus() && this.workflowEditorService.canRedo())
-            .subscribe(() => {
+        this.ipc.watch("accelerator", "Shift+CmdOrCtrl+Z").pipe(
+            filter(() => this.canvasIsInFocus() && this.workflowEditorService.canRedo())
+        ).subscribeTracked(this, () => {
 
-                this.modelChangedFromHistory = WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
+            this.modelChangedFromHistory = WorkflowFactory.from(this.workflowEditorService.historyRedo(this.model));
 
-                // Resets the reference of inspected node (reference is lost after model serialization)
-                this.resetInspectedNodeReference();
+            // Resets the reference of inspected node (reference is lost after model serialization)
+            this.resetInspectedNodeReference();
 
-                this.modelChange.next(this.modelChangedFromHistory);
-            });
+            this.modelChange.next(this.modelChangedFromHistory);
+        });
     }
 
     /**
@@ -340,17 +341,16 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
         fetch.then(result => this.gateway.resolveContent(result, nodeData.name).toPromise())
             .then(resolved => {
-                return this.appValidator.createValidator(Observable.of(JSON.stringify(resolved)))
-                    .filter(val => !val.isPending)
-                    .take(1)
-                    .toPromise()
-                    .then(val => {
-                        if (val.isValidCWL) {
-                            return resolved;
-                        }
+                return this.appValidator.createValidator(of(JSON.stringify(resolved))).pipe(
+                    filter(val => !val.isPending),
+                    take(1)
+                ).toPromise().then(val => {
+                    if (val.isValidCWL) {
+                        return resolved;
+                    }
 
-                        throw new Error("App did not pass JSON schema validation");
-                    });
+                    throw new Error("App did not pass JSON schema validation");
+                });
             })
             .then((resolved: Process) => {
 

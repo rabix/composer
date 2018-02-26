@@ -1,15 +1,5 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component, EventEmitter,
-    HostBinding,
-    Input,
-    OnInit,
-    Output,
-    ViewChild
-} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild} from "@angular/core";
 import {FormControl} from "@angular/forms";
-import {Observable} from "rxjs/Observable";
 import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.component";
 import {AceEditorOptions} from "../../ui/code-editor/code-editor.component";
 import {ModalService} from "../../ui/modal/modal.service";
@@ -17,6 +7,8 @@ import {TreeNode} from "../../ui/tree-view/tree-node";
 import {TreeViewComponent} from "../../ui/tree-view/tree-view.component";
 import {TreeViewService} from "../../ui/tree-view/tree-view.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {of} from "rxjs/observable/of";
+import {tap, debounceTime, filter, distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-expression-editor",
@@ -118,29 +110,30 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
             enableBasicAutocompletion: true,
         };
 
-        this.editorControl.valueChanges
-            .do(() => this.disableSave = true)
-            .debounceTime(500)
-            .filter(e => typeof e === "string")
-            .distinctUntilChanged()
-            .subscribeTracked(this, content => {
-                this.evaluator(content).then((res: any) => {
-                    this.status = null;
-                    this.disableSave = false;
+        this.editorControl.valueChanges.pipe(
+            tap(() => this.disableSave = true),
+            debounceTime(500),
+            filter(e => typeof e === "string"),
+            distinctUntilChanged()
+        ).subscribeTracked(this, content => {
 
-                    if (typeof res === "object") {
-                        this.status = res.type;
-                        res         = res.message;
-                    }
+            this.evaluator(content).then((res: any) => {
+                this.status      = null;
+                this.disableSave = false;
 
-                    this.previewControl.setValue(res);
+                if (typeof res === "object") {
+                    this.status = res.type;
+                    res         = res.message;
+                }
 
-                    // signaling to Angular that a change in this.status has occurred,
-                    // so it can set the appropriate class on the preview
-                    this.cdr.detectChanges();
-                    this.cdr.markForCheck();
-                });
+                this.previewControl.setValue(res);
+
+                // signaling to Angular that a change in this.status has occurred,
+                // so it can set the appropriate class on the preview
+                this.cdr.detectChanges();
+                this.cdr.markForCheck();
             });
+        });
 
         this.editorControl.setValue(this.code);
         this.contextNodes = this.transformContext(this.context);
@@ -202,7 +195,7 @@ export class ExpressionEditorComponent extends DirectiveBase implements OnInit, 
 
             if (type === "object" || type === "array") {
                 node.isExpandable = true;
-                node.children     = Observable.of(wrap(contextItem, trace));
+                node.children     = of(wrap(contextItem, trace));
             }
 
             node.id = trace.split(".").map(p => (parseInt(p, 10).toString() === p) ? `[${p}]` : p).join(".")

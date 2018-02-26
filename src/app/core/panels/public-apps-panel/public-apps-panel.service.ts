@@ -10,6 +10,8 @@ import {TreeNode} from "../../../ui/tree-view/tree-node";
 import {AppHelper} from "../../helpers/AppHelper";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {AppsPanelService} from "../common/apps-panel.service";
+import {of} from "rxjs/observable/of";
+import {map} from "rxjs/operators";
 
 @Injectable()
 export class PublicAppsPanelService extends AppsPanelService {
@@ -26,119 +28,128 @@ export class PublicAppsPanelService extends AppsPanelService {
 
         super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr, native);
 
-        this.apps = platformRepository.getPublicApps().map(apps => {
-            return (apps || []);
-        });
+        this.apps = platformRepository.getPublicApps().pipe(
+            map(apps => apps || [])
+        );
     }
 
     getAppsByNone(): Observable<TreeNode<any>[]> {
-        return this.apps.map((array) => {
-            return array.slice().sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
-                .map(app => this.makeAppTreeNode(app));
-        });
+        return this.apps.pipe(
+            map(array => array.slice()
+                .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+                .map(app => this.makeAppTreeNode(app))
+            )
+        );
     }
 
     getAppsGroupedByToolkit(): Observable<TreeNode<any>[]> {
-        return this.apps.map(apps => {
+        return this.apps.pipe(
+            map(apps => {
 
-            const toolkits = apps.reduce((acc, app) => {
-                const tk        = (app.raw && app.raw["sbg:toolkit"]) || "";
-                const tkVersion = (app.raw && app.raw["sbg:toolkitVersion"]) || "";
+                const toolkits = apps.reduce((acc, app) => {
+                    const tk        = (app.raw && app.raw["sbg:toolkit"]) || "";
+                    const tkVersion = (app.raw && app.raw["sbg:toolkitVersion"]) || "";
 
-                const fullToolkitName = `${tk} ${tkVersion}`.trim();
+                    const fullToolkitName = `${tk} ${tkVersion}`.trim();
 
-                if (!acc[fullToolkitName]) {
-                    acc[fullToolkitName] = [];
-                }
-
-                acc[fullToolkitName].push(app);
-
-                return acc;
-            }, {});
-
-            const folderNodes  = [];
-            const freeAppNodes = [];
-
-            Object.keys(toolkits)
-                .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-                .forEach(toolkit => {
-
-                    const appNodes = toolkits[toolkit]
-                        .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
-                        .map(app => this.makeAppTreeNode(app));
-
-                    if (toolkit === "") {
-                        freeAppNodes.push(...appNodes);
-                        return;
+                    if (!acc[fullToolkitName]) {
+                        acc[fullToolkitName] = [];
                     }
 
-                    const nodeID = `__toolkit/${toolkit}`;
+                    acc[fullToolkitName].push(app);
 
-                    folderNodes.push({
-                        id: nodeID,
-                        type: "toolkit",
-                        label: toolkit,
-                        isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(nodeID) !== -1),
-                        isExpandable: true,
-                        icon: "fa-folder",
-                        children: Observable.of(appNodes)
+                    return acc;
+                }, {});
+
+                const folderNodes  = [];
+                const freeAppNodes = [];
+
+                Object.keys(toolkits)
+                    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+                    .forEach(toolkit => {
+
+                        const appNodes = toolkits[toolkit]
+                            .sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+                            .map(app => this.makeAppTreeNode(app));
+
+                        if (toolkit === "") {
+                            freeAppNodes.push(...appNodes);
+                            return;
+                        }
+
+                        const nodeID = `__toolkit/${toolkit}`;
+
+                        folderNodes.push({
+                            id: nodeID,
+                            type: "toolkit",
+                            label: toolkit,
+                            isExpanded: this.platformRepository.getExpandedNodes().pipe(
+                                map(list => (list || []).indexOf(nodeID) !== -1)
+                            ),
+                            isExpandable: true,
+                            icon: "fa-folder",
+                            children: of(appNodes)
+                        });
                     });
-                });
 
-            return [...folderNodes, ...freeAppNodes];
-        });
+                return [...folderNodes, ...freeAppNodes];
+            })
+        );
     }
 
     getAppsGroupedByCategory(): Observable<TreeNode<any>[]> {
-        return this.apps.map(apps => {
+        return this.apps.pipe(
+            map(apps => {
 
+                const categories = apps.reduce((acc, app) => {
+                    const appCategories = (app.raw && app.raw["sbg:categories"]) || ["__uncategorized__"];
 
-            const categories = apps.reduce((acc, app) => {
-                const appCategories = (app.raw && app.raw["sbg:categories"]) || ["__uncategorized__"];
+                    appCategories.forEach(category => {
+                        if (!acc[category]) {
+                            acc[category] = [];
+                        }
 
-                appCategories.forEach(category => {
-                    if (!acc[category]) {
-                        acc[category] = [];
-                    }
-
-                    acc[category].push(app);
-                });
-
-                return acc;
-
-            }, {});
-
-            const folderNodes           = [];
-            const uncategorizedAppNodes = [];
-
-            Object.keys(categories)
-                .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-                .forEach(category => {
-
-                    const appNodes = categories[category]
-                        .map(app => this.makeAppTreeNode(app))
-                        .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-
-                    if (category === "__uncategorized__") {
-                        uncategorizedAppNodes.push(...appNodes);
-                        return;
-                    }
-
-                    const nodeID = `__category/${category}`;
-                    folderNodes.push({
-                        id: nodeID,
-                        type: "category",
-                        label: category,
-                        isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(nodeID) !== -1),
-                        isExpandable: true,
-                        children: Observable.of(appNodes),
-                        icon: "fa-folder",
-                        iconExpanded: "fa-folder-open"
+                        acc[category].push(app);
                     });
-                });
 
-            return [...folderNodes, ...uncategorizedAppNodes];
-        });
+                    return acc;
+
+                }, {});
+
+                const folderNodes           = [];
+                const uncategorizedAppNodes = [];
+
+                Object.keys(categories)
+                    .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+                    .forEach(category => {
+
+                        const appNodes = categories[category]
+                            .map(app => this.makeAppTreeNode(app))
+                            .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+
+                        if (category === "__uncategorized__") {
+                            uncategorizedAppNodes.push(...appNodes);
+                            return;
+                        }
+
+                        const nodeID = `__category/${category}`;
+                        folderNodes.push({
+                            id: nodeID,
+                            type: "category",
+                            label: category,
+                            isExpanded: this.platformRepository.getExpandedNodes().pipe(
+                                map(list => (list || []).indexOf(nodeID) !== -1)
+                            ),
+                            isExpandable: true,
+                            children: of(appNodes),
+                            icon: "fa-folder",
+                            iconExpanded: "fa-folder-open"
+                        });
+                    });
+
+                return [...folderNodes, ...uncategorizedAppNodes];
+            })
+        );
     }
 
     private makeAppTreeNode(app: App): TreeNode<App> {

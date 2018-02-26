@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
 import {Guid} from "./guid.service";
 import {IPC_EOS_MARK} from "../../../electron/src/constants";
+import {takeUntil, filter} from "rxjs/operators";
 
 enum RequestType {
     Once,
@@ -63,13 +64,14 @@ export type IPCListeners =
 export class IpcService {
 
     private ipcRenderer = window["require"]("electron").ipcRenderer;
+
     private pendingRequests: {
         [id: string]: {
             type: RequestType,
             stream: Subject<any>,
             zone?: NgZone
         }
-    }                   = {};
+    } = {};
 
     constructor(@Optional() private zone: NgZone) {
         this.ipcRenderer.on("data-reply", (sender, response) => {
@@ -147,13 +149,14 @@ export class IpcService {
 
         const incomingMessages = this.pendingRequests[messageID].stream;
 
-        const clientObservable = new Observable(observer => {
+        return new Observable(observer => {
 
             // Proxy all messages from the IPC channel to this observable
-            const msgSubscription = incomingMessages
-            // Complete when the “$$EOS$$” message comes in
-                .takeUntil(incomingMessages.filter(v => v === IPC_EOS_MARK))
-                .subscribe(observer);
+            const msgSubscription = incomingMessages.pipe(
+                takeUntil(incomingMessages.pipe(
+                    filter(v => v === IPC_EOS_MARK)
+                ))
+            ).subscribe(observer);
 
 
             return () => {
@@ -165,7 +168,5 @@ export class IpcService {
                 msgSubscription.unsubscribe();
             };
         });
-
-        return clientObservable;
     }
 }

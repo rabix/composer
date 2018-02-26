@@ -6,11 +6,11 @@ const {shell, webFrame} = window["require"]("electron");
 @Injectable()
 export class ElectronSystemService extends SystemService {
 
-    public boot() {
+    boot() {
         webFrame.setZoomLevelLimits(1, 1);
     }
 
-    public openLink(url: string, event?: MouseEvent) {
+    openLink(url: string, event?: MouseEvent) {
         if (event) {
             event.preventDefault();
         }
