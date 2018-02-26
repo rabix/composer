@@ -1,4 +1,6 @@
-import {AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation} from "@angular/core";
+import {
+    AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren, ViewEncapsulation
+} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
@@ -7,7 +9,9 @@ import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.
 import {ModalService} from "../../../../ui/modal/modal.service";
 import {merge} from "rxjs/observable/merge";
 import {of} from "rxjs/observable/of";
-import {map, distinctUntilChanged, filter} from "rxjs/operators";
+import {map, distinctUntilChanged, filter, take} from "rxjs/operators";
+import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -110,7 +114,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
+    constructor(private formBuilder: FormBuilder,
+                private modal: ModalService,
+                @Inject(AppMetaManagerToken) private appMetaManager: AppMetaManager) {
         super();
     }
 
@@ -146,11 +152,28 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             if (this.input.id !== value) {
                 try {
+
+                    const oldId = this.input.id;
+
                     this.model.changeIOId(this.input, value);
 
                     if (this.isType("enum") || this.isType("record")) {
                         this.input.type.name = value;
                     }
+
+                    // If input id is changed we should migrate related job key
+                    this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
+
+                        const jobValue = job[oldId];
+
+                        delete job[oldId];
+
+                        job[value] = jobValue;
+
+                        this.appMetaManager.patchAppMeta("job", job);
+
+                    });
+
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
@@ -185,6 +208,15 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             if (this.isType("enum") || this.isType("record")) {
                 this.input.type.name = this.input.id;
             }
+
+            // If type is changed nullify job value for that input
+            this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
+
+                job[this.input.id] = null;
+
+                this.appMetaManager.patchAppMeta("job", job);
+
+            });
 
         });
 

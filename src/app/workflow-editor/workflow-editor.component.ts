@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
 import * as Yaml from "js-yaml";
-import {APP_META_MANAGER, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
+import {AppMetaManagerToken, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
 import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
@@ -26,7 +26,6 @@ import {FileRepositoryService} from "../file-repository/file-repository.service"
 import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
 import {Store} from "@ngrx/store";
-import {AuthCredentials} from "../auth/model/auth-credentials";
 import {AuthService} from "../auth/auth.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
@@ -46,7 +45,7 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             useFactory: appSaverFactory,
             deps: [WorkflowEditorComponent, IpcService, ModalService, PlatformRepositoryService]
         }, {
-            provide: APP_META_MANAGER,
+            provide: AppMetaManagerToken,
             useFactory: appMetaManagerFactory,
             deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
         },
