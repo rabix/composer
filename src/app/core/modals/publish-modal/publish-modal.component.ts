@@ -118,7 +118,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         }, null, FormAsyncValidator.debounceValidator((group: FormGroup) => {
             const {id, project} = group.getRawValue();
 
-            const appID = `${project}/${this.slugify.transform(id.toLowerCase())}/0`;
+            const appID = `${project}/${this.slugify.transform(id)}/0`;
 
             return this.dataGateway.fetchFileContent(appID, true).toPromise().then((app: any) => {
                 this.revision = app["sbg:latestRevision"] + 1;
@@ -141,7 +141,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
         ).subscribe(() => {
             const {id, project} = this.inputForm.getRawValue();
             this.outputForm.patchValue({
-                appID: `${project}/${this.slugify.transform(id.toLowerCase())}/${this.revision}`
+                appID: `${project}/${this.slugify.transform(id)}/${this.revision}`
             });
         });
 
@@ -189,7 +189,7 @@ export class PublishModalComponent extends DirectiveBase implements OnInit {
          * All special characters should be replaced with hyphens,
          * and leading and trailing hyphens should then be removed
          */
-        return unidecode(id).replace(/[^a-z1-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
+        return unidecode(id).replace(/[^a-z1-9]+/gi, "-").replace(/^-|-$/g, "");
     }
 
     close() {
