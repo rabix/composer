@@ -37,7 +37,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() workflowModel: WorkflowModel;
 
-    @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
+    @Input() stepInputs: Array<WorkflowStepInputModel> = [];
 
     @Input() relativePathRoot?: string;
 
@@ -263,7 +263,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     }
 
-    enableEditing(input: InputParameterModel): void {
+    enableEditing(input: WorkflowStepInputModel): void {
 
         const inputFormField = this.jobGroup.get(input.source[0]);
 
