@@ -1,5 +1,6 @@
 import {Component, forwardRef, Input, ViewEncapsulation} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {first} from "rxjs/operators";
 import {ExpressionModel} from "cwlts/models";
 import {ModelExpressionEditorComponent} from "../../../editor-common/expression-editor/model-expression-editor.component";
 import {noop} from "../../../lib/utils.lib";
@@ -172,7 +173,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
 
             editor.model   = this.model.clone();
             editor.context = this.context;
-            editor.submit.first().subscribe(() => {
+            editor.submit.pipe(first()).subscribe(() => {
 
                 const val = editor.model.serialize();
 
