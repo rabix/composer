@@ -37,7 +37,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() workflowModel: WorkflowModel;
 
-    @Input() stepInputs: Array<WorkflowStepInputModel> = [];
+    @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
 
     @Input() relativePathRoot?: string;
 
@@ -67,7 +67,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         for (const controlName in this.jobGroup.controls) {
 
             const control = this.jobGroup.get(controlName);
-            const kval    = this.jobValue[controlName];
+            const kval = this.jobValue[controlName];
 
             if (kval === null || kval === undefined) {
                 control.disable({emitEvent: false, onlySelf: true});
@@ -154,7 +154,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
         // Get top level id from prefix
         const inputId = prefix.split(".")[0];
-        const input   = this.stepInputs.find(i => i.id === inputId);
+        const input = this.stepInputs.find(i => i.id === inputId);
 
         this.change.emit({
             input,
@@ -193,6 +193,19 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         inputControl.setValue(null);
     }
 
+    getInputSource(input: InputParameterModel) {
+
+        if (input instanceof WorkflowStepInputModel) {
+            const inputSource = input.source[0];
+            // Remove # if it exists on the beginning
+            return inputSource[0] === "#" ? inputSource.substring(1) : inputSource;
+        }
+
+        if (input instanceof WorkflowInputParameterModel) {
+            return input.id;
+        }
+    }
+
     private recreateForms(): void {
 
         for (const ctrl in this.jobGroup.controls) {
@@ -214,7 +227,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             grouped[group].push(input);
 
             const control = new FormControl();
-            this.jobGroup.addControl(input.source[0], control);
+            this.jobGroup.addControl(this.getInputSource(input), control);
 
             if (input.type.type === "array") {
                 control.setValue([], {emitEvent: false});
@@ -263,15 +276,14 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     }
 
-    enableEditing(input: WorkflowStepInputModel): void {
+    enableEditing(input: WorkflowInputParameterModel | WorkflowStepInputModel): void {
 
-        const inputFormField = this.jobGroup.get(input.source[0]);
-
+        const inputFormField = this.jobGroup.get(this.getInputSource(input));
 
         let value;
 
         const isArray = input.type.type === "array";
-        const type    = input.type.items || input.type.type;
+        const type = input.type.items || input.type.type;
 
         if (type !== "File" && type !== "Directory") {
             inputFormField.enable({onlySelf: true});
@@ -320,7 +332,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     isFileOrDirectory(input: WorkflowStepInputModel) {
-        const type      = input.type.type;
+        const type = input.type.type;
         const itemsType = input.type.items;
 
         return type === "File" || type === "Directory" || itemsType === "File" || itemsType === "Directory";

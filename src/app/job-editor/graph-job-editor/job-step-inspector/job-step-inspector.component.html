@@ -14,7 +14,7 @@
                         <!--Label and port options-->
                         <div class="input-title flex-baseline">
 
-                            <label class="input-label" title="{{ input.label || input.source[0] }}">
+                            <label class="input-label" title="{{ input.label || getInputSource(input) }}">
 
                                 <span *ngIf="!input.type.isNullable" class="text-danger">*</span>
 
@@ -24,7 +24,7 @@
                                    tooltipPlacement="top">
                                 </i>
 
-                                {{ input.label || input.source[0] }}
+                                {{ input.label || getInputSource(input) }}
 
                                 <span class="text-muted">({{input.type.type}})</span>
 
@@ -40,7 +40,7 @@
 
                                 <ng-template #menu class="mr-1">
                                     <ul class="list-unstyled" (click)="portChangeDropDown.hide()">
-                                        <li (click)="clear(jobGroup.get(input.source[0]))">
+                                        <li (click)="clear(jobGroup.get(getInputSource(input)))">
                                             Set values to null
                                         </li>
                                     </ul>
@@ -51,8 +51,8 @@
                         </div>
 
                         <!--Input-->
-                        <ct-job-step-inspector-entry *ngIf="jobGroup.get(input.source[0]).enabled"
-                                                     [formControl]="jobGroup.get(input.source[0])"
+                        <ct-job-step-inspector-entry *ngIf="jobGroup.get(getInputSource(input)).enabled"
+                                                     [formControl]="jobGroup.get(getInputSource(input))"
                                                      [relativePathRoot]="relativePathRoot"
                                                      [inputType]="input.type.type"
                                                      [inputArrayItemsType]="input.type.items"
@@ -61,7 +61,7 @@
                                                      class="mb-0">
                         </ct-job-step-inspector-entry>
 
-                        <div *ngIf="jobGroup.get(input.source[0]).disabled" class="text-xl-center mb-1">
+                        <div *ngIf="jobGroup.get(getInputSource(input)).disabled" class="text-xl-center mb-1">
                             <p class="text-muted">No values have been specified for this input</p>
                             <button class="btn btn-primary" type="button" (click)="enableEditing(input)">
                                 {{ isFileOrDirectory(input) ? "Browse" : "Set Value" }}
@@ -95,7 +95,7 @@
                         <!--Tooltip-->
                         <ct-tooltip-content [maxWidth]="500" #ctt>
 
-                            <h4>{{input.label || input.source[0]}}</h4>
+                            <h4>{{input.label || getInputSource(input)}}</h4>
 
                             <!--Description-->
                             <div>
