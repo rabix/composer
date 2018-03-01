@@ -44,7 +44,7 @@ export class ModalService {
     }
 
     fromComponent<T>(component: { new(...args: any[]): T; }, title?: string): T;
-    fromComponent<T>(component: { new(...args: any[]): T; }, options?: Partial<ModalOptions>);
+    fromComponent<T>(component: { new(...args: any[]): T; }, options?: Partial<ModalOptions>): T;
     fromComponent<T>(component: { new(...args: any[]): T; }, options?: Partial<ModalOptions> | string, instanceProperties?: Partial<T>): T;
     fromComponent<T>(...args: any[]): T {
 

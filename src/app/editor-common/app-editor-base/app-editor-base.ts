@@ -457,10 +457,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
 
         modal.appName = label;
-        return modal.response.take(1).toPromise().then(response => {
+        return modal.response.pipe(
+            take(1)
+        ).toPromise().then(response => {
             this.toggleLock(false);
             return response;
-        }, err => console.warn);
+        }, () => void 0);
     }
 
     /**
