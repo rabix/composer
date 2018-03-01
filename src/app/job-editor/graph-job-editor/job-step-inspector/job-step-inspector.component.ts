@@ -195,7 +195,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     private recreateForms(): void {
 
-        for (let ctrl in this.jobGroup.controls) {
+        for (const ctrl in this.jobGroup.controls) {
             this.jobGroup.removeControl(ctrl);
         }
 
@@ -214,7 +214,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             grouped[group].push(input);
 
             const control = new FormControl();
-            this.jobGroup.addControl(input.id, control);
+            this.jobGroup.addControl(input.source[0], control);
 
             if (input.type.type === "array") {
                 control.setValue([], {emitEvent: false});
@@ -265,7 +265,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     enableEditing(input: InputParameterModel): void {
 
-        const inputFormField = this.jobGroup.get(input.id);
+        const inputFormField = this.jobGroup.get(input.source[0]);
 
 
         let value;
