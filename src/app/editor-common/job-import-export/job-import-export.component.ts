@@ -14,6 +14,8 @@ import {CodeEditorComponent} from "../../ui/code-editor-new/code-editor.componen
 import {ModalService} from "../../ui/modal/modal.service";
 import {stringifyObject} from "../../helpers/yaml-helper";
 
+const path = require("path");
+
 type JobFormat = "json" | "yaml";
 
 @Component({
@@ -127,11 +129,29 @@ export class JobImportExportComponent implements OnInit, OnChanges {
     }
 
     chooseImportFile() {
+        let importFilePath;
+
         this.native.openFileChoiceDialog().then(paths => {
+            importFilePath = paths[0];
             return this.fileRepository.fetchFile(paths[0], true);
         }).then(content => {
             return Yaml.safeLoad(content, {json: true} as LoadOptions);
         }).then(jobObject => {
+            const appDirName = path.dirname(this.appID);
+
+            // Change File/Directory paths to be relative to app path
+            Object.keys(jobObject).forEach((key) => {
+                const inputPath = jobObject[key].path;
+
+                // If File/Directory
+                if (inputPath) {
+                    const inputAbsolutePath = path.isAbsolute(inputPath) ? inputPath
+                        : path.resolve(path.dirname(importFilePath), inputPath);
+
+                    jobObject[key].path = path.relative(appDirName, inputAbsolutePath);
+                }
+            });
+
             this.import.emit(jobObject);
         }).catch(err => {
             if (err) {
