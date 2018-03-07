@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, Inject, OnChanges} from "@angular/core";
+import {Component, Input, OnInit, Output, Inject} from "@angular/core";
 import {FormGroup, FormControl} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
@@ -8,7 +8,7 @@ import {InputTestValueChangeAction} from "../../reducers/actions";
 import {AppInfoToken, AppInfo} from "../../../editor-common/factories/app-info.factory";
 import {AppState} from "../../reducers";
 import {appTestData} from "../../reducers/selectors";
-import {filter, map, tap} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 
 @Component({
     selector: "ct-tool-input-inspector",

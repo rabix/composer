@@ -53,7 +53,7 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
      * This can happen for example if we encounter a mismatch between step value and the input type,
      * for example, an input can by File[], and the step value can be just a plain string.
      */
-    warning: string;
+            warning: string;
 
     secondaryFilesCount = 0;
     metadataKeysCount   = 0;
@@ -166,7 +166,6 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
     }
 
     ngAfterViewInit() {
-
         this.arrayElements.changes.subscribeTracked(this, list => {
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];
@@ -182,8 +181,11 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
      */
     ngOnChanges(changes: SimpleChanges): void {
 
-        if (changes.inputType) {
+        if (changes.inputType || changes.inputRecordFields) {
             this.setupFormControls();
+        }
+
+        if (changes.inputType) {
             this.bindFileMetadataSyncOnControlChanges();
             this.bindValuePropagationOnControlSetup();
         }

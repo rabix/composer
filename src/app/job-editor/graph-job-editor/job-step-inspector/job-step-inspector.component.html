@@ -51,15 +51,15 @@
                         </div>
 
                         <!--Input-->
-                        <ct-job-step-inspector-entry *ngIf="jobGroup.get(getInputSource(input)).enabled"
-                                                     [formControl]="jobGroup.get(getInputSource(input))"
-                                                     [relativePathRoot]="relativePathRoot"
-                                                     [inputType]="input.type.type"
-                                                     [inputArrayItemsType]="input.type.items"
-                                                     [inputEnumSymbols]="input.type.symbols"
-                                                     [inputRecordFields]="input.type.fields"
-                                                     class="mb-0">
-                        </ct-job-step-inspector-entry>
+                        <ct-input-value-editor *ngIf="jobGroup.get(getInputSource(input)).enabled"
+                                               [formControl]="jobGroup.get(getInputSource(input))"
+                                               [relativePathRoot]="relativePathRoot"
+                                               [inputType]="input.type.type"
+                                               [inputArrayItemsType]="input.type.items"
+                                               [inputEnumSymbols]="input.type.symbols"
+                                               [inputRecordFields]="input.type.fields"
+                                               class="mb-0">
+                        </ct-input-value-editor>
 
                         <div *ngIf="jobGroup.get(getInputSource(input)).disabled" class="text-xl-center mb-1">
                             <p class="text-muted">No values have been specified for this input</p>

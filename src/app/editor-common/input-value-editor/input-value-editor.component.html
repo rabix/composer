@@ -101,7 +101,7 @@
 
             </label>
 
-            <ct-input-value-editor
+            <ct-input-value-editor *ngIf="control.get(entry.id)"
                 [formControl]="control.get(entry.id)"
                 [readonly]="readonly"
                 [inputType]="entry.type.type"

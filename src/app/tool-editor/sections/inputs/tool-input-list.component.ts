@@ -71,7 +71,7 @@ import {take, delay, map} from "rxjs/operators";
                             <ct-editor-inspector-content>
                                 <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                 <div class="tc-body">
-                                    
+
                                     <ct-tool-input-inspector
                                         [model]="model"
                                         [input]="entry"
@@ -148,7 +148,8 @@ export class ToolInputListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService,
+                private modal: ModalService) {
         super();
     }
 
