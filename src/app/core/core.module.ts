@@ -42,7 +42,6 @@ import {WorkBoxTabComponent} from "./workbox/workbox-tab.component";
 import {WorkBoxComponent} from "./workbox/workbox.component";
 import {WorkboxService} from "./workbox/workbox.service";
 import {ClosingDirtyAppsModalComponent} from "./modals/closing-dirty-apps/closing-dirty-apps-modal.component";
-import {SystemService} from "../platform-providers/system.service";
 
 export function errorHandlerFactory(modal: ModalService) {
     return environment.production ? new ModalErrorHandler(modal) : new ErrorHandler();

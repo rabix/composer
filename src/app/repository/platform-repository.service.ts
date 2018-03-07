@@ -8,7 +8,7 @@ import {ReplaySubject} from "rxjs/ReplaySubject";
 import {App} from "../../../electron/src/sbg-api-client/interfaces/app";
 import {Project} from "../../../electron/src/sbg-api-client/interfaces";
 import {RawApp} from "../../../electron/src/sbg-api-client/interfaces/raw-app";
-import {AppMeta} from "../../../electron/src/storage/types/app-meta";
+import {AppMeta, AppMetaEntry} from "../../../electron/src/storage/types/app-meta";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
@@ -308,7 +308,7 @@ export class PlatformRepositoryService {
         );
     }
 
-    getAppMeta<T>(appID: string, key?: string): Observable<AppMeta> {
+    getAppMeta<T extends keyof AppMetaEntry>(appID: string, key: T): Observable<AppMetaEntry[T]> {
         return this.appMeta.pipe(
             map(meta => {
 
@@ -321,14 +321,11 @@ export class PlatformRepositoryService {
                 if (key && data) {
                     return data[key];
                 }
-
-                return data;
-
             })
         );
     }
 
-    patchAppMeta(appID: string, key: keyof AppMeta, value: any): Promise<any> {
+    patchAppMeta(appID: string, key: keyof AppMetaEntry, value: any): Promise<any> {
         return this.ipc.request("patchAppMeta", {
             profile: "user",
             appID,

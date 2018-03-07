@@ -13,7 +13,7 @@ module.exports = function (config) {
             require('@angular/cli/plugins/karma')
         ],
         client: {
-            clearContext: false // leave Jasmine Spec Runner output visible in browser
+            clearContext: false, // leave Jasmine Spec Runner output visible in browser
         },
         coverageIstanbulReporter: {
             reports: ['html', 'lcovonly'],
@@ -22,12 +22,18 @@ module.exports = function (config) {
         angularCli: {
             environment: 'dev',
         },
+        customLaunchers: {
+            ChromeUnthrottled: {
+                base: "Chrome",
+                flags: ["--disable-background-timer-throttling"]
+            }
+        },
         reporters: ['progress', 'kjhtml'],
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: false,
-        browsers: ['Chrome'],
+        browsers: ['ChromeUnthrottled'],
         singleRun: false,
         browserDisconnectTimeout: 30000,
         browserNoActivityTimeout: 30000,

@@ -20,7 +20,7 @@ import {distinctUntilChanged, debounceTime} from "rxjs/operators";
         <div class="form-group" *ngIf="form && propertyType">
 
             <div class="form-group" *ngIf="!isType('record')">
-                <label class="form-control-label">Value</label>
+                <label class="form-control-label">Value Transform</label>
                 <ct-expression-input
                         [context]="context"
                         [readonly]="readonly"

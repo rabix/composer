@@ -15,7 +15,6 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {map} from "rxjs/operators";
 
@@ -37,7 +36,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() workflowModel: WorkflowModel;
 
-    @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
+    @Input() stepInputs: Array<WorkflowStepInputModel> = [];
 
     @Input() relativePathRoot?: string;
 
@@ -214,7 +213,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             grouped[group].push(input);
 
             const control = new FormControl();
-            this.jobGroup.addControl(input.id, control);
+            this.jobGroup.addControl(input.source[0], control);
 
             if (input.type.type === "array") {
                 control.setValue([], {emitEvent: false});
@@ -263,10 +262,9 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     }
 
-    enableEditing(input: InputParameterModel): void {
+    enableEditing(input: WorkflowStepInputModel): void {
 
-        const inputFormField = this.jobGroup.get(input.id);
-
+        const inputFormField = this.jobGroup.get(input.source[0]);
 
         let value;
 

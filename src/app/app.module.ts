@@ -1,7 +1,7 @@
 import {NgModule} from "@angular/core";
 import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
-import {AuthService, CREDENTIALS_REGISTRY} from "./auth/auth.service";
+import {AuthService, CredentialsRegistryToken} from "./auth/auth.service";
 import {MainComponent} from "./components/main/main.component";
 import {PlatformConnectionService} from "./core/auth/platform-connection.service";
 import {CoreModule} from "./core/core.module";
@@ -33,6 +33,9 @@ import {credentialsRegistryFactory} from "./factories/auth";
 import {LinkOpenerToken, linkOpenerFactory} from "./factories/link-opener.factory";
 import {SystemService} from "./platform-providers/system.service";
 import {modalManagerFactory, ModalManagerToken} from "./factories/modal.factory";
+import {PreviewJobManagerToken} from "./tool-editor/dependencies";
+import {previewJobSaverFactory} from "./factories/preview-job-saver.factory";
+import {GlobalAppMetaManagerToken, globalAppMetaManagerFactory} from "./factories/app-meta.factory";
 
 @NgModule({
     providers: [
@@ -51,11 +54,17 @@ import {modalManagerFactory, ModalManagerToken} from "./factories/modal.factory"
         PlatformConnectionService,
         PlatformRepositoryService,
         StatusBarService,
-        {provide: CREDENTIALS_REGISTRY, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},
+        {provide: CredentialsRegistryToken, useFactory: credentialsRegistryFactory, deps: [LocalRepositoryService]},
         {provide: DirectoryExplorerToken, useFactory: directoryExplorerFactory, deps: [NativeSystemService]},
         {provide: FileOpenerToken, useFactory: fileOpenerFactory, deps: [WorkboxService]},
         {provide: LinkOpenerToken, useFactory: linkOpenerFactory, deps: [SystemService]},
         {provide: ModalManagerToken, useFactory: modalManagerFactory, deps: [ModalService]},
+        {
+            provide: GlobalAppMetaManagerToken,
+            useFactory: globalAppMetaManagerFactory,
+            deps: [LocalRepositoryService, PlatformRepositoryService]
+        },
+        {provide: PreviewJobManagerToken, useFactory: previewJobSaverFactory, deps: [GlobalAppMetaManagerToken]}
     ],
     declarations: [
         MainComponent,

@@ -101,14 +101,14 @@
 
             </label>
 
-            <ct-job-step-inspector-entry
+            <ct-input-value-editor
                 [formControl]="control.get(entry.id)"
                 [readonly]="readonly"
                 [inputType]="entry.type.type"
                 [inputArrayItemsType]="entry.type.items"
                 [inputEnumSymbols]="entry.type.symbols"
                 [inputRecordFields]="entry.type.fields">
-            </ct-job-step-inspector-entry>
+            </ct-input-value-editor>
 
             <ct-tooltip-content #ctt>
                 <div class="tooltip-info">{{ entry.description }}</div>
@@ -136,13 +136,13 @@
             </div>
 
             <div class="array-entry">
-                <ct-job-step-inspector-entry #arrayItem
-                                             [inputType]="inputArrayItemsType"
-                                             [inputEnumSymbols]="inputEnumSymbols"
-                                             [inputRecordFields]="inputRecordFields"
-                                             [readonly]="readonly"
-                                             [formControl]="ctrl">
-                </ct-job-step-inspector-entry>
+                <ct-input-value-editor #arrayItem
+                                       [inputType]="inputArrayItemsType"
+                                       [inputEnumSymbols]="inputEnumSymbols"
+                                       [inputRecordFields]="inputRecordFields"
+                                       [readonly]="readonly"
+                                       [formControl]="ctrl">
+                </ct-input-value-editor>
 
                 <!--Delete button if not array of maps-->
                 <span *ngIf="inputArrayItemsType !== 'map' && !readonly"

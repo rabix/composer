@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, Inject} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ProcessRequirement} from "cwlts/mappings/d2sb/ProcessRequirement";
 import {ResourceRequirement} from "cwlts/mappings/v1.0";
@@ -7,6 +7,10 @@ import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 
 import {EditorInspectorService} from "../../editor-common/inspector/editor-inspector.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {AppState} from "../reducers";
+import {Store} from "@ngrx/store";
+import {appTestData} from "../reducers/selectors";
+import {AppInfoToken, AppInfo} from "../../editor-common/factories/app-info.factory";
 
 @Component({
     selector: "ct-tool-visual-editor",
@@ -101,7 +105,8 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
 
     form: FormGroup;
 
-    constructor(public inspector: EditorInspectorService) {
+    constructor(public inspector: EditorInspectorService, private store: Store<AppState>,
+                @Inject(AppInfoToken) private appInfo: AppInfo) {
         super();
     }
 
@@ -113,20 +118,25 @@ export class ToolVisualEditorComponent extends DirectiveBase implements OnDestro
         if (this.model && this.form && changes.model) {
             this.form.setValue({
                 baseCommand: this.model.baseCommand
-            }, { emitEvent: false });
+            }, {emitEvent: false});
         }
     }
 
     ngOnInit() {
+
+        this.store.select(appTestData(this.appInfo.id)).subscribeTracked(this, () => {
+            this.context = this.model.getContext();
+        });
+
         this.form = new FormGroup({
             baseCommand: new FormControl(this.model.baseCommand)
         });
 
-        this.form.get("baseCommand").valueChanges.subscribeTracked(this, (old) => {
+        this.form.get("baseCommand").valueChanges.subscribeTracked(this, () => {
             this.updateBaseCommand(this.form.getRawValue().baseCommand);
         });
 
-        this.form.valueChanges.subscribeTracked(this, (old) => {
+        this.form.valueChanges.subscribeTracked(this, () => {
             this.dirty.emit();
         });
     }

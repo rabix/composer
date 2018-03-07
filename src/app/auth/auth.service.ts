@@ -6,14 +6,14 @@ import {AuthCredentials} from "./model/auth-credentials";
 import {combineLatest} from "rxjs/observable/combineLatest";
 import {distinctUntilChanged, take} from "rxjs/operators";
 
-export const CREDENTIALS_REGISTRY = new InjectionToken<CredentialsRegistry>("auth.credentials-registry");
+export const CredentialsRegistryToken = new InjectionToken<CredentialsRegistry>("auth.credentials-registry");
 
 @Injectable()
 export class AuthService {
 
     private active = new ReplaySubject<AuthCredentials>(1);
 
-    constructor(@Inject(CREDENTIALS_REGISTRY) private registry: CredentialsRegistry) {
+    constructor(@Inject(CredentialsRegistryToken) private registry: CredentialsRegistry) {
 
         combineLatest(
             this.registry.getCredentials(),

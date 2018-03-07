@@ -20,7 +20,7 @@ import {WorkflowModel} from "cwlts/models/generic/WorkflowModel";
 import {WorkflowOutputParameterModel} from "cwlts/models/generic/WorkflowOutputParameterModel";
 import {JobHelper} from "cwlts/models/helpers/JobHelper";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
-import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManagerToken} from "../../core/app-meta/app-meta-manager-factory";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {SVGExecutionProgressPlugin} from "../svg-execution-progress-plugin/svg-execution-progress-plugin";
@@ -66,7 +66,7 @@ export class GraphJobEditorComponent extends DirectiveBase implements AfterViewI
 
     constructor(private inspector: EditorInspectorService,
                 private store: Store<any>,
-                @Inject(APP_META_MANAGER) private metaManager: AppMetaManager) {
+                @Inject(AppMetaManagerToken) private metaManager: AppMetaManager) {
         super();
 
 
