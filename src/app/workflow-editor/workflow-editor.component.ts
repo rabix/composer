@@ -26,7 +26,6 @@ import {FileRepositoryService} from "../file-repository/file-repository.service"
 import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
 import {Store} from "@ngrx/store";
-import {AuthCredentials} from "../auth/model/auth-credentials";
 import {AuthService} from "../auth/auth.service";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {

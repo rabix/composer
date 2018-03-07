@@ -31,7 +31,7 @@ import {distinctUntilChanged} from "rxjs/operators";
 
                         <option *ngFor="let item of stageInputOptions"
                                 [disabled]="readonly"
-                                [value]="item.value">
+                                [ngValue]="item.value">
                             {{item.text}}
                         </option>
                     </select>

@@ -17,6 +17,7 @@ import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputPar
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {map} from "rxjs/operators";
+import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 
 @Component({
     selector: "ct-job-step-inspector",
@@ -192,9 +193,22 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         inputControl.setValue(null);
     }
 
+    getInputSource(input: InputParameterModel) {
+
+        if (input instanceof WorkflowStepInputModel) {
+            const inputSource = input.source[0];
+            // Remove # if it exists on the beginning
+            return inputSource[0] === "#" ? inputSource.substring(1) : inputSource;
+        }
+
+        if (input instanceof WorkflowInputParameterModel) {
+            return input.id;
+        }
+    }
+
     private recreateForms(): void {
 
-        for (let ctrl in this.jobGroup.controls) {
+        for (const ctrl in this.jobGroup.controls) {
             this.jobGroup.removeControl(ctrl);
         }
 
@@ -213,7 +227,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             grouped[group].push(input);
 
             const control = new FormControl();
-            this.jobGroup.addControl(input.source[0], control);
+            this.jobGroup.addControl(this.getInputSource(input), control);
 
             if (input.type.type === "array") {
                 control.setValue([], {emitEvent: false});
@@ -262,9 +276,9 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     }
 
-    enableEditing(input: WorkflowStepInputModel): void {
+    enableEditing(input: WorkflowInputParameterModel | WorkflowStepInputModel): void {
 
-        const inputFormField = this.jobGroup.get(input.source[0]);
+        const inputFormField = this.jobGroup.get(this.getInputSource(input));
 
         let value;
 
