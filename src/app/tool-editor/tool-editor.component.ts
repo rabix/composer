@@ -116,8 +116,6 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
 
     jobSubscription: Subscription;
 
-    private appInfo: AppInfo;
-
     private testJob = new BehaviorSubject({});
 
     private appID: string;
@@ -218,8 +216,7 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
                 this.dataModel.setJobInputs(job);
             });
         } else {
-            // set dummy values for the job
-            this.dataModel.setJobInputs(JobHelper.getJobInputs(this.dataModel));
+            this.dataModel.setJobInputs(this.testJob.getValue());
         }
     }
 
@@ -258,14 +255,12 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             this.store.dispatch(new LoadTestJobAction(this.appID));
         }
 
-        const testJob = this.store.select(appTestData(this.appID));
-
         // When we get the first result from a test job, ensure that it conforms to the model that we have
-        testJob.pipe(take(1)).subscribe(data => {
+        this.testJob.pipe(take(1)).subscribe(data => {
             this.store.dispatch(new AppMockValuesChange(this.appID, fixJob(data, this.dataModel)));
         });
 
-        testJob.subscribe(job => this.dataModel.setJobInputs(job));
+        this.testJob.subscribe(job => this.dataModel.setJobInputs(job));
 
         this.dataModel.on("input.create", (input: CommandInputParameterModel) => {
             // When input is created it emits an event, but its type is set afterwards from Composer
