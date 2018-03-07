@@ -99,7 +99,9 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
         });
 
 
-        inputTestJob.subscribeTracked(this, mockValue => {
+        inputTestJob.pipe(
+            filter(val => val !== this.testValueControl.value)
+        ).subscribeTracked(this, mockValue => {
             this.context = this.model.getContext(this.input);
             this.testValueControl.setValue(mockValue, {emitEvent: false});
         });
