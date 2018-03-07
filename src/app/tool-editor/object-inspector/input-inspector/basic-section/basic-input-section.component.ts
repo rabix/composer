@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, forwardRef, Inject,Input, QueryList, ViewChildren} from "@angular/core";
+import {AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
