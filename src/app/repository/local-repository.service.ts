@@ -216,7 +216,7 @@ export class LocalRepositoryService {
         ).toPromise();
     }
 
-    getAppMeta<T>(appID: string, key?: keyof AppMeta): Observable<AppMeta> {
+    getAppMeta<T extends keyof AppMetaEntry>(appID: string, key: T): Observable<AppMetaEntry[T]> {
         return this.appMeta.pipe(
             map(meta => {
                 const data = meta[appID];
@@ -224,9 +224,6 @@ export class LocalRepositoryService {
                 if (key && data) {
                     return data[key];
                 }
-
-                return data;
-
             })
         );
     }

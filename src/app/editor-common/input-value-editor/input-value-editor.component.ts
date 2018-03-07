@@ -16,25 +16,25 @@ import {
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
-import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
-import {ModalService} from "../../../ui/modal/modal.service";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {JobFileMetadataModalComponent} from "../job-file-metadata-modal/job-file-metadata-modal.component";
-import {NativeSystemService} from "../../../native/system/native-system.service";
+import {AppModelToken} from "../../core/factories/app-model-provider-factory";
+import {ModalService} from "../../ui/modal/modal.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
+import {FileMetadataModalComponent} from "../file-metadata-modal/file-metadata-modal.component";
+import {NativeSystemService} from "../../native/system/native-system.service";
 import {take, filter} from "rxjs/operators";
 
 @Component({
-    selector: "ct-job-step-inspector-entry",
+    selector: "ct-input-value-editor",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    templateUrl: "./job-step-inspector-entry.component.html",
-    styleUrls: ["./job-step-inspector-entry.component.scss"],
+    templateUrl: "./input-value-editor.component.html",
+    styleUrls: ["./input-value-editor.component.scss"],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
-        useExisting: forwardRef(() => JobStepInspectorEntryComponent),
+        useExisting: forwardRef(() => InputValueEditorComponent),
         multi: true
     }]
 })
-export class JobStepInspectorEntryComponent extends DirectiveBase implements OnChanges, AfterViewInit, ControlValueAccessor {
+export class InputValueEditorComponent extends DirectiveBase implements OnChanges, AfterViewInit, ControlValueAccessor {
 
     @Input() readonly = false;
 
@@ -58,8 +58,8 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     secondaryFilesCount = 0;
     metadataKeysCount   = 0;
 
-    @ViewChildren("arrayItem", {read: JobStepInspectorEntryComponent})
-    private arrayElements: QueryList<JobStepInspectorEntryComponent>;
+    @ViewChildren("arrayItem", {read: InputValueEditorComponent})
+    private arrayElements: QueryList<InputValueEditorComponent>;
 
     @ViewChild("input", {read: ElementRef})
 
@@ -75,7 +75,7 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 private modal: ModalService,
                 private injector: Injector,
                 private native: NativeSystemService,
-                @Inject(APP_MODEL) private appModel) {
+                @Inject(AppModelToken) private appModel) {
         super();
 
     }
@@ -108,9 +108,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
             case "array":
 
                 if (this.inputType === "array" && !Array.isArray(value)) {
-                    this.patchArrayValue([]);
+                    this.patchArrayValue([], updateOptions);
                 } else {
-                    this.patchArrayValue(update);
+                    this.patchArrayValue(update, updateOptions);
                 }
 
                 break;
@@ -120,8 +120,12 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 break;
 
             case "float":
+                const float = parseFloat(update);
+                this.control.setValue(isNaN(float) ? 0 : float, updateOptions);
+                break;
             case "int":
-                this.control.setValue(parseInt(update, 10), updateOptions);
+                const int = parseInt(update);
+                this.control.setValue(isNaN(int) ? 0 : int, updateOptions);
                 break;
             case "boolean":
                 this.control.setValue(Boolean(update), updateOptions);
@@ -166,7 +170,6 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     ngAfterViewInit() {
-
         this.arrayElements.changes.subscribeTracked(this, list => {
 
             const plainInputTypes = ["boolean", "float", "int", "string", "enum"];
@@ -175,35 +178,20 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
                 list.last.focus();
             }
         });
-
-        this.control.valueChanges.subscribeTracked(this, value => {
-            this.recalculateSecondaryFilesAndMetadataCounts();
-        });
-
-        this.control.valueChanges.pipe(
-            filter(v => this.control.status !== "DISABLED")
-        ).subscribeTracked(this, change => {
-
-                let typecheckedChange = change;
-
-                if (this.inputType === "int") {
-                    typecheckedChange = parseInt(change, 10);
-                } else if (this.inputType === "float") {
-                    typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
-                }
-
-                this.propagateChange(typecheckedChange);
-            });
     }
-
 
     /**
      * Whenever our inputs change, we should recreate form controls for this component
      */
     ngOnChanges(changes: SimpleChanges): void {
 
-        if (changes.inputType) {
+        if (changes.inputType || changes.inputRecordFields) {
             this.setupFormControls();
+        }
+
+        if (changes.inputType) {
+            this.bindFileMetadataSyncOnControlChanges();
+            this.bindValuePropagationOnControlSetup();
         }
 
         if (changes.readonly) {
@@ -221,48 +209,9 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     addArrayEntry(): void {
-        this.warning = undefined;
-
-        let newControl: AbstractControl;
-        switch (this.inputArrayItemsType) {
-
-            case "array":
-                newControl = new FormArray([]);
-                break;
-            case "record":
-                newControl = new FormControl({});
-                break;
-            case "string":
-                newControl = new FormControl("");
-                break;
-            case "int":
-            case "float":
-                newControl = new FormControl(0);
-                break;
-            case "boolean":
-                newControl = new FormControl(false);
-                break;
-            case "Directory":
-                newControl = new FormControl({
-                    class: "Directory",
-                    path: ""
-                });
-                break;
-            case "File":
-                newControl = new FormControl({
-                    path: "",
-                    class: "File",
-                    metadata: {},
-                    secondaryFiles: [],
-
-                });
-                break;
-            default:
-                newControl = new FormControl();
-                break;
-        }
-
-        (this.control as FormArray).push(newControl);
+        this.warning  = undefined;
+        const control = this.makeControlForArray();
+        (this.control as FormArray).push(control);
     }
 
     deleteFromArray(index: number, control = this.control as FormArray): void {
@@ -270,7 +219,80 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
     }
 
     focus(): void {
-        this.inputElement.nativeElement.focus();
+        if (this.inputElement && this.inputElement.nativeElement) {
+            this.inputElement.nativeElement.focus();
+        }
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+
+        if (isDisabled && this.control.enabled) {
+            this.control.disable();
+        } else if (!isDisabled && this.control.disabled) {
+            this.control.enable();
+        }
+
+        this.cdr.markForCheck();
+    }
+
+    promptFileMetadata() {
+        const {secondaryFiles, metadata} = this.control.value;
+        const allowDirectories           = this.appModel.cwlVersion.indexOf("draft-2") === -1;
+        const relativePathRoot           = this.relativePathRoot;
+
+        const comp = this.modal.fromComponent(FileMetadataModalComponent, "Secondary files and metadata", {
+            metadata,
+            secondaryFiles,
+            allowDirectories,
+            relativePathRoot
+        });
+
+        comp.submit.pipe(
+            take(1)
+        ).subscribeTracked(this, (data) => {
+            this.modal.close();
+            this.control.patchValue(data);
+            this.cdr.markForCheck();
+        });
+    }
+
+    addArrayFileOrDirectory() {
+
+        const properties = ["multiSelections"] as any;
+        properties.push(this.inputArrayItemsType === "File" ? "openFile" : "openDirectory");
+
+        this.native.openFileChoiceDialog({properties}).then(filePaths => {
+
+            const fileOrDirEntries = filePaths.map(p => ({class: this.inputArrayItemsType, path: p}));
+            fileOrDirEntries.forEach(entry => (this.control as FormArray).push(new FormControl(entry)));
+            this.cdr.markForCheck();
+
+        }, () => void 0);
+    }
+
+    private bindFileMetadataSyncOnControlChanges() {
+        this.control.valueChanges.subscribeTracked(this, () => {
+            this.recalculateSecondaryFilesAndMetadataCounts();
+        });
+    }
+
+    private bindValuePropagationOnControlSetup() {
+        this.control.valueChanges.pipe(
+            // We this is called from  ngOnChanges, so on first call propagateChange will not be set,
+            // therefore, we should not try to propagate the value right away
+            filter(() => this.control.status !== "DISABLED" && typeof this.propagateChange === "function")
+        ).subscribeTracked(this, change => {
+
+            let typecheckedChange = change;
+
+            if (this.inputType === "int") {
+                typecheckedChange = parseInt(change, 10);
+            } else if (this.inputType === "float") {
+                typecheckedChange = isNaN(change) ? 0 : parseFloat(change);
+            }
+
+            this.propagateChange(typecheckedChange);
+        });
     }
 
     private setupFormControls(): void {
@@ -320,50 +342,59 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
         }
     }
 
-    private patchArrayValue(update: any[], control = this.control as FormArray) {
+    private patchArrayValue(update: any[], options: { onlySelf?: boolean, emitEvent?: boolean }) {
 
-        while (control.length !== update.length) {
-            if (update.length < control.length) {
-                this.deleteFromArray(control.length - 1);
-            } else if (update.length > control.length) {
-                this.addArrayEntry();
-            }
+        const updateIsSameSize  = update.length === (this.control as FormArray).length;
+        const serializesEqually = () => JSON.stringify(update) === JSON.stringify(this.control.value);
+        const shouldNotEmit     = options.emitEvent === false;
+
+        // This solves a problem that
+        if (updateIsSameSize && shouldNotEmit && serializesEqually()) {
+            return;
         }
 
-        control.patchValue(update);
-    }
-
-
-    setDisabledState(isDisabled: boolean): void {
-
-        if (isDisabled && this.control.enabled) {
-            this.control.disable();
-        } else if (!isDisabled && this.control.disabled) {
-            this.control.enable();
+        if (!updateIsSameSize) {
+            const ctrlArr = Array.apply(null, Array(update.length)).map(() => this.makeControlForArray());
+            this.control  = new FormArray(ctrlArr);
+            this.readonly ? this.control.disable(options) : this.control.enable(options);
+            this.bindFileMetadataSyncOnControlChanges();
+            this.bindValuePropagationOnControlSetup();
         }
 
-        this.cdr.markForCheck();
+        this.control.setValue(update, options);
     }
 
-    promptFileMetadata() {
-        const {secondaryFiles, metadata} = this.control.value;
-        const allowDirectories           = this.appModel.cwlVersion.indexOf("draft-2") === -1;
-        const relativePathRoot           = this.relativePathRoot;
+    private makeControlForArray(): AbstractControl {
 
-        const comp = this.modal.fromComponent(JobFileMetadataModalComponent, "Secondary files and metadata", {
-            metadata,
-            secondaryFiles,
-            allowDirectories,
-            relativePathRoot
-        });
+        switch (this.inputArrayItemsType) {
 
-        comp.submit.pipe(
-            take(1)
-        ).subscribeTracked(this, (data) => {
-            this.modal.close();
-            this.control.patchValue(data);
-            this.cdr.markForCheck();
-        });
+            case "array":
+                return new FormArray([]);
+            case "record":
+                return new FormControl({});
+            case "string":
+                return new FormControl("");
+            case "int":
+            case "float":
+                return new FormControl(0);
+            case "boolean":
+                return new FormControl(false);
+            case "Directory":
+                return new FormControl({
+                    class: "Directory",
+                    path: ""
+                });
+            case "File":
+                return new FormControl({
+                    path: "",
+                    class: "File",
+                    metadata: {},
+                    secondaryFiles: [],
+                });
+            default:
+                return new FormControl();
+
+        }
     }
 
     private recalculateSecondaryFilesAndMetadataCounts() {
@@ -373,21 +404,6 @@ export class JobStepInspectorEntryComponent extends DirectiveBase implements OnC
 
         this.secondaryFilesCount = Array.isArray(secondaryFiles) ? secondaryFiles.length : 0;
         this.metadataKeysCount   = Object.prototype.isPrototypeOf(metadata) ? Object.keys(metadata).length : 0;
-
-    }
-
-    addArrayFileOrDirectory() {
-
-        const properties = ["multiSelections"] as any;
-        properties.push(this.inputArrayItemsType === "File" ? "openFile" : "openDirectory");
-
-        this.native.openFileChoiceDialog({properties}).then(filePaths => {
-
-            const fileOrDirEntries = filePaths.map(p => ({class: this.inputArrayItemsType, path: p}));
-            fileOrDirEntries.forEach(entry => (this.control as FormArray).push(new FormControl(entry)));
-            this.cdr.markForCheck();
-
-        }, () => void 0);
 
     }
 }

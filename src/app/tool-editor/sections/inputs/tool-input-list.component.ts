@@ -71,6 +71,7 @@ import {take, delay, map} from "rxjs/operators";
                             <ct-editor-inspector-content>
                                 <div class="tc-header">{{ entry.id || entry.loc || "Input" }}</div>
                                 <div class="tc-body">
+
                                     <ct-tool-input-inspector
                                         [model]="model"
                                         [input]="entry"
@@ -147,7 +148,8 @@ export class ToolInputListComponent extends DirectiveBase {
     @ViewChildren("inspector", {read: TemplateRef})
     inspectorTemplate: QueryList<TemplateRef<any>>;
 
-    constructor(public inspector: EditorInspectorService, private modal: ModalService) {
+    constructor(public inspector: EditorInspectorService,
+                private modal: ModalService) {
         super();
     }
 
@@ -164,6 +166,8 @@ export class ToolInputListComponent extends DirectiveBase {
             }
 
             this.update.emit(this.model.inputs);
+
+            this.inspector.reload();
         }, err => console.warn);
     }
 
@@ -180,6 +184,8 @@ export class ToolInputListComponent extends DirectiveBase {
         newEntry.isField   = this.isField;
         newEntry.type.type = "File";
 
+        this.inspector.reload();
+
         this.update.emit(this.model.inputs);
 
         this.inspectorTemplate.changes.pipe(
@@ -187,7 +193,7 @@ export class ToolInputListComponent extends DirectiveBase {
             delay(1),
             map(list => list.last)
         ).subscribe(templateRef => {
-            this.inspector.show(templateRef, newEntry.loc);
+            // this.inspector.show(templateRef, newEntry.loc);
         });
     }
 

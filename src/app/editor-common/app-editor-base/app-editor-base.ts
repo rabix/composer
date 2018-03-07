@@ -33,7 +33,7 @@ import {RevisionListComponent} from "../components/revision-list/revision-list.c
 import {GraphJobEditorComponent} from "../../job-editor/graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
-import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {AppSaverToken, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 import {Store} from "@ngrx/store";
 import {ExecutorService} from "../../executor-service/executor.service";
@@ -173,7 +173,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         ).subscribeTracked(this, show => this.showInspector = show);
 
         // Get the app saver from the injector
-        this.appSavingService = this.injector.get(APP_SAVER_TOKEN) as AppSaver;
+        this.appSavingService = this.injector.get(AppSaverToken) as AppSaver;
 
         // Set this app's ID to the code content service
         this.codeSwapService.appID = this.tabData.id;

@@ -1,6 +1,17 @@
-import {ChangeDetectorRef, Component, forwardRef, Input, ViewChild, ElementRef, NgZone, ChangeDetectionStrategy,} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {
+    ChangeDetectorRef,
+    Component,
+    forwardRef,
+    Input,
+    ViewChild,
+    ElementRef,
+    NgZone,
+    ChangeDetectionStrategy,
+    OnInit,
+} from "@angular/core";
+import {ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl} from "@angular/forms";
 import {NativeSystemService} from "../../native/system/native-system.service";
+import {DirectiveBase} from "../../util/directive-base/directive-base";
 
 const path = require("path");
 
@@ -17,7 +28,7 @@ type SelectionType = "file" | "directory";
         }
     ],
     template: `
-        <input #pathInput class="form-control" [(ngModel)]="value" (blur)="onTouched()" [disabled]="isDisabled || disableTextInput"/>
+        <input #pathInput class="form-control" [formControl]="control" (blur)="onTouched()"/>
 
         <span class="input-group-btn">
             <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
@@ -31,7 +42,7 @@ type SelectionType = "file" | "directory";
     `,
 
 })
-export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor {
+export class NativeFileBrowserFormFieldComponent extends DirectiveBase implements ControlValueAccessor, OnInit {
 
     /** Title of the modal windows that opens when user clicks on "browse" */
     @Input() modalTitle = "Choose File or Directory";
@@ -72,37 +83,38 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     onTouched: Function;
 
-    onChange: (value: any) => void;
+    propagateChange: (value: any) => void;
 
     @ViewChild("pathInput")
     pathInputField: ElementRef;
 
-    private _value = "";
+    control = new FormControl("");
 
     constructor(private native: NativeSystemService, private cdr: ChangeDetectorRef, private zone: NgZone) {
+        super();
     }
 
-    get value(): string {
-        return this._value;
+    ngOnInit() {
+        this.control.valueChanges.subscribeTracked(this, value => {
+            if (typeof this.propagateChange === "function") {
+                this.propagateChange(value);
+            }
+        });
+
+        this.updateControlDisabledState();
     }
 
-    set value(val: string) {
-        this._value = val;
-
-        if (typeof this.onChange === "function") {
-            this.onChange(val);
-        }
-
+    updateValue(val: string, options?: { emitEvent?: boolean }) {
+        this.control.setValue(val, options);
         if (this.disableTextInput) {
             this.updateInputScroll();
         }
-
         this.cdr.markForCheck();
     }
 
     onBrowse() {
 
-        const defaultPath = this.relativePathRoot || this.value;
+        const defaultPath = this.relativePathRoot || this.control.value;
         const params      = Object.assign({
             title: this.modalTitle,
             defaultPath
@@ -126,10 +138,11 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
             if (this.relativePathRoot) {
                 const relPath = path.relative(this.relativePathRoot, path.dirname(file)) + path.sep + path.basename(file);
-                this.value    = relPath.startsWith(path.sep) ? relPath.substr(1) : relPath;
+                const value   = relPath.startsWith(path.sep) ? relPath.substr(1) : relPath;
+                this.updateValue(value);
 
             } else {
-                this.value = file;
+                this.updateValue(file);
             }
 
         }).then(() => this.cdr.markForCheck()).catch(() => void 0);
@@ -137,15 +150,19 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     writeValue(obj: any): void {
 
+        if (obj === undefined) {
+            return;
+        }
+
         if (typeof obj !== "string") {
             obj = "";
         }
 
-        this.value = obj;
+        this.updateValue(obj, {emitEvent: false});
     }
 
     registerOnChange(fn: any): void {
-        this.onChange = fn;
+        this.propagateChange = fn;
     }
 
     registerOnTouched(fn: any): void {
@@ -154,6 +171,11 @@ export class NativeFileBrowserFormFieldComponent implements ControlValueAccessor
 
     setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+        this.updateControlDisabledState();
+    }
+
+    private updateControlDisabledState(options?: { emitEvent?: boolean, onlySelf?: boolean }) {
+        (this.isDisabled || this.disableTextInput) ? this.control.disable(options) : this.control.enable(options);
     }
 
     private updateInputScroll() {

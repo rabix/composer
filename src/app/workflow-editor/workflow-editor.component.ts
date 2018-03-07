@@ -4,13 +4,13 @@ import * as Yaml from "js-yaml";
 import {AppMetaManagerToken, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
-import {APP_MODEL, appModelFactory} from "../core/factories/app-model-provider-factory";
+import {AppModelToken, appModelFactory} from "../core/factories/app-model-provider-factory";
 import {WorkboxService} from "../core/workbox/workbox.service";
 import {AppEditorBase} from "../editor-common/app-editor-base/app-editor-base";
 import {AppValidatorService} from "../editor-common/app-validator/app-validator.service";
 import {PlatformAppService} from "../editor-common/components/platform-app-common/platform-app.service";
 import {EditorInspectorService} from "../editor-common/inspector/editor-inspector.service";
-import {APP_SAVER_TOKEN} from "../editor-common/services/app-saving/app-saver.interface";
+import {AppSaverToken} from "../editor-common/services/app-saving/app-saver.interface";
 import {LocalFileSavingService} from "../editor-common/services/app-saving/local-file-saving.service";
 import {PlatformAppSavingService} from "../editor-common/services/app-saving/platform-app-saving.service";
 import {ExecutorService} from "../executor-service/executor.service";
@@ -41,7 +41,7 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
     selector: "ct-workflow-editor",
     providers: [EditorInspectorService, NotificationBarService, WorkflowEditorService, CodeSwapService, PlatformAppService,
         {
-            provide: APP_SAVER_TOKEN,
+            provide: AppSaverToken,
             useFactory: appSaverFactory,
             deps: [WorkflowEditorComponent, IpcService, ModalService, PlatformRepositoryService]
         }, {
@@ -50,7 +50,7 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
             deps: [WorkflowEditorComponent, LocalRepositoryService, PlatformRepositoryService]
         },
         {
-            provide: APP_MODEL,
+            provide: AppModelToken,
             useFactory: appModelFactory,
             deps: [WorkflowEditorComponent]
         }

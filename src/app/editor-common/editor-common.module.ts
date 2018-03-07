@@ -40,11 +40,14 @@ import {CommonDocumentControlsComponent} from "./template-common/common-document
 import {CommonReportPanelComponent} from "./template-common/common-preview-panel/common-report-panel.component";
 import {CommonStatusControlsComponent} from "./template-common/common-status-controls/common-status-controls.component";
 import {ExecutionModule} from "../execution/execution.module";
+import {FileMetadataModalComponent} from "./file-metadata-modal/file-metadata-modal.component";
+import {InputValueEditorComponent} from "./input-value-editor/input-value-editor.component";
 
 
 @NgModule({
     declarations: [
         AppExecutionContextModalComponent,
+        AppExportModalComponent,
         AppInfoComponent,
         CommonDocumentControlsComponent,
         CommonReportPanelComponent,
@@ -62,8 +65,11 @@ import {ExecutionModule} from "../execution/execution.module";
         FileDefContentPipe,
         FileDefNamePipe,
         FileInputInspectorComponent,
+        FileMetadataModalComponent,
         HintsComponent,
         InputTypeSelectComponent,
+        InputValueEditorComponent,
+        JobImportExportComponent,
         JobImportExportComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
@@ -77,8 +83,6 @@ import {ExecutionModule} from "../execution/execution.module";
         ValidationPreviewComponent,
         ValidationReportComponent,
         ValidationTextPipe,
-        JobImportExportComponent,
-        AppExportModalComponent
 
     ],
     exports: [
@@ -89,6 +93,7 @@ import {ExecutionModule} from "../execution/execution.module";
         CompactListComponent,
         EditableDirective,
         EditorInspectorComponent,
+        EditorInspectorContentComponent,
         EditorInspectorDirective,
         EditorLayoutComponent,
         ExpressionEditorComponent,
@@ -96,8 +101,10 @@ import {ExecutionModule} from "../execution/execution.module";
         FileDefContentPipe,
         FileDefNamePipe,
         FileInputInspectorComponent,
+        FileMetadataModalComponent,
         HintsComponent,
         InputTypeSelectComponent,
+        InputValueEditorComponent,
         KeyValueInputComponent,
         KeyValueListComponent,
         MapListComponent,
@@ -110,7 +117,6 @@ import {ExecutionModule} from "../execution/execution.module";
         ValidationClassDirective,
         ValidationPreviewComponent,
         ValidationReportComponent,
-        EditorInspectorContentComponent
     ],
     entryComponents: [
         AppExecutionContextModalComponent,
@@ -118,6 +124,7 @@ import {ExecutionModule} from "../execution/execution.module";
         EditorInspectorComponent,
         EditorInspectorContentComponent,
         ExpressionEditorComponent,
+        FileMetadataModalComponent,
         JobImportExportComponent,
         ModelExpressionEditorComponent,
     ],

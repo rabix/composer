@@ -1,6 +1,4 @@
-import {
-    AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren, ViewEncapsulation
-} from "@angular/core";
+import {AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
@@ -14,82 +12,14 @@ import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-fa
 import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-basic-input-section",
     styleUrls: ["./basic-input-section.component.scss"],
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => BasicInputSectionComponent),
-            multi: true
-        }
-    ],
-    template: `
-        <form class="ct-basic-input-section">
-
-            <!--Required-->
-            <div class="form-group flex-container">
-                <label>Required</label>
-                <span class="align-right">
-                        <ct-toggle-slider date-test="required-toggle" [formControl]="form.controls['isRequired']">
-                        </ct-toggle-slider>
-                    </span>
-            </div>
-
-            <!--ID-->
-            <div class="form-group" [class.has-danger]="form.controls['id'].errors">
-                <label class="form-control-label">ID</label>
-                <input type="text"
-                       class="form-control"
-                       data-test="id-field"
-                       [formControl]="form.controls['id']">
-                <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
-                    {{form.controls['id'].errors['error']}}
-                </div>
-            </div>
-
-            <!--Input Type -->
-            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
-
-            <!--Symbols-->
-            <div class="form-group"
-                 *ngIf="isType('enum')">
-                <label>Symbols</label>
-                <ct-auto-complete data-test="symbols-field"
-                                  [create]="true"
-                                  [formControl]="form.controls['symbols']"></ct-auto-complete>
-            </div>
-
-            <!--Include in command line -->
-            <div class="form-group flex-container"
-                 *ngIf="!isType('map') && !!form.controls['isBound']">
-                <label>Include in the command line</label>
-                <span class="align-right">
-                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']"
-                                          #includeInCommandLine>
-                        </ct-toggle-slider>
-                    </span>
-            </div>
-
-            <!--Input Binding-->
-            <ct-input-binding-section *ngIf="input.isBound"
-                                      [context]="context"
-                                      [propertyType]="input.type.type"
-                                      [formControl]="form.controls['inputBinding']">
-            </ct-input-binding-section>
-
-
-            <ct-secondary-file *ngIf="isType('File') && showSecondaryFiles()"
-                               [formControl]="form.controls['secondaryFiles']"
-                               [readonly]="readonly"
-                               [context]="context"
-                               [port]="input"
-                               [bindingName]="'inputBinding'"
-                               (update)="propagateChange(input)">
-            </ct-secondary-file>
-        </form>
-    `
+    templateUrl: "./basic-input-section.component.html",
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => BasicInputSectionComponent),
+        multi: true
+    }],
 })
 export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 

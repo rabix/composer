@@ -11,6 +11,9 @@ export interface AppMetaEntry {
     swapUnlocked?: boolean,
     isDirty?: boolean
     executionConfig?: AppExecutionContext,
-    job: Object
+    /** Job is an actual job that will be sent to execution */
+    job: Object,
+    /** Test job is a job object used for testing command line parameters while building a CLT */
+    testJob?: Object,
 
 }

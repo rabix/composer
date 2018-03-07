@@ -15,9 +15,9 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 import {NativeSystemService} from "../../../native/system/native-system.service";
 import {map} from "rxjs/operators";
+import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 
 @Component({
     selector: "ct-job-step-inspector",
@@ -37,7 +37,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() workflowModel: WorkflowModel;
 
-    @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
+    @Input() stepInputs: Array<WorkflowStepInputModel> = [];
 
     @Input() relativePathRoot?: string;
 
@@ -67,7 +67,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         for (const controlName in this.jobGroup.controls) {
 
             const control = this.jobGroup.get(controlName);
-            const kval = this.jobValue[controlName];
+            const kval    = this.jobValue[controlName];
 
             if (kval === null || kval === undefined) {
                 control.disable({emitEvent: false, onlySelf: true});
@@ -154,7 +154,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
         // Get top level id from prefix
         const inputId = prefix.split(".")[0];
-        const input = this.stepInputs.find(i => i.id === inputId);
+        const input   = this.stepInputs.find(i => i.id === inputId);
 
         this.change.emit({
             input,
@@ -283,7 +283,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         let value;
 
         const isArray = input.type.type === "array";
-        const type = input.type.items || input.type.type;
+        const type    = input.type.items || input.type.type;
 
         if (type !== "File" && type !== "Directory") {
             inputFormField.enable({onlySelf: true});
@@ -332,7 +332,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     }
 
     isFileOrDirectory(input: WorkflowStepInputModel) {
-        const type = input.type.type;
+        const type      = input.type.type;
         const itemsType = input.type.items;
 
         return type === "File" || type === "Directory" || itemsType === "File" || itemsType === "Directory";

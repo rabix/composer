@@ -10,12 +10,19 @@ export class EditorInspectorService {
     private hostView: ViewContainerRef;
 
     private embeddedView: EmbeddedViewRef<any>;
+    private openTemplate: TemplateRef<any>;
 
 
     hide() {
         this.clearView();
         this.inspectedObject.next(undefined);
 
+    }
+
+    reload(): void {
+        if (this.openTemplate) {
+            this.show(this.openTemplate, this.inspectedObject.getValue(), true);
+        }
     }
 
     setHostView(view: ViewContainerRef) {
@@ -36,7 +43,9 @@ export class EditorInspectorService {
             return;
         }
 
+
         this.clearView();
+        this.openTemplate = template;
         this.embeddedView = this.hostView.createEmbeddedView(template);
         this.inspectedObject.next(inspectedObject);
     }
@@ -47,6 +56,8 @@ export class EditorInspectorService {
             this.embeddedView.destroy();
             this.embeddedView = undefined;
         }
+
+        this.openTemplate = undefined;
 
 
         try {

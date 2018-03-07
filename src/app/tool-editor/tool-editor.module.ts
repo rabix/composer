@@ -36,6 +36,10 @@ import {ResourcesComponent} from "./sections/resources/resources.component";
 import {ToolEditorComponent} from "./tool-editor.component";
 import {ToolVisualEditorComponent} from "./tool-visual-editor/tool-visual-editor.component";
 import {JobEditorModule} from "../job-editor/job-editor.module";
+import {StoreModule} from "@ngrx/store";
+import {reducers, moduleStateRoot} from "./reducers";
+import {TestJobManagerService} from "./services/test-job/test-job-manager.service";
+import {EffectsModule} from "@ngrx/effects";
 
 @NgModule({
     declarations: [
@@ -82,7 +86,9 @@ import {JobEditorModule} from "../job-editor/job-editor.module";
         EditorCommonModule,
         CWLModule,
         UIModule,
-        JobEditorModule
+        JobEditorModule,
+        StoreModule.forFeature(moduleStateRoot, reducers),
+        EffectsModule.forFeature([TestJobManagerService])
     ]
 })
 export class ToolEditorModule {
