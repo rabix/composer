@@ -53,7 +53,7 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
      * This can happen for example if we encounter a mismatch between step value and the input type,
      * for example, an input can by File[], and the step value can be just a plain string.
      */
-            warning: string;
+    warning: string;
 
     secondaryFilesCount = 0;
     metadataKeysCount   = 0;
@@ -120,8 +120,12 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
                 break;
 
             case "float":
+                const float = parseFloat(update);
+                this.control.setValue(isNaN(float) ? 0 : float, updateOptions);
+                break;
             case "int":
-                this.control.setValue(parseInt(update, 10), updateOptions);
+                const int = parseInt(update);
+                this.control.setValue(isNaN(int) ? 0 : int, updateOptions);
                 break;
             case "boolean":
                 this.control.setValue(Boolean(update), updateOptions);
