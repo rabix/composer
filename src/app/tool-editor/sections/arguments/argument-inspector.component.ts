@@ -30,7 +30,7 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
                 <!--Expression Field-->
                 <div class="form-group">
-                    <label class="form-control-label">Expression</label>
+                    <label class="form-control-label">Value</label>
                     <ct-expression-input
                         [context]="context"
                         [readonly]="readonly"

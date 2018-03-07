@@ -172,18 +172,20 @@ export class PublicAppsPanelService extends AppsPanelService {
             imageClass = "icon-workflow";
         }
 
+        const tkVersion = (app.raw && app.raw["sbg:toolkitVersion"]) || "";
+
         return {
             id: AppHelper.getRevisionlessID(app.id),
             data: app,
             type: "app",
-            label: app.name,
+            label: `${app.name} ${tkVersion}`,
             dragEnabled: true,
             dragLabel: app.name,
             dragDropZones: ["graph-editor"],
             dragTransferData: {name: app.id, type: "cwl"},
             icon: icon,
             dragImageClass: imageClass,
-        }
+        };
     }
 
 

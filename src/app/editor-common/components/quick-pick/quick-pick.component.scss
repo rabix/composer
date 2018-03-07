@@ -18,10 +18,9 @@
     .radio-container .btn {
         background-color: $input-bg;
         color: $smoke;
-        border: 1px solid $layout-section-border-light;
+        border: $layout-section-border-light;
 
         &.selected {
-            background: $editor-panel-selected-background;
             border-color: $brand-primary;
         }
 
