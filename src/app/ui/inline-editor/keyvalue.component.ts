@@ -5,8 +5,6 @@ import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {map, tap, distinctUntilChanged} from "rxjs/operators";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-key-value",
     host: {
         "class": "block container"
@@ -18,6 +16,7 @@ import {map, tap, distinctUntilChanged} from "rxjs/operators";
             multi: true
         }
     ],
+    styleUrls: ["./keyvalue.component.scss"],
     template: `
         <div [formGroup]="formGroup" (change)="onInputsFormChange($event)">
             <div formArrayName="pairs">
@@ -25,13 +24,13 @@ import {map, tap, distinctUntilChanged} from "rxjs/operators";
                      [formGroupName]="i"
                      class="mb-1 input-group row">
 
-                    <input class="form-control  col-xs-5" formControlName="key" data-test="key-field" [placeholder]="keyLabel"/>
+                    <input class="form-control col-xs-5" formControlName="key" data-test="key-field" [placeholder]="keyLabel"/>
                     <span class="input-group-addon">:</span>
                     <input class="form-control col-xs-5" formControlName="value" data-test="value-field" [placeholder]="valueLabel"/>
                     <span class="input-group-btn">
                         <button (click)="remove(i)"
                                 type="button"
-                                class="input-group-addon btn btn-secondary"
+                                class="btn btn-secondary remove-btn"
                                 data-test="remove-entry-button">
                             <i class="fa fa-trash"></i></button>
                     </span>
