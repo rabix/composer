@@ -60,6 +60,7 @@ import {merge} from "rxjs/observable/merge";
 import {of} from "rxjs/observable/of";
 import {empty} from "rxjs/observable/empty";
 import {combineLatest} from "rxjs/observable/combineLatest";
+import {fixJobFilePaths} from "../utilities/imported-job-parser/imported-job-parser";
 
 const path = require("path");
 
@@ -827,9 +828,11 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     importJob() {
         const metaManager = this.injector.get<AppMetaManager>(AppMetaManagerToken);
-        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
-        comp.appID        = this.tabData.id;
-        comp.action       = "import";
+        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job", {
+            appID: this.tabData.id,
+            action: "import",
+            importTrasform: (job, path) => fixJobFilePaths(this.tabData.id, path, job)
+        });
 
         comp.import.pipe(
             take(1)
@@ -839,7 +842,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             if (this.jobEditor) {
                 this.jobEditor.updateJob(jobObject);
             }
-
         });
 
     }

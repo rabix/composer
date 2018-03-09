@@ -26,7 +26,6 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     @Input()
     context: { $job?: any, $self?: any } = {};
 
-    @Input()
     readonly = false;
 
     @Input()
@@ -184,6 +183,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     }
 
     setDisabledState(isDisabled: boolean): void {
+        console.log("Setting disabled state on input section", isDisabled);
         this.readonly = isDisabled;
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];

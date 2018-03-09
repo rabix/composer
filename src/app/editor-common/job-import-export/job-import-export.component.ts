@@ -1,6 +1,14 @@
 import {
-    Component, EventEmitter, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges,
-    ViewChild, ChangeDetectorRef
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    Renderer2,
+    SimpleChanges,
+    ViewChild,
+    ChangeDetectorRef
 } from "@angular/core";
 import {FormControl} from "@angular/forms";
 import * as Yaml from "js-yaml";
@@ -52,7 +60,6 @@ export class JobImportExportComponent implements OnInit, OnChanges {
     editorOptions = {
         mode: "ace/mode/yaml"
     } as Partial<AceEditorOptions>;
-
 
     constructor(public modal: ModalService,
                 private native: NativeSystemService,
@@ -128,9 +135,13 @@ export class JobImportExportComponent implements OnInit, OnChanges {
 
     chooseImportFile() {
         this.native.openFileChoiceDialog().then(paths => {
-            return this.fileRepository.fetchFile(paths[0], true);
-        }).then(content => {
-            return Yaml.safeLoad(content, {json: true} as LoadOptions);
+            const path = paths[0];
+            return this.fileRepository.fetchFile(path, true).then(content => ({content, path}));
+        }).then(data => {
+            const {content, path} = data;
+
+            const loaded = Yaml.safeLoad(content, {json: true} as LoadOptions);
+            return typeof this.importTrasform === "function" ? this.importTrasform(loaded, path) : loaded;
         }).then(jobObject => {
             this.import.emit(jobObject);
         }).catch(err => {
@@ -196,6 +207,10 @@ export class JobImportExportComponent implements OnInit, OnChanges {
             btn.textContent = originalContent;
             btn.disabled    = false;
         }, 1000);
+    }
+
+    importTrasform(jobObject: Object, filePath: string) {
+        return jobObject;
     }
 
 }

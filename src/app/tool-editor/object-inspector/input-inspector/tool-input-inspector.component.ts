@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, Inject} from "@angular/core";
+import {Component, Input, OnInit, Output, Inject, SimpleChanges} from "@angular/core";
 import {FormGroup, FormControl} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
@@ -50,17 +50,8 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
 
     testValueControl = new FormControl();
 
-    get readonly(): boolean {
-        return this.inputForm.disabled;
-    }
-
-    @Input("readonly")
-    set readonly(isDisabled: boolean) {
-        if (this.inputForm) {
-            const eventDescriptor = {onlySelf: true, emitEvent: false};
-            isDisabled ? this.inputForm.disable(eventDescriptor) : this.inputForm.enable(eventDescriptor);
-        }
-    }
+    @Input()
+    readonly = false;
 
     inputForm: FormGroup;
 
@@ -80,6 +71,13 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
     constructor(private store: Store<AppState>,
                 @Inject(AppInfoToken) private appInfo: AppInfo) {
         super();
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.readonly && this.inputForm) {
+            const descriptor = {emitEvent: changes.readonly.isFirstChange()};
+            this.readonly ? this.inputForm.disable(descriptor) : this.inputForm.enable(descriptor);
+        }
     }
 
     ngOnInit() {
@@ -111,6 +109,11 @@ export class ToolInputInspectorComponent extends DirectiveBase implements OnInit
             description: new FormControl(this.input),
             stageInputSection: new FormControl(this.input),
         });
+
+        if (this.readonly) {
+            this.inputForm.disable({emitEvent: false});
+        }
+
 
         this.inputForm.valueChanges.subscribeTracked(this, () => {
             this.save.next(this.input);

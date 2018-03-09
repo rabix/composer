@@ -149,6 +149,7 @@ export class NativeFileBrowserFormFieldComponent extends DirectiveBase implement
     }
 
     writeValue(obj: any): void {
+        console.log("Writing file value", obj);
 
         if (obj === undefined) {
             return;

@@ -82,6 +82,8 @@ export class InputValueEditorComponent extends DirectiveBase implements OnChange
 
     writeValue(value: any): void {
 
+        console.log("Write input value", value);
+
         if (value === undefined) {
             return;
         }
