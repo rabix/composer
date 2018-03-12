@@ -38,9 +38,10 @@ export class Execution {
         this.process = spawn(this.jrePath, [
             "-jar",
             this.jarPath,
+            "--enable-composer-logs",
             this.appPath,
             this.jobPath,
-            ...this.parseExecutorParamsToArgs(this.executionParams)
+            ...this.parseExecutorParamsToArgs(this.executionParams),
         ]);
 
         if (this.stdoutPath) {

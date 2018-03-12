@@ -2,7 +2,6 @@ import {
     ExecutionStartedAction,
     EXECUTION_COMPLETED,
     ExecutionCompletedAction,
-    EXECUTION_ERROR,
     ExecutionErrorAction,
     EXECUTION_STOPPED,
     EXECUTION_REQUIREMENT_ERROR,
@@ -77,15 +76,32 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             return {...state, [appID]: app.complete()};
         }
 
-        case EXECUTION_ERROR: {
+        case ExecutionErrorAction.type: {
 
-            const {appID, exitCode} = action as Partial<ExecutionErrorAction>;
-            const app               = state[appID];
+            const {appID, error} = action as Partial<ExecutionErrorAction>;
+
+            const app = state[appID];
+
             if (!app) {
                 return state;
             }
 
-            return {...state, [appID]: app.fail(new ExecutionError(exitCode, undefined, "execution"))};
+            let errorCode    = error.code;
+            let errorMessage = error.message;
+
+            if (app.error) {
+                if (errorCode === undefined) {
+                    errorCode = app.error.code;
+                }
+
+                if (!errorMessage) {
+                    errorMessage = app.error.message;
+                }
+            }
+
+            let mergedError = new ExecutionError(errorCode, errorMessage, "execution");
+
+            return {...state, [appID]: app.fail(mergedError)};
         }
 
         case EXECUTION_REQUIREMENT_ERROR: {

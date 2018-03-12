@@ -77,17 +77,17 @@
             {{ step?.label || step.id }}
 
             <span class="text-muted">
-                    {{ step.state }}
+                {{ step.state }}
 
-                    <ng-container *ngIf="step.state === 'started' && step.startTime">
-                        {{ step.startTime | amTimeAgo:false }}
-                    </ng-container>
+                <ng-container *ngIf="step.state === 'started' && step.startTime">
+                    {{ step.startTime | amTimeAgo:false }}
+                </ng-container>
 
-                    <ng-container
-                        *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
-                        in {{ (step.endTime - step.startTime) | executionDuration }}
-                    </ng-container>
-                </span>
+                <ng-container
+                    *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
+                    in {{ (step.endTime - step.startTime) | executionDuration }}
+                </ng-container>
+            </span>
         </div>
     </div>
 </div>

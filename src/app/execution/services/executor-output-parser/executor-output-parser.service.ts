@@ -1,20 +1,19 @@
- import {Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
 import {Actions, Effect} from "@ngrx/effects";
 import {Observable} from "rxjs/Observable";
 import {
-    EXECUTOR_OUTPUT,
     ExecutorOutputAction,
     ExecutionStepFailedAction,
     ExecutionStepCompletedAction,
     ExecutionStepStartedAction,
-    ExecutionDockerPullTimeoutAction
+    ExecutionDockerPullTimeoutAction, ExecutionErrorAction
 } from "../../actions/execution.actions";
 import {Action} from "@ngrx/store";
-import {ExecutionState} from "../../models";
-import {extractStepProgress, extractDockerTimeout} from "./log-parser";
-import {flatMap, map, filter} from "rxjs/operators";
+import {flatMap} from "rxjs/operators";
 import {of} from "rxjs/observable/of";
 import {empty} from "rxjs/observable/empty";
+import {StepInfoLogEntry, DockerPullTryLogEntry, ComposerLogEntry} from "../../types";
+import {ExecutionError} from "../../models";
 
 @Injectable()
 export class ExecutorOutputParser {
@@ -22,50 +21,68 @@ export class ExecutorOutputParser {
     @Effect()
     stepStates: Observable<Action>;
 
-    @Effect()
-    dockerPullFailure: Observable<Action>;
-
     constructor(private actions: Actions) {
 
-        this.stepStates = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT).pipe(
-            flatMap(action => {
-                const updates = extractStepProgress(action.message);
-                const appID   = action.appID;
-                const list    = [];
+        this.stepStates = this.actions.ofType<ExecutorOutputAction>(ExecutorOutputAction.type).pipe(
+            flatMap((action: ExecutorOutputAction) => {
+                const {appID, message} = action;
 
-                updates.forEach((state, stepID) => list.push({appID, stepID, state}));
+                const composerMark = "Composer: ";
+                const lines        = message.split("\n");
 
-                if (list.length === 0) {
-                    return empty();
-                }
+                const composerLogs = lines.reduce((acc, line) => {
 
-                return of(...list);
+                    const composerMarkIndex = line.indexOf(composerMark);
+                    if (composerMarkIndex === -1) {
+                        return acc;
+                    }
+
+                    const composerMessage = line.substr(composerMarkIndex + composerMark.length);
+
+                    try {
+                        const data = JSON.parse(composerMessage) as ComposerLogEntry;
+                        return acc.concat({appID, data});
+                    } catch (ex) {
+                        console.warn("Could not parse composer message", composerMessage);
+                        return acc;
+                    }
+
+                }, []);
+                return of(...composerLogs);
+
             }),
-            flatMap(data => {
-                const {appID, stepID, state} = data;
+            flatMap(action => {
+                const {data} = action;
+                const appID  = action.appID;
+                if (data.hasOwnProperty("stepId")) {
+                    const {status, stepId, message} = data as StepInfoLogEntry;
 
-                switch (state as ExecutionState) {
+                    const stepParts        = stepId.split(".");
+                    const firstLevelStepID = stepParts[1];
 
-                    case "failed":
-                        return of(new ExecutionStepFailedAction(appID, stepID));
-
-                    case "completed":
-                        return of(new ExecutionStepCompletedAction(appID, stepID));
-
-                    case "started":
-                        return of(new ExecutionStepStartedAction(appID, stepID));
-
-                    default:
+                    if (!firstLevelStepID) {
+                        if (status === "FAILED") {
+                            return of(new ExecutionErrorAction(appID, new ExecutionError(undefined, message, "execution")));
+                        }
                         return empty();
+                    }
+
+                    switch (status) {
+                        case "COMPLETED":
+                            return of(new ExecutionStepCompletedAction(appID, firstLevelStepID));
+                        case "FAILED":
+                            return of(new ExecutionStepFailedAction(appID, firstLevelStepID, message));
+                        case "READY":
+                            return of(new ExecutionStepStartedAction(appID, firstLevelStepID));
+                    }
+                } else if (data.status === "DOCKER_PULL_FAILED") {
+                    const {retry} = data as DockerPullTryLogEntry;
+                    return of(new ExecutionDockerPullTimeoutAction(appID, Date.now() + retry * 1000));
                 }
+
+                return empty();
 
             })
-        );
-
-        this.dockerPullFailure = this.actions.ofType<ExecutorOutputAction>(EXECUTOR_OUTPUT).pipe(
-            map(action => ({appID: action.appID, timeout: extractDockerTimeout(action.message)})),
-            filter(data => data.timeout !== undefined),
-            map(data => new ExecutionDockerPullTimeoutAction(data.appID, Date.now() + data.timeout * 1000))
         );
     }
 }
