@@ -193,7 +193,7 @@ export class ToolInputListComponent extends DirectiveBase {
             delay(1),
             map(list => list.last)
         ).subscribe(templateRef => {
-            // this.inspector.show(templateRef, newEntry.loc);
+            this.inspector.show(templateRef, newEntry.loc);
         });
     }
 
