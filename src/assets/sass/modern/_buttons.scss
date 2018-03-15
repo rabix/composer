@@ -54,3 +54,15 @@ $gradientDarken: 2%;
 .btn:enabled:hover {
     border-color: $btn-border-hover-color;
 }
+
+.btn:active {
+    outline-color: rgb(77, 144, 254);
+}
+
+.btn:focus {
+    outline-color: rgb(77, 144, 254);
+}
+
+.btn:focus:active {
+    outline-color: rgb(77, 144, 254);
+}
