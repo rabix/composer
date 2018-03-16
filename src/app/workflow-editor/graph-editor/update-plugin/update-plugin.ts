@@ -6,28 +6,61 @@ import {PlatformRepositoryService} from "../../../repository/platform-repository
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {Subscription} from "rxjs/Subscription";
 import {StepModel} from "cwlts/models";
-import {LocalRepositoryService} from "../../../repository/local-repository.service";
-import {take, finalize} from "rxjs/operators";
+import {Subject} from "rxjs/Subject";
+import {switchMap, map, filter} from "rxjs/operators";
+import {AuthService} from "../../../auth/auth.service";
 import {fromPromise} from "rxjs/observable/fromPromise";
 
 export class UpdatePlugin extends PluginBase {
-
     private css = {
         plugin: "__plugin-update",
         update: "__update-has-update"
     };
 
-    private updateMap = new Map<string, boolean>();
+    private stepUpdateRequest = new Subject<any>();
+    private subscriptions     = [] as Subscription[];
+    private updateMap         = new Map<string, boolean>();
 
-    private subscription: Subscription;
-
-    private updateStatusProcess;
+    private statusMessageID;
 
     constructor(private statusBar: StatusBarService,
-                private localRepository: LocalRepositoryService,
+                private auth: AuthService,
                 private platformRepository: PlatformRepositoryService,
                 private notificationBar: NotificationBarService) {
         super();
+
+        const updateCheckIsDoable = this.stepUpdateRequest.pipe(
+            switchMap(() => this.auth.getActive()),
+            filter(activeCredentials => Boolean(activeCredentials))
+        );
+
+        const updateFlow = updateCheckIsDoable.pipe(
+            map(() => this.getUpdateCandidateAppIDs()),
+            switchMap(appIDs => fromPromise(this.platformRepository.getUpdates(appIDs))),
+            map(updates => updates.reduce((acc, item) => {
+                const revisionlessID = AppHelper.getRevisionlessID(item.id);
+                return {...acc, [revisionlessID]: item.revision};
+            }, {}))
+        );
+
+        const statusStart = updateCheckIsDoable.subscribe(() => {
+            this.stopStatus();
+            this.statusMessageID = this.statusBar.startProcess("Checking for app updates...")
+        });
+
+        const update = updateFlow.subscribe(appRevisionMap => {
+            this.stopStatus();
+            this.applyRevisionMap(appRevisionMap);
+        }, err => {
+            this.stopStatus();
+            const errWrapper = new ErrorWrapper(err);
+            if (!errWrapper.isOffline()) {
+                this.notificationBar.showNotification("Cannot get app updates. " + errWrapper);
+            }
+        });
+
+        this.subscriptions.push(update, statusStart);
+
     }
 
     registerWorkflow(workflow: Workflow) {
@@ -36,28 +69,13 @@ export class UpdatePlugin extends PluginBase {
     }
 
     afterModelChange() {
-        this.cleanUp();
-    }
-
-    afterRender() {
-        if (this.workflow.editingEnabled) {
-            this.localRepository.getActiveCredentials().pipe(
-                take(1)
-            ).subscribe(creds => {
-                if (creds) {
-                    this.getStepUpdates();
-                }
-            });
-        }
+        this.stepUpdateRequest.next();
     }
 
     // noinspection JSUnusedGlobalSymbols
-    enableEditing(enabled: boolean): void {
+    enableEditing(enabled: boolean) {
         if (enabled) {
-            this.getStepUpdates();
-        } else if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
+            this.stepUpdateRequest.next();
         }
     }
 
@@ -72,86 +90,56 @@ export class UpdatePlugin extends PluginBase {
         new StepNode(stepEl, step as any).update();
     }
 
-    private cleanUp() {
-        if (this.updateStatusProcess) {
-            this.statusBar.stopProcess(this.updateStatusProcess);
-            this.updateStatusProcess = null;
-        }
+    destroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
 
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
+    private stopStatus() {
+        if (this.statusMessageID) {
+            this.statusBar.stopProcess(this.statusMessageID);
+            this.statusMessageID = undefined;
         }
     }
 
-    private findStep(step: StepModel): SVGElement {
-        return this.workflow.svgRoot.querySelector(`.step[data-connection-id="${step.connectionId}"]`) as SVGElement;
+    private applyRevisionMap(appRevisionMap: { [appID: string]: number }): void {
+        this.workflow.model.steps.forEach(step => {
+
+            // a non-sbg app might be embedded in an sbg workflow
+            if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
+                return;
+            }
+            const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
+            const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
+
+            if (appRevisionMap[revisionless] === undefined) {
+                return;
+            }
+
+            let hasUpdate = appRevisionMap[revisionless] > revision;
+            this.updateMap.set(step.connectionId, hasUpdate);
+
+            if (hasUpdate) {
+                const stepEl = this.findStep(step as any);
+                stepEl.classList.add(this.css.update);
+            }
+        });
     }
 
     /**
-     * Call updates service to get information about steps if they have updates and mark ones that can be updated
+     * Iterates over model steps and extracts IDs of contained steps
+     * @returns Array of revisionless app IDs
      */
-    private getStepUpdates() {
-
-        this.updateStatusProcess       = this.statusBar.startProcess("Checking for app updates…");
-        const nestedAppRevisionlessIDs = this.workflow.model.steps.reduce((acc, step) => {
-
+    private getUpdateCandidateAppIDs(): string[] {
+        return this.workflow.model.steps.reduce((acc, step) => {
             if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
                 return acc;
             }
 
-            return acc.concat(
-                AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null)
-            );
+            return acc.concat(AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null));
         }, []);
-
-        // there is already a request for updates underway
-        if (this.subscription) return;
-
-        // We are wrapping a promise as a tracked observable so we easily dispose of it when component gets destroyed
-        // If this gets destroyed while fetch is in progress, when it completes it will try to access the destroyed view
-        // which results in throwing an exception
-        this.subscription = fromPromise(this.platformRepository.getUpdates(nestedAppRevisionlessIDs)).pipe(
-            finalize(() => this.cleanUp())
-        ).subscribe(result => {
-            const appRevisionMap = result.reduce((acc, item) => {
-
-                const revisionlessID = AppHelper.getRevisionlessID(item.id);
-                return {...acc, [revisionlessID]: item.revision};
-            }, {});
-
-            this.workflow.model.steps.forEach(step => {
-
-                // a non-sbg app might be embedded in an sbg workflow
-                if (!step.run || !step.run.customProps || !step.run.customProps["sbg:id"]) {
-                    return;
-                }
-                const revisionless = AppHelper.getAppIDWithRevision(step.run.customProps["sbg:id"], null);
-                const revision     = AppHelper.getRevision(step.run.customProps["sbg:id"]);
-
-                if (appRevisionMap[revisionless] === undefined) {
-                    return;
-                }
-
-                let hasUpdate = appRevisionMap[revisionless] > revision;
-                this.updateMap.set(step.connectionId, hasUpdate);
-
-                if (hasUpdate) {
-                    const stepEl = this.findStep(step as any);
-                    stepEl.classList.add(this.css.update);
-                }
-            });
-
-        }, err => {
-            const errWrapper = new ErrorWrapper(err);
-            if (!errWrapper.isOffline()) {
-                this.notificationBar.showNotification("Cannot get app updates. " + errWrapper);
-            }
-            this.cleanUp();
-        });
     }
 
-    destroy() {
-        this.cleanUp();
+    private findStep(step: StepModel): SVGElement {
+        return this.workflow.svgRoot.querySelector(`.step[data-connection-id="${step.connectionId}"]`) as SVGElement;
     }
 }
