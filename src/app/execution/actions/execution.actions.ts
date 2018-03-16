@@ -1,14 +1,13 @@
 import {Action} from "@ngrx/store";
 import {AppType} from "../types";
+import {ExecutionError} from "../models";
 
 export const EXECUTION_STOP                = "[App Execution] stop";
 export const EXECUTION_PREPARED            = "[App Execution] prepared";
 export const EXECUTION_STARTED             = "[App Execution] started";
-export const EXECUTION_ERROR               = "[App Execution] error";
 export const EXECUTION_REQUIREMENT_ERROR   = "[App Execution] requirement error";
 export const EXECUTION_COMPLETED           = "[App Execution] completed";
 export const EXECUTION_STOPPED             = "[App Execution] stopped";
-export const EXECUTOR_OUTPUT               = "[App Execution] executor output";
 export const EXECUTION_STEP_FAILED         = "[App Execution] step failed";
 export const EXECUTION_STEP_STARTED        = "[App Execution] step started";
 export const EXECUTION_STEP_COMPLETED      = "[App Execution] step completed";
@@ -41,10 +40,10 @@ export class ExecutionStartedAction extends ExecutionAction {
 }
 
 export class ExecutionErrorAction extends ExecutionAction {
-    readonly type = EXECUTION_ERROR;
+    static readonly type = "[App Execution] error";
+    type = ExecutionErrorAction.type;
 
-
-    constructor(appID: string, public exitCode) {
+    constructor(appID: string, public error: ExecutionError) {
         super(appID);
     }
 }
@@ -66,7 +65,8 @@ export class ExecutionStoppedAction extends ExecutionAction {
 }
 
 export class ExecutorOutputAction extends ExecutionAction {
-    readonly type = EXECUTOR_OUTPUT;
+    static type = "[App Execution] executor output";
+    readonly type = ExecutorOutputAction.type;
 
     constructor(public appID: string, public message: string, public source?: string) {
         super(appID);
@@ -101,7 +101,13 @@ export class ExecutionDockerPullTimeoutAction extends ExecutionAction {
 
     readonly type = EXECUTION_DOCKER_PULL_TIMEOUT;
 
-    constructor(appID: string, public timeout: number) {
+    /**
+     * Millisecond timestamp that indicates the exact time when the executor will retry to pull the docker image.
+     */
+    timeout: number;
+
+    constructor(appID: string, timeout: number) {
         super(appID);
+        this.timeout = timeout;
     }
 }

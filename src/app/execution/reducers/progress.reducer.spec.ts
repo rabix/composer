@@ -10,7 +10,7 @@ import {
     ExecutionStepCompletedAction,
     ExecutionStepFailedAction
 } from "../actions/execution.actions";
-import {AppExecution, StepExecution} from "../models";
+import {AppExecution, StepExecution, ExecutionError} from "../models";
 import objectContaining = jasmine.objectContaining;
 
 describe("Execution module", () => {
@@ -82,7 +82,7 @@ describe("Execution module", () => {
                     new ExecutionStepCompletedAction(appID, stepID),
                     new ExecutionStepFailedAction(appID, stepID),
                     new ExecutionCompletedAction(appID),
-                    new ExecutionErrorAction(appID, 1),
+                    new ExecutionErrorAction(appID, new ExecutionError(1)),
                     new ExecutionStoppedAction(appID)
                 ].reduce(reducer, {});
 
@@ -123,7 +123,7 @@ describe("Execution module", () => {
                     const appID = "/root/app-id";
                     const state = reducer({
                         [appID]: new AppExecution("CommandLineTool", "app-outdir", [new StepExecution("app-id", "Only Step")])
-                    }, new ExecutionErrorAction(appID, 1));
+                    }, new ExecutionErrorAction(appID, new ExecutionError(1)));
 
                     expect(state[appID].stepExecution[0].state).toBe("failed");
                 });

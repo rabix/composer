@@ -19,6 +19,7 @@ import * as Yaml from "js-yaml";
 import {Actions} from "@ngrx/effects";
 import {filter, take} from "rxjs/operators";
 import {AppType} from "../../types";
+import {ExecutionError} from "../../models";
 
 const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
 const path            = window["require"]("path");
@@ -122,7 +123,7 @@ export class ExecutorService2 {
 
                 obs.next(execution.getCommandLineString());
 
-                process.on("exit", (code, sig) => {
+                process.on("exit", (code: number, sig) => {
                     processStillRunning = false;
 
                     /** Successful completion if exit code is 0 */
@@ -150,7 +151,7 @@ export class ExecutorService2 {
                         obs.complete();
                         return;
                     } else {
-                        this.store.dispatch(new ExecutionErrorAction(appID, code));
+                        this.store.dispatch(new ExecutionErrorAction(appID, new ExecutionError(code)));
                         obs.error(new Error(`Execution failed with exit code ${code}.`));
                     }
 
@@ -166,14 +167,12 @@ export class ExecutorService2 {
                 });
 
                 process.stdout.on("data", data => {
-
-                    this.store.dispatch(new ExecutorOutputAction(appID, data.toString(), "stdout"));
-
                     obs.next(data.toString());
                 });
 
                 process.stderr.on("data", data => {
-                    this.store.dispatch(new ExecutorOutputAction(appID, data.toString(), "stderr"));
+                    const output = data.toString();
+                    this.store.dispatch(new ExecutorOutputAction(appID, output, "stderr"));
                 });
 
             }, ex => {

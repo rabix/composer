@@ -51,14 +51,18 @@ export class AppExecution {
     }
 
     fail(error: ExecutionError, ...failedStepIDs: string[]) {
+        let mergedError = error;
+        if (!error.message && this.error && this.error.message) {
+            mergedError = new ExecutionError(error.code, this.error.message, error.type);
+        }
         return this.update({
-            error,
+            error: mergedError,
             state: "failed",
             endTime: Date.now(),
             dockerPullTimeout: undefined,
             stepExecution: this.stepExecution.map(step => {
 
-                if(error.type === "requirement"){
+                if (error.type === "requirement") {
                     return step.transitionTo("stopped");
                 }
 
