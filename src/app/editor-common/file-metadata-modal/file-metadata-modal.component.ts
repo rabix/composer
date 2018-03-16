@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
-import {ModalService} from "../../../ui/modal/modal.service";
+import {ModalService} from "../../ui/modal/modal.service";
 
 @Component({
-    selector: "ct-job-file-metadata-modal",
+    selector: "ct-file-metadata-modal",
     template: `
         <form [formGroup]="form" (ngSubmit)="form.valid && applyChanges()">
 
@@ -57,9 +57,9 @@ import {ModalService} from "../../../ui/modal/modal.service";
 
         </form>
     `,
-    styleUrls: ["./job-file-metadata-modal.component.scss"],
+    styleUrls: ["./file-metadata-modal.component.scss"],
 })
-export class JobFileMetadataModalComponent implements OnInit {
+export class FileMetadataModalComponent implements OnInit {
 
     @Input()
     secondaryFiles: { class: "File" | "Directory", path: string }[] = [];

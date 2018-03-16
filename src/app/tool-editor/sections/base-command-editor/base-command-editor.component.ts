@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, forwardRef, Inject, Input} from "@angular/
 import {ControlValueAccessor, FormArray, FormControl, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {CommandLineToolModel, ExpressionModel} from "cwlts/models";
 import {ErrorCode} from "cwlts/models/helpers/validation";
-import {APP_MODEL} from "../../../core/factories/app-model-provider-factory";
+import {AppModelToken} from "../../../core/factories/app-model-provider-factory";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
@@ -71,7 +71,7 @@ export class BaseCommandEditorComponent extends DirectiveBase implements Control
 
     private propagateTouch = () => void 0;
 
-    constructor(@Inject(APP_MODEL) private appModel: CommandLineToolModel,
+    constructor(@Inject(AppModelToken) private appModel: CommandLineToolModel,
                 private modal: ModalService,
                 private cdr: ChangeDetectorRef) {
         super();

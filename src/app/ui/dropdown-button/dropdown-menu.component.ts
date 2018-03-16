@@ -1,5 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation} from "@angular/core";
-import {Observable} from "rxjs/Observable";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {first, filter} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -26,16 +27,16 @@ import {Observable} from "rxjs/Observable";
 export class DropDownMenuComponent {
 
     @Input()
-    public hostElement: HTMLElement;
+    hostElement: HTMLElement;
 
     @Input()
-    public dropDownOptions: { value, caption, description }[] = [];
+    dropDownOptions: { value, caption, description }[] = [];
 
     @Input()
-    public selected: { value, caption, description } = null;
+    selected: { value, caption, description } = null;
 
     @Output()
-    public select = new EventEmitter();
+    select = new EventEmitter();
 
     private selectItem(item) {
         this.select.emit(item);
@@ -43,10 +44,9 @@ export class DropDownMenuComponent {
 
     ngOnInit() {
         // Close drop-down menu when you click outside of it
-        Observable.fromEvent(document, "click").filter((ev: MouseEvent) => {
-            return !this.hostElement.contains(ev.target as Node)
-        }).first().subscribe(() => {
-            this.selectItem(undefined);
-        });
+        fromEvent(document, "click").pipe(
+            filter((ev: MouseEvent) => !this.hostElement.contains(ev.target as Node)),
+            first()
+        ).subscribe(() => this.selectItem(undefined));
     }
 }

@@ -15,7 +15,7 @@ export class AppHelper {
     }
 
     static getRevisionlessID(appID: string): string {
-        return appID.split("/").slice(0, 3).join("/").toLowerCase();
+        return appID.split("/").slice(0, 3).join("/");
     }
 
     static getAppIDWithRevision(id: string, revision: string);

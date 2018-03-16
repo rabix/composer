@@ -7,6 +7,9 @@ import {Subject} from "rxjs/Subject";
 import {noop} from "../../lib/utils.lib";
 import {Guid} from "../../services/guid.service";
 import {StatusBarComponent} from "./status-bar.component";
+import {last} from "rxjs/operators";
+import {concat} from "rxjs/operators";
+import {empty} from "rxjs/observable/empty";
 
 
 @Injectable()
@@ -28,9 +31,13 @@ export class StatusBarService {
 
         this.queueSize.next(this.queueSize.getValue() + 1);
 
-        this.process = (this.process || Observable as any).concat(process);
+        this.process = (this.process || empty()).pipe(
+            concat(process)
+        );
 
-        process.last().subscribe(() => {
+        process.pipe(
+            last()
+        ).subscribe(() => {
 
             this.queueSize.next(this.queueSize.getValue() - 1);
 

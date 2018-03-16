@@ -11,6 +11,7 @@ import {ExecutorDefaultPathLoader} from "./storage/hooks/executor-config-hook";
 import {CredentialsCache, LocalRepository} from "./storage/types/local-repository";
 import {UserRepository} from "./storage/types/user-repository";
 import {heal} from "./storage/repository-healer";
+import {AppMetaPatcher, LocalRepositoryWatcher, UserRepositoryWatcher} from "./interfaces/interfaces";
 
 
 const userDataPath   = require("electron").app.getPath("userData");
@@ -185,7 +186,7 @@ export function getLocalRepository(data: { key?: string } = {}, callback) {
     });
 }
 
-export function watchLocalRepository(data: { key: string }, callback) {
+export const watchLocalRepository: LocalRepositoryWatcher = (data: { key: string }, callback) => {
 
     repositoryLoad.then((repoData) => {
 
@@ -223,7 +224,7 @@ export function getUserRepository(data: { key?: string } = {}, callback) {
     }, err => callback(err));
 }
 
-export function watchUserRepository(data: { key: string }, callback) {
+export const watchUserRepository: UserRepositoryWatcher = (data: { key: string }, callback) => {
     repositoryLoad.then(() => {
 
         const demoUser = new UserRepository();
@@ -553,12 +554,12 @@ export function checkForPlatformUpdates(data: {}, callback) {
     }, callback);
 }
 
-export function patchAppMeta(data: {
+export const patchAppMeta: AppMetaPatcher = (data: {
     profile: "local" | "user",
     appID: string,
     key: string,
     value: any,
-}, callback) {
+}, callback) => {
     const {profile, appID, key, value} = data;
 
     repositoryLoad.then(() => {
@@ -580,7 +581,7 @@ export function patchAppMeta(data: {
         repository.updateUser({appMeta: allMeta}, callback);
 
     }, callback);
-}
+};
 
 export function probeExecutorVersion(data: { path: string }, callback) {
     repositoryLoad.then(() => {

@@ -25,6 +25,8 @@ import {Subject} from "rxjs/Subject";
 
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {ACE_MODE_MAP} from "../code-editor-new/ace-mode-map";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {debounceTime, map, filter} from "rxjs/operators";
 
 export interface AceEditorOptions {
 
@@ -87,6 +89,7 @@ export interface AceEditorOptions {
     spellcheck?: boolean;
     useElasticTabstops?: boolean;
 }
+
 /**
  * @deprecated Use Regular CodeEditorComponent
  */
@@ -102,20 +105,20 @@ export class CodeEditorXComponent extends DirectiveBase {
     /** Stream of raw string content that should be displayed in the editor */
     @Input()
     @Output()
-    public content: Subject<string>;
+    content: Subject<string>;
 
     /** Language of the textual content, used for syntax highlighting */
     @Input()
-    public language: Observable<string> | string;
+    language: Observable<string> | string;
 
     /* Instance of the Ace editor */
-    public editor: AceAjax.Editor;
+    editor: AceAjax.Editor;
 
     @Input()
-    public options: AceEditorOptions = {};
+    options: AceEditorOptions = {};
 
     @Input()
-    public readonly = false;
+    readonly = false;
 
 
     constructor(private elementRef: ElementRef) {
@@ -125,7 +128,7 @@ export class CodeEditorXComponent extends DirectiveBase {
     ngOnInit() {
 
         // Instantiate the editor instance inside the target element
-        this.editor = ace.edit(this.elementRef.nativeElement);
+        this.editor  = ace.edit(this.elementRef.nativeElement);
         this.tracked = this.editor;
 
         // Set the theme and language
@@ -148,20 +151,22 @@ export class CodeEditorXComponent extends DirectiveBase {
         this.editor.$blockScrolling = Infinity;
 
         // Watch for text on the input stream that is not the same as what we already have in the editor
-        const contentChange = this.content.filter(input => input !== this.editor.getValue());
+        const contentChange = this.content.pipe(
+            filter(input => input !== this.editor.getValue())
+        );
 
         // Update the editor content whenever something new comes to the stream.
         // We need to set the value on the session because otherwise the whole content will be selected upon setting.
         this.tracked = contentChange.subscribe(text => this.editor.session.setValue(text));
 
         // Listen for changes on the editor, debounce them for 150ms and then push them back into the text stream
-        Observable.fromEvent(<any>this.editor, "change")
-            .debounceTime(150)
-            .map(_ => this.editor.getValue())
-            .subscribe(this.content);
+        fromEvent(<any>this.editor, "change").pipe(
+            debounceTime(150),
+            map(() => this.editor.getValue())
+        ).subscribeTracked(this, this.content);
     }
 
-    public getEditorInstance() {
+    getEditorInstance() {
         return this.editor;
     }
 

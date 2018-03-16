@@ -32,7 +32,7 @@ export interface GroupItem<T> {
 export class RadioGroupComponent<T> {
 
     /** Observable of an actively selected value */
-    public readonly value: Observable<T>;
+    readonly value: Observable<T>;
 
     @Input()
     items: GroupItem<T>[];
@@ -42,7 +42,7 @@ export class RadioGroupComponent<T> {
 
     }
 
-    public getSelectedValue(): T {
+    getSelectedValue(): T {
         return (this.value as BehaviorSubject<T>).getValue();
     }
 

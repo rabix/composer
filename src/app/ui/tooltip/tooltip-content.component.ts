@@ -79,7 +79,7 @@ export class TooltipContentComponent implements AfterViewInit {
         this.cdr.detectChanges();
     }
 
-    public show(): void {
+    show(): void {
         if (!this.hostElement) {
             return;
         }
@@ -99,14 +99,21 @@ export class TooltipContentComponent implements AfterViewInit {
 
     }
 
-    public hide(): void {
-        this.top  = -10000;
-        this.left = -10000;
-        this.isIn = false;
+    hide(): void {
 
-        if (this.animation) {
-            this.isFade = false;
-        }
+        // Timeout is needed because if this tooltip becomes shown and hidden in the same tick,
+        // setTimeout from showing it will actually bring it back after it was hidden
+        // so we need to ensure that these two get called in the correct order
+        setTimeout(() => {
+            this.top  = -10000;
+            this.left = -10000;
+            this.isIn = false;
+
+            if (this.animation) {
+                this.isFade = false;
+            }
+            this.cdr.markForCheck();
+        });
     }
 
     private positionElements(hostEl: HTMLElement, targetEl: HTMLElement) {

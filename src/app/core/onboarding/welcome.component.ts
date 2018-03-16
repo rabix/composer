@@ -1,7 +1,8 @@
-import {Component} from "@angular/core";
-import {SystemService} from "../../platform-providers/system.service";
-import {ModalService} from "../../ui/modal/modal.service";
+import {Component, Inject} from "@angular/core";
 import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-modal/platform-credentials-modal.component";
+import {take} from "rxjs/operators";
+import {LinkOpener, LinkOpenerToken} from "../../factories/link-opener.factory";
+import {ModalManagerToken, ModalManager} from "../../factories/modal.factory";
 
 @Component({
     styleUrls: ["welcome.component.scss"],
@@ -20,8 +21,7 @@ import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-
                     with online services like DockerHub.
                     <br/>
                     Visit
-                    <a #infoLink href="http://rabix.io" data-test="info-link"
-                       (click)="system.openLink(infoLink.href, $event)">rabix.io</a>
+                    <a #infoLink href="http://rabix.io" data-test="info-link" (click)="openLink(infoLink.href, $event)">rabix.io</a>
                     for more information.
                 </p>
 
@@ -30,9 +30,7 @@ import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-
                 </h2>
 
                 <p>
-                    <button data-test="connect-to-platform-btn" type="button"
-                            (click)="onConnectButtonClick()"
-                            class="btn btn-primary">
+                    <button data-test="connect-to-platform-btn" type="button" class="btn btn-primary" (click)="onConnectButtonClick()">
                         Connect to the Platform
                     </button>
                 </p>
@@ -45,15 +43,19 @@ import {PlatformCredentialsModalComponent} from "../modals/platform-credentials-
 })
 export class WelcomeTabComponent {
 
-    constructor(public system: SystemService,
-                private modal: ModalService) {
+    constructor(
+        @Inject(LinkOpenerToken) public openLink: LinkOpener,
+        @Inject(ModalManagerToken) public modal: ModalManager) {
     }
 
     onConnectButtonClick() {
-        const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add an Account");
 
-        modal.submit.take(1).subscribe(() => {
-            modal.close();
+        const component = this.modal.open(PlatformCredentialsModalComponent, "Add an Account");
+
+        component.submit.pipe(
+            take(1)
+        ).subscribe(() => {
+            component.close();
         });
     }
 }

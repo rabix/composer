@@ -88,7 +88,7 @@ export class SVGJobFileDropPlugin extends PluginBase {
                     continue;
                 }
 
-                if (entry.class === "File" && entry.path) {
+                if ((entry.class === "File" || entry.class === "Directory") && entry.path) {
                     filePaths.push(entry.path);
                 }
             }

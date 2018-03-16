@@ -2,13 +2,13 @@ import {NO_ERRORS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {By} from "@angular/platform-browser";
-import {Observable} from "rxjs/Observable";
 import {RecentAppTab} from "../../../../../electron/src/storage/types/recent-app-tab";
 import {ModalService} from "../../../ui/modal/modal.service";
 import {CreateAppModalComponent} from "../../modals/create-app-modal/create-app-modal.component";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {NewFileTabComponent} from "./new-file-tab.component";
 import {NewFileTabService} from "./new-file-tab.service";
+import {of} from "rxjs/observable/of";
 
 describe("NewFileTabComponent", () => {
     let component: NewFileTabComponent;
@@ -94,7 +94,7 @@ describe("NewFileTabComponent", () => {
         ] as RecentAppTab[];
 
         const serviceMock = fixture.debugElement.injector.get(NewFileTabService);
-        spyOn(serviceMock, "getRecentApps").and.returnValue(Observable.of(recentAppsTestData));
+        spyOn(serviceMock, "getRecentApps").and.returnValue(of(recentAppsTestData));
 
         fixture.detectChanges();
 
@@ -113,7 +113,7 @@ describe("NewFileTabComponent", () => {
         const openRecentAppSpy = spyOn(component, "openRecentApp").and.callThrough();
 
         const openTabSpy = spyOn(workboxMock, "openTab").and.returnValue(null);
-        spyOn(serviceMock, "getRecentApps").and.returnValue(Observable.of([appEntry]));
+        spyOn(serviceMock, "getRecentApps").and.returnValue(of([appEntry]));
 
         fixture.detectChanges();
 

@@ -51,15 +51,15 @@ export class ProjectSelectionModal {
         this.selectedProject = projectID;
     }
 
-    public onSubmit() {
+    onSubmit() {
         this.save(this.selectedProject);
     }
 
-    public onCancel() {
+    onCancel() {
         this.closeModal();
     }
 
-    public closeModal() {
+    closeModal() {
         this.modal.close();
     }
 }

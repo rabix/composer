@@ -1,4 +1,4 @@
-import {Observable} from "rxjs/Observable";
+import {of as ObservableOf} from "rxjs/observable/of";
 import {AuthService} from "./auth.service";
 import {AuthCredentials} from "./model/auth-credentials";
 
@@ -7,8 +7,8 @@ describe("AuthService", () => {
     it("should submit a new set of credentials if a similar one does not exist", function (done) {
 
         const registry = {
-            getCredentials: () => Observable.of([]),
-            getActiveCredentials: () => Observable.of(null),
+            getCredentials: () => ObservableOf([]),
+            getActiveCredentials: () => ObservableOf(null),
             setCredentials: () => Promise.resolve(),
             setActiveCredentials: () => Promise.resolve()
         };
@@ -37,10 +37,10 @@ describe("AuthService", () => {
     it("should submit a new set of credentials if a similar one exist", function (done) {
 
         const registry = {
-            getCredentials: () => Observable.of([
+            getCredentials: () => ObservableOf([
                 new AuthCredentials("https://api.sbgenomics.com", "originalToken", {username: "testuser"} as any)
             ]),
-            getActiveCredentials: () => Observable.of(null),
+            getActiveCredentials: () => ObservableOf(null),
             setCredentials: () => Promise.resolve(),
             setActiveCredentials: () => Promise.resolve()
         };

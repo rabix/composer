@@ -6,49 +6,51 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 import {DataGatewayService} from "../../data-gateway/data-gateway.service";
 import {FormAsyncValidator} from "../../forms/helpers/form-async-validator";
+import {take} from "rxjs/operators";
 
 @Component({
     selector: "ct-create-local-folder-modal",
     styleUrls: ["./create-local-folder-modal.component.scss"],
-    template: `<form [formGroup]="form" (submit)="onSubmit()">
+    template: `
+        <form [formGroup]="form" (submit)="onSubmit()">
 
-    <div class="p-1">
-        <div class="form-group">
-            <label>Folder Name:</label>
-            <input autofocus class="form-control" formControlName="folderName"/>
-        </div>       
+            <div class="p-1">
+                <div class="form-group">
+                    <label>Folder Name:</label>
+                    <input autofocus class="form-control" formControlName="folderName"/>
+                </div>
 
-        <div *ngIf="form.hasError('exists', ['folderName'])">
+                <div *ngIf="form.hasError('exists', ['folderName'])">
             <span class="text-warning">
                 <i class="fa fa-warning fa-fw"></i>    
                     Folder with this name already exists. Please choose another name.
             </span>
-        </div>
+                </div>
 
-        <div *ngIf="form.hasError('invalidName', ['folderName'])">
+                <div *ngIf="form.hasError('invalidName', ['folderName'])">
             <span class="text-warning">
                 <i class="fa fa-warning fa-fw"></i>    
                     {{ form.getError('invalidName', 'folderName') }}
             </span>
-        </div>
+                </div>
 
-        <div *ngIf="form.hasError('creationFailure')">
+                <div *ngIf="form.hasError('creationFailure')">
             <span class="text-danger">
                 <i class="fa fa-times-circle fa-fw"></i>
                     {{ form.getError('creationFailure') }}
-            </span>            
-        </div>
+            </span>
+                </div>
 
-    </div>
+            </div>
 
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
-            <ct-loader-button-content [isLoading]="form.pending">Create</ct-loader-button-content>
-        </button>
-    </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+                    <ct-loader-button-content [isLoading]="form.pending">Create</ct-loader-button-content>
+                </button>
+            </div>
 
-</form>
+        </form>
     `
 })
 export class CreateLocalFolderModalComponent extends DirectiveBase implements OnInit {
@@ -67,30 +69,31 @@ export class CreateLocalFolderModalComponent extends DirectiveBase implements On
     hasFolderNameAsyncValidator(control: FormControl) {
         return new Promise(resolve => {
 
-            this.dataGateway.checkIfPathExists(this.rootFolder + "/" + control.value).take(1)
-                .subscribeTracked(this, (val) => {
-                    if (val.exists) {
-                        resolve({exists: true});
-                    } else {
-                        resolve(null);
-                    }
-                });
+            this.dataGateway.checkIfPathExists(this.rootFolder + "/" + control.value).pipe(
+                take(1)
+            ).subscribeTracked(this, (val) => {
+                if (val.exists) {
+                    resolve({exists: true});
+                } else {
+                    resolve(null);
+                }
+            });
         });
     }
 
     onSubmit() {
         const fullPath = `${this.rootFolder}/${this.form.get("folderName").value}`;
 
-        this.dataGateway
-            .createLocalFolder(fullPath).take(1)
-            .subscribeTracked(this, () => {
-                this.localFileRepository.reloadPath(this.rootFolder);
-                this.modal.close();
-            }, err => {
-                    this.form.setErrors({
-                    creationFailure: err.message
-                })
-            });
+        this.dataGateway.createLocalFolder(fullPath).pipe(
+            take(1)
+        ).subscribeTracked(this, () => {
+            this.localFileRepository.reloadPath(this.rootFolder);
+            this.modal.close();
+        }, err => {
+            this.form.setErrors({
+                creationFailure: err.message
+            })
+        });
     }
 
     ngOnInit() {

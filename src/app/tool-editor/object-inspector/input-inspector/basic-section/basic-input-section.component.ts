@@ -1,98 +1,31 @@
-import {Observable} from "rxjs/Observable";
-import {
-    AfterViewInit, Component, forwardRef, Input, QueryList, ViewChildren, ViewEncapsulation
-} from "@angular/core";
+import {AfterViewInit, Component, forwardRef, Inject, Input, QueryList, ViewChildren} from "@angular/core";
 import {ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, Validators} from "@angular/forms";
 import {CommandInputParameterModel, CommandLineToolModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {ToggleSliderComponent} from "../../../../ui/toggle-slider/toggle-slider.component";
 import {ModalService} from "../../../../ui/modal/modal.service";
+import {merge} from "rxjs/observable/merge";
+import {of} from "rxjs/observable/of";
+import {map, distinctUntilChanged, filter, take} from "rxjs/operators";
+import {AppMetaManagerToken} from "../../../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManager} from "../../../../core/app-meta/app-meta-manager";
 
 @Component({
-    encapsulation: ViewEncapsulation.None,
-
     selector: "ct-basic-input-section",
     styleUrls: ["./basic-input-section.component.scss"],
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => BasicInputSectionComponent),
-            multi: true
-        }
-    ],
-    template: `
-        <form class="ct-basic-input-section">
-
-            <!--Required-->
-            <div class="form-group flex-container">
-                <label>Required</label>
-                <span class="align-right">
-                        <ct-toggle-slider date-test="required-toggle" [formControl]="form.controls['isRequired']">
-                        </ct-toggle-slider>
-                    </span>
-            </div>
-
-            <!--ID-->
-            <div class="form-group" [class.has-danger]="form.controls['id'].errors">
-                <label class="form-control-label">ID</label>
-                <input type="text"
-                       class="form-control"
-                       data-test="id-field"
-                       [formControl]="form.controls['id']">
-                <div *ngIf="form.controls['id'].errors" class="form-control-feedback">
-                    {{form.controls['id'].errors['error']}}
-                </div>
-            </div>
-
-            <!--Input Type -->
-            <ct-type-select [formControl]="form.controls['type']"></ct-type-select>
-
-            <!--Symbols-->
-            <div class="form-group"
-                 *ngIf="isType('enum')">
-                <label>Symbols</label>
-                <ct-auto-complete data-test="symbols-field"
-                                  [create]="true"
-                                  [formControl]="form.controls['symbols']"></ct-auto-complete>
-            </div>
-
-            <!--Include in command line -->
-            <div class="form-group flex-container"
-                 *ngIf="!isType('map') && !!form.controls['isBound']">
-                <label>Include in the command line</label>
-                <span class="align-right">
-                        <ct-toggle-slider data-test="cmd-line-toggle" [formControl]="form.controls['isBound']"
-                                          #includeInCommandLine>
-                        </ct-toggle-slider>
-                    </span>
-            </div>
-
-            <!--Input Binding-->
-            <ct-input-binding-section *ngIf="input.isBound"
-                                      [context]="context"
-                                      [propertyType]="input.type.type"
-                                      [formControl]="form.controls['inputBinding']">
-            </ct-input-binding-section>
-
-
-            <ct-secondary-file *ngIf="isType('File') && showSecondaryFiles()"
-                               [formControl]="form.controls['secondaryFiles']"
-                               [readonly]="readonly"
-                               [context]="context"
-                               [port]="input"
-                               [bindingName]="'inputBinding'"
-                               (update)="propagateChange(input)">
-            </ct-secondary-file>
-        </form>
-    `
+    templateUrl: "./basic-input-section.component.html",
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => BasicInputSectionComponent),
+        multi: true
+    }],
 })
 export class BasicInputSectionComponent extends DirectiveBase implements ControlValueAccessor, AfterViewInit {
 
     @Input()
     context: { $job?: any, $self?: any } = {};
 
-    @Input()
     readonly = false;
 
     @Input()
@@ -110,7 +43,9 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
     private propagateChange = noop;
 
-    constructor(private formBuilder: FormBuilder, private modal: ModalService) {
+    constructor(private formBuilder: FormBuilder,
+                private modal: ModalService,
+                @Inject(AppMetaManagerToken) private appMetaManager: AppMetaManager) {
         super();
     }
 
@@ -146,11 +81,28 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             if (this.input.id !== value) {
                 try {
+
+                    const oldId = this.input.id;
+
                     this.model.changeIOId(this.input, value);
 
                     if (this.isType("enum") || this.isType("record")) {
                         this.input.type.name = value;
                     }
+
+                    // If input id is changed we should migrate related job key
+                    this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
+
+                        const jobValue = job[oldId];
+
+                        delete job[oldId];
+
+                        job[value] = jobValue;
+
+                        this.appMetaManager.patchAppMeta("job", job);
+
+                    });
+
                 } catch (ex) {
                     this.form.controls["id"].setErrors({error: ex.message});
                 }
@@ -185,6 +137,15 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
             if (this.isType("enum") || this.isType("record")) {
                 this.input.type.name = this.input.id;
             }
+
+            // If type is changed nullify job value for that input
+            this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
+
+                job[this.input.id] = null;
+
+                this.appMetaManager.patchAppMeta("job", job);
+
+            });
 
         });
 
@@ -222,6 +183,7 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     }
 
     setDisabledState(isDisabled: boolean): void {
+        console.log("Setting disabled state on input section", isDisabled);
         this.readonly = isDisabled;
         Object.keys(this.form.controls).forEach((item) => {
             const control = this.form.controls[item];
@@ -257,10 +219,16 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
     }
 
     ngAfterViewInit() {
-        Observable.merge(Observable.of(this.includeInCommandLine.length), this.includeInCommandLine.changes.map(l => l.length))
-            .distinctUntilChanged().filter(a => !!a)
-            .subscribeTracked(this, () => {
-                this.addIncludeInCommandLineToggleDecorator();
-            });
+        merge(
+            of(this.includeInCommandLine.length),
+            this.includeInCommandLine.changes.pipe(
+                map(l => l.length)
+            )
+        ).pipe(
+            distinctUntilChanged(),
+            filter(a => !!a)
+        ).subscribeTracked(this, () => {
+            this.addIncludeInCommandLineToggleDecorator();
+        });
     }
 }

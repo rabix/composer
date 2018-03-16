@@ -15,8 +15,9 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALUE_
 import {WorkflowModel, WorkflowStepInputModel} from "cwlts/models";
 import {WorkflowInputParameterModel} from "cwlts/models/generic/WorkflowInputParameterModel";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
-import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 import {NativeSystemService} from "../../../native/system/native-system.service";
+import {map} from "rxjs/operators";
+import {InputParameterModel} from "cwlts/models/generic/InputParameterModel";
 
 @Component({
     selector: "ct-job-step-inspector",
@@ -36,7 +37,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     @Input() workflowModel: WorkflowModel;
 
-    @Input() stepInputs: Array<WorkflowInputParameterModel | WorkflowStepInputModel> = [];
+    @Input() stepInputs: Array<WorkflowStepInputModel> = [];
 
     @Input() relativePathRoot?: string;
 
@@ -89,8 +90,8 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
     ngAfterViewInit(): void {
         super.ngAfterViewInit();
 
-        this.jobGroup.valueChanges
-            .map(changes => {
+        this.jobGroup.valueChanges.pipe(
+            map(changes => {
                 const out = {...this.jobValue, ...changes};
 
                 for (const cname in this.jobGroup.controls) {
@@ -101,7 +102,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
                 return out;
             })
-            .subscribeTracked(this, changes => this.propagateChange(changes));
+        ).subscribeTracked(this, changes => this.propagateChange(changes));
     }
 
     /**
@@ -192,9 +193,22 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
         inputControl.setValue(null);
     }
 
+    getInputSource(input: InputParameterModel) {
+
+        if (input instanceof WorkflowStepInputModel) {
+            const inputSource = input.source[0];
+            // Remove # if it exists on the beginning
+            return inputSource[0] === "#" ? inputSource.substring(1) : inputSource;
+        }
+
+        if (input instanceof WorkflowInputParameterModel) {
+            return input.id;
+        }
+    }
+
     private recreateForms(): void {
 
-        for (let ctrl in this.jobGroup.controls) {
+        for (const ctrl in this.jobGroup.controls) {
             this.jobGroup.removeControl(ctrl);
         }
 
@@ -213,7 +227,7 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
             grouped[group].push(input);
 
             const control = new FormControl();
-            this.jobGroup.addControl(input.id, control);
+            this.jobGroup.addControl(this.getInputSource(input), control);
 
             if (input.type.type === "array") {
                 control.setValue([], {emitEvent: false});
@@ -262,10 +276,9 @@ export class JobStepInspectorComponent extends DirectiveBase implements OnInit, 
 
     }
 
-    enableEditing(input: InputParameterModel): void {
+    enableEditing(input: WorkflowInputParameterModel | WorkflowStepInputModel): void {
 
-        const inputFormField = this.jobGroup.get(input.id);
-
+        const inputFormField = this.jobGroup.get(this.getInputSource(input));
 
         let value;
 

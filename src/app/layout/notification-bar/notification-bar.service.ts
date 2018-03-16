@@ -1,6 +1,8 @@
 import {Component, ComponentRef, Injectable, ComponentFactoryResolver, Type, ReflectiveInjector} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {race} from "rxjs/observable/race";
+import {of} from "rxjs/observable/of";
+import {delay, take, filter, flatMap} from "rxjs/operators";
 
 export type NotificationContent = string | Type<Component>;
 export type NotificationType = "success" | "info" | "error" | "warning";
@@ -20,11 +22,11 @@ export interface Notification {
 @Injectable()
 export class NotificationBarService {
 
-    public static maxDisplay = 3;
+    static maxDisplay = 3;
 
-    public static defaultNotificationType: NotificationType = "error";
+    static defaultNotificationType: NotificationType = "error";
 
-    public static defaultNotificationTimeout = Infinity;
+    static defaultNotificationTimeout = Infinity;
 
     /** Array of notifications */
     private notifications: Array<Notification> = [];
@@ -34,16 +36,25 @@ export class NotificationBarService {
     private dismissNotificationStream = new Subject<Notification>();
 
     /** Stream of displayed notifications */
-    public displayedNotifications = new Subject<any>();
+    displayedNotifications = new Subject<any>();
 
     constructor(private resolver: ComponentFactoryResolver) {
-        this.showNotificationStream.flatMap((notification) => {
 
-            // Dismiss notification when delay time passed or when its manually dismissed
-            return Observable.race(Observable.of(notification).delay(notification.timeout)
-                , this.dismissNotificationStream.filter((n) => n === notification).take(1));
+        this.showNotificationStream.pipe(
+            flatMap((notification) => {
 
-        }).subscribe((notification) => {
+                // Dismiss notification when delay time passed or when its manually dismissed
+                return race(
+                    of(notification).pipe(
+                        delay(notification.timeout)
+                    ),
+                    this.dismissNotificationStream.pipe(
+                        filter((n) => n === notification),
+                        take(1)
+                    )
+                );
+            })
+        ).subscribe((notification) => {
             this.dismiss(notification);
         });
     }
@@ -69,7 +80,7 @@ export class NotificationBarService {
     private showNext(added: boolean = false) {
 
         const notificationsLength = this.notifications.length;
-        const maxDisplayLength = NotificationBarService.maxDisplay;
+        const maxDisplayLength    = NotificationBarService.maxDisplay;
 
         if (added && notificationsLength <= maxDisplayLength) {
             // If last operation was addition we should display the added notification if length <= maxDisplay
@@ -102,7 +113,7 @@ export class NotificationBarService {
         return notification;
     }
 
-    public showNotification(notificationContent: NotificationContent, options?: NotificationOptions) {
+    showNotification(notificationContent: NotificationContent, options?: NotificationOptions) {
 
         const notification = this.createNotification(notificationContent, options);
 
@@ -118,11 +129,11 @@ export class NotificationBarService {
         }
     }
 
-    public showDynamicNotification<T>(notificationContent: { new(...argv: any[]): T }, options?: NotificationOptions): T {
+    showDynamicNotification<T>(notificationContent: { new(...argv: any[]): T }, options?: NotificationOptions): T {
 
         const notification = this.createNotification(notificationContent, options);
 
-        const similarExists =  this.notifications.find((n) => n === notification);
+        const similarExists = this.notifications.find((n) => n === notification);
 
         if (!similarExists) {
 
@@ -136,13 +147,12 @@ export class NotificationBarService {
         return notification.component.instance as T;
     }
 
-    public dismissNotification(notification: Notification) {
+    dismissNotification(notification: Notification) {
         this.dismissNotificationStream.next(notification);
     }
 
-    public dismissDynamicNotification<T>(component: T) {
-        const notification = this.notifications
-            .find((notification) => notification.component.instance === component);
+    dismissDynamicNotification<T>(component: T) {
+        const notification = this.notifications.find((notification) => notification.component.instance === component);
         this.dismissNotification(notification);
     }
 }

@@ -17,6 +17,7 @@ import {
 import {DirectiveBase} from "../../util/directive-base/directive-base";
 import {TabSelectorEntryComponent} from "./tab-selector-entry/tab-selector-entry.component";
 import {TabSelectorService} from "./tab-selector.service";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     selector: "ct-tab-selector",
@@ -74,7 +75,9 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
     ngAfterViewInit() {
 
         setTimeout(() => {
-            this.tracked = this.selector.selectedTab.distinctUntilChanged().subscribe((tab) => {
+            this.tracked = this.selector.selectedTab.pipe(
+                distinctUntilChanged()
+            ).subscribe((tab) => {
 
                 this.active = tab;
                 this.activeChange.emit(tab);
@@ -97,7 +100,7 @@ export class TabSelectorComponent extends DirectiveBase implements OnInit, After
             return;
         }
 
-        const idx     = this.tabEntries.toArray().findIndex(tab => tab.tabName === this.active);
+        const idx = this.tabEntries.toArray().findIndex(tab => tab.tabName === this.active);
         if (idx === -1) {
             throw new Error(`Tab entry "${this.active}" does not exist in tab entries "${this.tabEntries.toArray().join(", ")}"`);
         }

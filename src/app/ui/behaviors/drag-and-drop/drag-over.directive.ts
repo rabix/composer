@@ -1,7 +1,9 @@
 import {Directive, ElementRef, Input, OnInit} from "@angular/core";
-import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {fromEvent} from "rxjs/observable/fromEvent";
+import {flatMap, delay, takeUntil} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
 
 @Directive({selector: "[ct-drag-over]"})
 export class DragOverDirective extends DirectiveBase implements OnInit {
@@ -14,7 +16,7 @@ export class DragOverDirective extends DirectiveBase implements OnInit {
         }
     }
 
-    public el: Element;
+    el: Element;
 
     constructor(el: ElementRef, private domEvents: DomEventService) {
         super();
@@ -28,9 +30,14 @@ export class DragOverDirective extends DirectiveBase implements OnInit {
     }
 
     private dragOver() {
-        const dragEnter = Observable.fromEvent(this.el, this.domEvents.ON_DRAG_ENTER_EVENT);
-        const dragLeave = Observable.fromEvent(this.el, this.domEvents.ON_DRAG_LEAVE_EVENT);
+        const dragEnter = fromEvent(this.el, this.domEvents.ON_DRAG_ENTER_EVENT);
+        const dragLeave = fromEvent(this.el, this.domEvents.ON_DRAG_LEAVE_EVENT);
 
-        return dragEnter.flatMap(md => Observable.of(md).delay(500).takeUntil(dragLeave));
+        return dragEnter.pipe(
+            flatMap(mouseDrag => of(mouseDrag).pipe(
+                delay(500),
+                takeUntil(dragLeave)
+            ))
+        );
     }
 }

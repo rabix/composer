@@ -1,4 +1,5 @@
 import {Subject} from "rxjs/Subject";
+import {filter, take, map} from "rxjs/operators";
 
 export class WebWorker<T> {
 
@@ -29,15 +30,11 @@ export class WebWorker<T> {
 
         this.webWorker.postMessage(message);
         return new Promise((resolve, reject) => {
-            this.messages
-                .filter(m => m.id === message.id)
-                .take(1)
-                .map(m => m.data)
-                .subscribe(response => {
-                    resolve(response);
-                }, err => {
-                    reject(err);
-                });
+            this.messages.pipe(
+                filter(m => m.id === message.id),
+                take(1),
+                map(m => m.data)
+            ).subscribe(resolve, reject);
         });
     }
 }

@@ -18,6 +18,10 @@ import {WorkboxService} from "../../workbox/workbox.service";
 import {AppsPanelService} from "../common/apps-panel.service";
 import {AppHelper} from "../../helpers/AppHelper";
 import {getDragImageClass, getDragTransferDataType} from "../../../ui/tree-view/tree-view-utils";
+import {map, concat} from "rxjs/operators";
+import {of} from "rxjs/observable/of";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {empty} from "rxjs/observable/empty";
 
 @Injectable()
 export class MyAppsPanelService extends AppsPanelService {
@@ -43,16 +47,19 @@ export class MyAppsPanelService extends AppsPanelService {
         super(fileRepository, platformRepository, notificationBar, workbox, statusBar, cdr, native);
 
         this.localFolders       = this.localRepository.getLocalFolders();
-        this.projects           = this.platformRepository.getOpenProjects().map(projects => projects || []);
         this.localExpandedNodes = this.localRepository.getExpandedFolders();
         this.rootFolders        = this.getRootFolders();
+
+        this.projects = this.platformRepository.getOpenProjects().pipe(
+            map(projects => projects || [])
+        );
     }
 
     private static makeTreeNode(data: Partial<TreeNode<any>>): TreeNode<any> {
         return Object.assign({
             type: "source",
             icon: "fa-folder",
-            isExpanded: Observable.of(false),
+            isExpanded: of(false),
             isExpandable: true,
             iconExpanded: "fa-folder-open",
         }, data);
@@ -62,52 +69,63 @@ export class MyAppsPanelService extends AppsPanelService {
      * Gives an observable of root tree nodes.
      */
     getRootFolders(): Observable<TreeNode<any>[]> {
-        const localFolder = Observable.of(MyAppsPanelService.makeTreeNode({
+        const localFolder = of(MyAppsPanelService.makeTreeNode({
             id: "local",
             label: "Local Files",
             children: this.getLocalNodes(),
-            isExpanded: this.localExpandedNodes.map(list => list.indexOf("local") !== -1)
+            isExpanded: this.localExpandedNodes.pipe(
+                map(list => list.indexOf("local") !== -1)
+            )
         }));
 
-        const platformEntry = this.auth.getActive().map(credentials => {
-            if (!credentials) {
-                return null;
-            }
-            const platformHash = credentials.getHash();
+        const platformEntry = this.auth.getActive().pipe(
+            map(credentials => {
+                if (!credentials) {
+                    return null;
+                }
+                const platformHash = credentials.getHash();
 
-            return {
-                id: platformHash,
-                data: credentials,
-                type: "source",
-                icon: "fa-folder",
-                iconExpanded: "fa-folder-open",
-                label: AuthCredentials.getPlatformLabel(credentials.url),
-                isExpandable: true,
-                isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(platformHash) !== -1),
-                children: this.platformRepository.getOpenProjects().map(projects => this.createPlatformListingTreeNodes(projects || []))
-            };
-        });
+                return {
+                    id: platformHash,
+                    data: credentials,
+                    type: "source",
+                    icon: "fa-folder",
+                    iconExpanded: "fa-folder-open",
+                    label: AuthCredentials.getPlatformLabel(credentials.url),
+                    isExpandable: true,
+                    isExpanded: this.platformRepository.getExpandedNodes().pipe(
+                        map(list => (list || []).indexOf(platformHash) !== -1)
+                    ),
+                    children: this.platformRepository.getOpenProjects().pipe(
+                        map(projects => this.createPlatformListingTreeNodes(projects || []))
+                    )
+                };
+            })
+        );
 
-        return Observable
-            .combineLatest(localFolder, platformEntry)
-            .map(list => list.filter(v => v));
+        return combineLatest(localFolder, platformEntry).pipe(
+            map(list => list.filter(Boolean))
+        );
     }
 
     getLocalNodes(): Observable<TreeNode<string>[]> {
-        return this.localRepository.getLocalFolders()
-            .map(folders => {
+        return this.localRepository.getLocalFolders().pipe(
+            map(folders => {
                 return folders.map(path => MyAppsPanelService.makeTreeNode({
                     id: path,
                     data: path,
                     type: "folder",
                     label: AppHelper.getBasename(path),
-                    isExpanded: this.localExpandedNodes.map(list => list.indexOf(path) !== -1),
-                    children: Observable.empty()
-                        .concat(this.fileRepository.watch(path))
-                        .map(listing => this.createDirectoryListingTreeNodes(listing))
-
+                    isExpanded: this.localExpandedNodes.pipe(
+                        map(list => list.indexOf(path) !== -1)
+                    ),
+                    children: empty().pipe(
+                        concat(this.fileRepository.watch(path)),
+                        map(listing => this.createDirectoryListingTreeNodes(listing))
+                    )
                 }));
-            });
+            })
+        );
     }
 
     reloadPlatformData() {
@@ -142,9 +160,10 @@ export class MyAppsPanelService extends AppsPanelService {
             let children = undefined;
 
             if (fsEntry.isDir) {
-                children = Observable.empty()
-                    .concat(this.ipc.request("readDirectory", fsEntry.path))
-                    .map(list => this.createDirectoryListingTreeNodes(list));
+                children = empty().pipe(
+                    concat(this.ipc.request("readDirectory", fsEntry.path)),
+                    map(list => this.createDirectoryListingTreeNodes(list))
+                );
             }
 
             return MyAppsPanelService.makeTreeNode({
@@ -159,7 +178,9 @@ export class MyAppsPanelService extends AppsPanelService {
                 isExpandable: fsEntry.isDir,
                 dragTransferData: {name: fsEntry.path, type: getDragTransferDataType(fsEntry)},
                 type: fsEntry.isDir ? "folder" : "file",
-                isExpanded: this.localExpandedNodes.map(list => list.indexOf(fsEntry.path) !== -1),
+                isExpanded: this.localExpandedNodes.pipe(
+                    map(list => list.indexOf(fsEntry.path) !== -1)
+                ),
                 dragEnabled: true,
                 dragImageClass: getDragImageClass(fsEntry)
             });
@@ -177,12 +198,15 @@ export class MyAppsPanelService extends AppsPanelService {
                 type: "project",
                 icon: isWritable ? "fa-folder" : "fa-lock",
                 label: project.name,
-                isExpanded: this.platformRepository.getExpandedNodes().map(list => (list || []).indexOf(project.id) !== -1),
+                isExpanded: this.platformRepository.getExpandedNodes().pipe(
+                    map(list => (list || []).indexOf(project.id) !== -1)
+                ),
                 isExpandable: true,
                 iconExpanded: isWritable ? "fa-folder-open" : "fa-lock",
-                children: this.platformRepository.getAppsForProject(project.id).map(apps => this.createPlatformAppListingTreeNodes(apps, isWritable)),
-
-            };
+                children: this.platformRepository.getAppsForProject(project.id).pipe(
+                    map(apps => this.createPlatformAppListingTreeNodes(apps, isWritable))
+                ),
+            }
         });
     }
 

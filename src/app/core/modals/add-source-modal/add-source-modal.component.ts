@@ -8,6 +8,7 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
 import {Observable} from "rxjs/Observable";
+import {map, take} from "rxjs/operators";
 
 @Component({
     selector: "ct-add-source-modal",
@@ -128,23 +129,27 @@ export class AddSourceModalComponent extends DirectiveBase {
 
         super();
 
-        this.allProjectsCount = this.platformRepository.getProjects().map(projects => projects ? projects.length : 0);
+        this.allProjectsCount = this.platformRepository.getProjects().pipe(
+            map(projects => projects ? projects.length : 0)
+        );
 
-        this.platformRepository.getClosedProjects()
-            .map(p => p || [])
-            .subscribeTracked(this, projects => {
-                this.closedProjectOptions = projects.map(project => {
-                    return {
-                        value: project.id,
-                        text: project.name
-                    };
-                });
+        this.platformRepository.getClosedProjects().pipe(
+            map(p => p || [])
+        ).subscribeTracked(this, projects => {
+            this.closedProjectOptions = projects.map(project => {
+                return {
+                    value: project.id,
+                    text: project.name
+                };
             });
+        });
     }
 
     onDone() {
 
-        this.auth.getActive().take(1).subscribeTracked(this, (activePlatform) => {
+        this.auth.getActive().pipe(
+            take(1)
+        ).subscribeTracked(this, (activePlatform) => {
             if (!activePlatform) {
                 throw new Error("Trying to open a project, but there is no active platform set.");
             }
@@ -172,7 +177,9 @@ export class AddSourceModalComponent extends DirectiveBase {
     openCredentialsForm() {
         const modal = this.modal.fromComponent(PlatformCredentialsModalComponent, "Add an Account");
 
-        modal.submit.take(1).subscribe(() => {
+        modal.submit.pipe(
+            take(1)
+        ).subscribe(() => {
             this.modal.close();
         });
     }

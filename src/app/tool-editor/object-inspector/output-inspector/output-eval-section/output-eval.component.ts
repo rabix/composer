@@ -4,6 +4,7 @@ import {CommandLineToolModel, CommandOutputParameterModel} from "cwlts/models";
 import {noop} from "../../../../lib/utils.lib";
 import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 import {ErrorCode} from "cwlts/models/helpers/validation";
+import {distinctUntilChanged} from "rxjs/operators";
 
 @Component({
     encapsulation: ViewEncapsulation.None,
@@ -52,12 +53,12 @@ import {ErrorCode} from "cwlts/models/helpers/validation";
 export class OutputEvalSectionComponent extends DirectiveBase implements ControlValueAccessor {
 
     @Input()
-    public model: CommandLineToolModel;
+    model: CommandLineToolModel;
 
     /** Context in which expression should be evaluated */
-    public context: any = {};
+    context: any = {};
 
-    public output: CommandOutputParameterModel;
+    output: CommandOutputParameterModel;
 
     private onTouched = noop;
 
@@ -81,14 +82,13 @@ export class OutputEvalSectionComponent extends DirectiveBase implements Control
             outputEval: [this.output.outputBinding.outputEval]
         });
 
-        this.tracked = this.outputEvalFormGroup.valueChanges
-            .distinctUntilChanged()
-            .subscribe(value => {
-                this.output.outputBinding.outputEval.clearIssue(ErrorCode.OUTPUT_EVAL_INHERIT);
-                this.output.outputBinding.loadContents = value.loadContents;
-                this.propagateChange(this.output);
-
-            });
+        this.outputEvalFormGroup.valueChanges.pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, value => {
+            this.output.outputBinding.outputEval.clearIssue(ErrorCode.OUTPUT_EVAL_INHERIT);
+            this.output.outputBinding.loadContents = value.loadContents;
+            this.propagateChange(this.output);
+        });
     }
 
     registerOnChange(fn: any): void {

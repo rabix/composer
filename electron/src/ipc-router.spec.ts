@@ -6,10 +6,10 @@ import sinon = require("sinon");
 const assert = chai.assert;
 
 
-describe.skip("IPC Router", function () {
+xdescribe("IPC Router", function () {
 
 
-    it.skip("should register the data-request event cb", function (done) {
+    xit("should register the data-request event cb", function (done) {
 
         const electron = {ipcMain: {on: sinon.spy()}};
         const router   = proxy("./ipc-router", {electron});

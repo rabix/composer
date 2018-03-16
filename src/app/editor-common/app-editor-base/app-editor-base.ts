@@ -7,9 +7,8 @@ import {LoadOptions} from "js-yaml";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import {Subject} from "rxjs/Subject";
-import {AppExecutionContext} from "../../../../electron/src/storage/types/executor-config";
 import {AppMetaManager} from "../../core/app-meta/app-meta-manager";
-import {APP_META_MANAGER} from "../../core/app-meta/app-meta-manager-factory";
+import {AppMetaManagerToken} from "../../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../../core/data-gateway/data-gateway.service";
 import {AppHelper} from "../../core/helpers/AppHelper";
@@ -28,22 +27,40 @@ import {PlatformRepositoryService} from "../../repository/platform-repository.se
 import {ExportAppService} from "../../services/export-app/export-app.service";
 import {ModalService} from "../../ui/modal/modal.service";
 import {DirectiveBase} from "../../util/directive-base/directive-base";
-import {AppExecutionContextModalComponent} from "../app-execution-context-modal/app-execution-context-modal.component";
 import {AppValidatorService, AppValidityState} from "../app-validator/app-validator.service";
 import {PlatformAppService} from "../components/platform-app-common/platform-app.service";
 import {RevisionListComponent} from "../components/revision-list/revision-list.component";
 import {GraphJobEditorComponent} from "../../job-editor/graph-job-editor/graph-job-editor.component";
 import {EditorInspectorService} from "../inspector/editor-inspector.service";
 import {JobImportExportComponent} from "../job-import-export/job-import-export.component";
-import {APP_SAVER_TOKEN, AppSaver} from "../services/app-saving/app-saver.interface";
+import {AppSaverToken, AppSaver} from "../services/app-saving/app-saver.interface";
 import {CommonReportPanelComponent} from "../template-common/common-preview-panel/common-report-panel.component";
 import {Store} from "@ngrx/store";
 import {ExecutorService} from "../../executor-service/executor.service";
 import {ExecutorService2} from "../../execution/services/executor/executor.service";
 import {AuthService} from "../../auth/auth.service";
 import {ExecutionStopAction} from "../../execution/actions/execution.actions";
-import {switchMap, flatMap, finalize, catchError} from "rxjs/operators";
+import {
+    switchMap,
+    flatMap,
+    finalize,
+    catchError,
+    distinctUntilChanged,
+    map,
+    skip,
+    filter,
+    debounceTime,
+    share,
+    take,
+    withLatestFrom,
+    startWith
+} from "rxjs/operators";
 import {ensureAbsolutePaths} from "../../job-editor/utilities/path-resolver";
+import {merge} from "rxjs/observable/merge";
+import {of} from "rxjs/observable/of";
+import {empty} from "rxjs/observable/empty";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {fixJobFilePaths} from "../utilities/imported-job-parser/imported-job-parser";
 
 const path = require("path");
 
@@ -99,9 +116,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     executionQueue = new Subject<any>();
 
-    /** TODO: Check where this is populated */
-    executionJob: Object;
-
     @ViewChild("reportPanelComponent", {read: CommonReportPanelComponent})
     private reportPanelComponent: CommonReportPanelComponent;
 
@@ -119,6 +133,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private modelCreated = false;
 
+    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
+
     /**
      * Used as a hack flag so we can recreate the model on changes from non-gui mode,
      * or from any mode when switching revisions.
@@ -128,11 +144,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
      * {@link revisionHackFlagSwitchOn}
      */
     protected revisionChangingInProgress = false;
-
-    /**
-     * Show modal when app is dirty when changing revisions to prevent loosing changes
-     */
-    showModalIfAppIsDirtyBound = this.showModalIfAppIsDirty.bind(this);
 
     constructor(protected statusBar: StatusBarService,
                 protected notificationBar: NotificationBarService,
@@ -158,51 +169,69 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     ngOnInit() {
 
-        this.inspector.inspectedObject
-            .map(obj => obj !== undefined)
-            .subscribeTracked(this, show => this.showInspector = show);
+        this.inspector.inspectedObject.pipe(
+            map(obj => obj !== undefined)
+        ).subscribeTracked(this, show => this.showInspector = show);
 
         // Get the app saver from the injector
-        this.appSavingService = this.injector.get(APP_SAVER_TOKEN) as AppSaver;
+        this.appSavingService = this.injector.get(AppSaverToken) as AppSaver;
 
         // Set this app's ID to the code content service
         this.codeSwapService.appID = this.tabData.id;
 
-        this.codeEditorContent.valueChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
+        const codeEditorContentDistinctChanges = this.codeEditorContent.valueChanges.pipe(distinctUntilChanged());
+
+        codeEditorContentDistinctChanges.subscribeTracked(this, content => this.codeSwapService.codeContent.next(content));
 
         /** Replay subject used here because withLatestFrom operator did not work well for validationStateChanges stream */
         const externalCodeChanges = new ReplaySubject(1);
 
         /** Changes to the code that did not come from user's typing. */
-        Observable.merge(this.tabData.fileContent, this.priorityCodeUpdates).distinctUntilChanged().subscribeTracked(this, externalCodeChanges);
+        merge(this.tabData.fileContent, this.priorityCodeUpdates).pipe(
+            distinctUntilChanged()
+        ).subscribeTracked(this, externalCodeChanges);
 
         /** On user interactions (changes) set app state to Dirty */
-        this.codeEditorContent.valueChanges.skip(1).filter(() => this.revisionChangingInProgress === false).subscribeTracked(this, () => {
-            this.setAppDirtyState(true);
-        }, (err) => {
-            console.warn("Error on dirty checking stream", err);
-        });
+        codeEditorContentDistinctChanges.pipe(
+            skip(1),
+            filter(() => this.revisionChangingInProgress === false)
+        ).subscribeTracked(this,
+            () => this.setAppDirtyState(true),
+            err => console.warn("Error on dirty checking stream", err)
+        );
 
         /** Changes to the code from user's typing, slightly debounced */
-        const codeEditorChanges = this.codeEditorContent.valueChanges.debounceTime(300).distinctUntilChanged();
+        const codeEditorChanges = codeEditorContentDistinctChanges.pipe(
+            debounceTime(300),
+            distinctUntilChanged()
+        );
 
         /** Observe all code changes */
-        const allCodeChanges = Observable.merge(externalCodeChanges, codeEditorChanges).distinctUntilChanged();
+        const allCodeChanges = merge(externalCodeChanges, codeEditorChanges).pipe(
+            distinctUntilChanged()
+        );
 
         /** Attach a CWL validator to code updates and observe the validation state changes. */
-        const schemaValidation = this.appValidator.createValidator(allCodeChanges).map((state: AppValidityState) => {
-            if (state.isValidCWL && this.dataModel) {
-                state.errors   = state.errors.concat(this.dataModel.errors);
-                state.warnings = state.warnings.concat(this.dataModel.warnings);
-            }
+        const schemaValidation = this.appValidator.createValidator(allCodeChanges).pipe(
+            map((state: AppValidityState) => {
+                if (state.isValidCWL && this.dataModel) {
+                    state.errors   = state.errors.concat(this.dataModel.errors);
+                    state.warnings = state.warnings.concat(this.dataModel.warnings);
+                }
 
-            return state;
-        }).share();
+                return state;
+            }),
+            share()
+        );
 
-        const validationCompletion = schemaValidation.filter(state => !state.isPending);
+        const validationCompletion = schemaValidation.pipe(
+            filter(state => !state.isPending)
+        );
 
         /** Get the end of first validation check */
-        const firstValidationEnd = validationCompletion.take(1);
+        const firstValidationEnd = validationCompletion.pipe(
+            take(1)
+        );
 
         /**
          * For each code change from outside the ace editor, update the content of the editor form control.
@@ -237,17 +266,18 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
          * the model creation.
          */
 
-        const validationStateChanges = firstValidationEnd.withLatestFrom(externalCodeChanges)
-            .switchMap((data: [AppValidityState, string]) => {
-                const [validationState] = data;
-                return validationCompletion
-                    .startWith(validationState)
-                    .map(state => [this.codeEditorContent.value, state]);
-            })
-            .withLatestFrom(
-                AppHelper.isLocal(this.tabData.id) ? Observable.of(true)
-                    : this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
-                (outer, inner) => [...outer, inner]).share();
+        const validationStateChanges = firstValidationEnd.pipe(
+            withLatestFrom(externalCodeChanges),
+            switchMap((data: [AppValidityState, string]) => validationCompletion.pipe(
+                startWith(data[0]),
+                map(state => [this.codeEditorContent.value, state])
+            )),
+            withLatestFrom(
+                AppHelper.isLocal(this.tabData.id) ? of(true) : this.platformRepository.getAppMeta(this.tabData.id, "swapUnlocked"),
+                (outer, inner) => [...outer, inner]
+            ),
+            share()
+        );
 
         validationStateChanges.subscribeTracked(this, (data: [string, AppValidityState, boolean]) => {
             const [code, validation, unlocked] = data;
@@ -329,7 +359,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         }
     }
 
-    save(): void {
+    save(loadUpdate = true): Promise<boolean> {
 
         // Do nothing if app is not local
         // If we open an app that has no namespaces defined and save it right away,
@@ -346,7 +376,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         const proc = this.statusBar.startProcess(`Saving ${appName}`);
         const text = this.viewMode === "code" ? this.codeEditorContent.value : this.getModelText();
 
-        this.appSavingService
+        return this.appSavingService
             .save(this.tabData.id, text)
             .then(update => {
                 /**
@@ -356,24 +386,28 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                  */
 
-                if (this.tabData.dataSource !== "local") {
-                    this.revisionChangingInProgress = true;
-                }
+                if (loadUpdate) {
+                    if (this.tabData.dataSource !== "local") {
+                        this.revisionChangingInProgress = true;
+                    }
 
-                this.priorityCodeUpdates.next(update);
+                    this.priorityCodeUpdates.next(update);
+                }
 
                 // After app is saved, app state is not Dirty any more
                 this.setAppDirtyState(false);
 
                 this.statusBar.stopProcess(proc, `Saved: ${appName}`);
+                return true;
             }, err => {
                 if (!err || !err.message) {
                     this.statusBar.stopProcess(proc);
-                    return;
+                    return false;
                 }
 
                 this.notificationBar.showNotification(`Saving failed: ${err.message}`);
                 this.statusBar.stopProcess(proc, `Could not save ${appName} (${err.message})`);
+                return false;
             });
     }
 
@@ -384,26 +418,25 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             return;
         }
 
-        this.syncModelAndCode(true).then(() => {
-            const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
-            modal.appID      = this.dataModel.id;
-            modal.appContent = this.getModelText(true);
+        const modal      = this.modal.fromComponent(PublishModalComponent, "Push an App");
+        modal.appID      = this.dataModel.id;
+        modal.appContent = this.getModelText(true);
 
-            modal.published.take(1).subscribeTracked(this, (appID) => {
+        modal.published.pipe(
+            take(1)
+        ).subscribeTracked(this, appID => {
 
-                const tab = this.workbox.getOrCreateAppTab({
-                    id: AppHelper.getRevisionlessID(appID),
-                    type: this.dataModel.class,
-                    label: modal.inputForm.get("id").value,
-                    isWritable: true,
-                    language: "json"
-
-                });
-
-                this.workbox.openTab(tab);
+            const tab = this.workbox.getOrCreateAppTab({
+                id: AppHelper.getRevisionlessID(appID),
+                type: this.dataModel.class,
+                label: modal.inputForm.get("id").value,
+                isWritable: true,
+                language: "json"
             });
 
-        }, err => console.warn);
+            this.workbox.openTab(tab);
+        });
+
     }
 
     provideStatusControls(): TemplateRef<any> {
@@ -425,10 +458,12 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
 
         modal.appName = label;
-        return modal.response.take(1).toPromise().then(response => {
+        return modal.response.pipe(
+            take(1)
+        ).toPromise().then(response => {
             this.toggleLock(false);
             return response;
-        }, err => console.warn);
+        }, () => void 0);
     }
 
     /**
@@ -452,11 +487,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.tabsUnlocked() && !this.isReadonly;
     }
 
-    appIsResolvable(): boolean {
-        /** Bound to lock state by accident, not intention */
-        return this.tabsUnlocked();
-    }
-
     appIsPublishable(): boolean {
         /** Bound to lock state by accident, not intention */
         return this.tabsUnlocked();
@@ -473,18 +503,19 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         /** @name revisionHackFlagSwitchOn */
         this.revisionChangingInProgress = true;
 
-        return this.dataGateway.fetchFileContent(fid).take(1)
-            .toPromise().then(result => {
-                this.priorityCodeUpdates.next(result);
+        return this.dataGateway.fetchFileContent(fid).pipe(
+            take(1)
+        ).toPromise().then(result => {
+            this.priorityCodeUpdates.next(result);
 
-                this.setAppDirtyState(false);
+            this.setAppDirtyState(false);
 
-                return result;
-            }).catch(err => {
-                this.revisionChangingInProgress   = false;
-                this.revisionList.loadingRevision = false;
-                this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
-            });
+            return result;
+        }).catch(err => {
+            this.revisionChangingInProgress   = false;
+            this.revisionList.loadingRevision = false;
+            this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
+        });
     }
 
     switchTab(tabName): void {
@@ -543,42 +574,19 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         this.platformAppService.openOnPlatform(appID);
     }
 
-    editRunConfiguration() {
-        const appID     = this.tabData.id;
-        const appConfig = this.executor.getAppConfig(appID).take(1);
-
-        appConfig.take(1).subscribeTracked(this, (context) => {
-
-            const modal = this.modal.fromComponent(AppExecutionContextModalComponent, {
-                title: "Set Execution Parameters"
-            });
-
-            modal.context = context;
-            modal.appID   = appID;
-
-            modal.onSubmit = (raw) => {
-                this.executor.setAppConfig(appID, raw);
-                this.modal.close();
-            };
-
-            modal.onCancel = () => {
-                this.modal.close();
-            };
-        });
-    }
-
     scheduleExecution() {
         this.executionQueue.next(true);
     }
 
-    /**
-     * Serializes model to text. It also adds sbg:modified flag to indicate
-     * the text has been formatted by the GUI editor.
-     *
-     */
-    protected getModelText(embed?: boolean): string {
+    /** Serializes model to a string. */
+    protected getModelText(embed = false): string {
 
-        const modelObject = this.dataModel.serialize();
+        let modelObject;
+        if (embed && this.dataModel instanceof WorkflowModel) {
+            modelObject = this.dataModel.serializeEmbedded();
+        } else {
+            modelObject = this.dataModel.serialize();
+        }
 
         if (this.tabData.language === "json" || this.tabData.dataSource === "app") {
             return JSON.stringify(modelObject, null, 4);
@@ -629,10 +637,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             warnings: this.dataModel.warnings || [],
             isPending: false
         };
-    }
-
-    protected applyModelValidity() {
-
     }
 
     /**
@@ -724,16 +728,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     protected afterModelCreated(isFirstCreation: boolean): void {
     }
 
-    protected updateSavingAvailability() {
-
-        if (this.tabData.dataSource === "local") {
-            this.savingDisabled = false;
-            return;
-        }
-
-        this.savingDisabled = !(this.isValidatingCWL || !!this.unavailableError || !this.dataModel);
-    }
-
     protected resolveContent(content: string): Promise<Object> {
         this.isResolvingContent = true;
         return this.tabData.resolve(content).toPromise().then(resolved => {
@@ -745,44 +739,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         });
     }
 
-    private getExecutionContext(): Observable<AppExecutionContext | null> {
-
-        const appID = this.tabData.id;
-
-        return this.executor.getAppConfig(appID).take(1)
-            .switchMap((context: AppExecutionContext) => {
-
-                // If we have job path set, we can proceed with execution
-                if (context) {
-                    return Observable.of(context);
-                }
-
-                // Otherwise, we have to obtain job path
-                const modal = this.modal.fromComponent(AppExecutionContextModalComponent, "Set Execution Parameters");
-
-                modal.confirmLabel = "Run";
-                modal.context      = context;
-                modal.appID        = appID;
-
-                return new Observable(observer => {
-                    modal.onSubmit = (raw) => {
-                        observer.next(raw);
-                        observer.complete();
-                        this.modal.close();
-                        this.executor.setAppConfig(appID, raw);
-                    };
-
-                    modal.onCancel = () => {
-                        observer.next(null);
-                        observer.complete();
-                        this.modal.close();
-                        this.executor.setAppConfig(appID, null);
-                    };
-                });
-
-            }).take(1).filter(v => !!v) as Observable<AppExecutionContext>;
-    }
-
     private bindExecutionQueue() {
 
         this.executionQueue.pipe(
@@ -790,15 +746,17 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 finalize(() => this.isExecuting = false),
                 catchError(err => {
                     console.error(err);
-                    return Observable.empty();
+                    return empty();
                 })
             ))
         ).subscribeTracked(this, () => void 0);
 
         this.executionQueue.pipe(
             flatMap(() => {
-                const metaManager = this.injector.get(APP_META_MANAGER) as AppMetaManager;
-                return metaManager.getAppMeta("job").take(1);
+                const metaManager = this.injector.get(AppMetaManagerToken) as AppMetaManager;
+                return metaManager.getAppMeta("job").pipe(
+                    take(1)
+                );
             })
         ).subscribeTracked(this, () => {
             this.toggleReport("execution", true);
@@ -812,85 +770,88 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     private runOnExecutor(): Observable<string | Object> {
 
-        const metaManager    = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const metaManager    = this.injector.get<AppMetaManager>(AppMetaManagerToken);
         const executorConfig = this.localRepository.getExecutorConfig();
         const job            = metaManager.getAppMeta("job");
-        const user           = this.auth.getActive().map(user => user ? user.id : "local");
+        const user           = this.auth.getActive().pipe(
+            map(user => user ? user.id : "local")
+        );
 
-        return Observable.combineLatest(job, executorConfig, user).take(1).switchMap(data => {
+        return combineLatest(job, executorConfig, user).pipe(
+            take(1),
+            switchMap(data => {
 
-            const [job, executorConfig, user] = data;
+                const [job, executorConfig, user] = data;
 
-            const appID        = this.tabData.id;
-            const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
+                const appID        = this.tabData.id;
+                const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
+                const executor     = this.injector.get(ExecutorService2);
+                const appIsLocal   = AppHelper.isLocal(appID);
+                const outDir       = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
 
-            const executor = this.injector.get(ExecutorService2);
+                const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 
-            const appIsLocal = AppHelper.isLocal(appID);
-
-            const outDir = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
-
-            const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
-
-            return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).finally(() => {
-                this.fileRepository.reloadPath(outDir);
-            });
-        });
+                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).pipe(
+                    finalize(() => this.fileRepository.reloadPath(outDir))
+                );
+            })
+        );
 
     }
 
     showModalIfAppIsDirty(): Promise<boolean> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise((changeRevision, preventRevisionChange) => {
 
             if (!this.isDirty) {
-                return resolve(true);
+                return changeRevision();
             }
 
-            const modal = this.modal.fromComponent(ClosingDirtyAppsModalComponent, {
-                title: "Change revision"
-            });
-
-            modal.confirmationLabel = "Save";
-            modal.discardLabel      = "Change without saving";
-
-            modal.decision.take(1).subscribe((result) => {
-
-                if (result) {
-                    this.modal.close();
-                    this.save();
-                    reject();
-                } else {
-                    resolve(true);
-                    this.modal.close();
+            const dialog = this.modal.fromComponent(ClosingDirtyAppsModalComponent, "Change revision", {
+                confirmationLabel: "Save",
+                discardLabel: "Change without saving",
+                onCancel: () => preventRevisionChange(),
+                onDiscard: () => changeRevision(),
+                onConfirm: () => {
+                    this.save(false).then(isSaved => {
+                        isSaved ? changeRevision() : preventRevisionChange();
+                    });
                 }
             });
 
+            dialog.inAnyCase = () => {
+                this.modal.close(dialog);
+            };
         });
 
     }
 
     importJob() {
-        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
-        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job");
-        comp.appID        = this.tabData.id;
-        comp.action       = "import";
+        const metaManager = this.injector.get<AppMetaManager>(AppMetaManagerToken);
+        const comp        = this.modal.fromComponent(JobImportExportComponent, "Import Job", {
+            appID: this.tabData.id,
+            action: "import",
+            importTrasform: (job, path) => fixJobFilePaths(this.tabData.id, path, job)
+        });
 
-        comp.import.take(1).subscribeTracked(this, (jobObject) => {
+        comp.import.pipe(
+            take(1)
+        ).subscribeTracked(this, (jobObject) => {
             metaManager.patchAppMeta("job", jobObject);
             this.modal.close();
             if (this.jobEditor) {
                 this.jobEditor.updateJob(jobObject);
             }
-
         });
 
     }
 
     exportJob() {
-        const metaManager = this.injector.get<AppMetaManager>(APP_META_MANAGER);
+        const metaManager = this.injector.get<AppMetaManager>(AppMetaManagerToken);
 
-        metaManager.getAppMeta("job").take(1).subscribeTracked(this, job => {
+        metaManager.getAppMeta("job").pipe(
+            take(1)
+        ).subscribeTracked(this, job => {
             const comp  = this.modal.fromComponent(JobImportExportComponent, "Export Job");
             comp.action = "export";
             comp.appID  = this.tabData.id;

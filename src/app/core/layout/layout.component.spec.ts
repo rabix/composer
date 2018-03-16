@@ -1,12 +1,12 @@
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {async, ComponentFixture, TestBed} from "@angular/core/testing";
 import {By} from "@angular/platform-browser";
-import {Observable} from "rxjs/Observable";
 import {StatusBarService} from "../../layout/status-bar/status-bar.service";
 import {DomEventService} from "../../services/dom/dom-event.service";
 
 import {LayoutComponent} from "./layout.component";
 import {LayoutService} from "./layout.service";
+import {of} from "rxjs/observable/of";
 
 describe("LayoutComponent", () => {
     let component: LayoutComponent;
@@ -19,7 +19,7 @@ describe("LayoutComponent", () => {
     };
 
     const domEventsStub = {
-        onMove: (el) => Observable.of([])
+        onMove: (el) => of([])
     };
 
     beforeEach(async(() => {

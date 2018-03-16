@@ -7,7 +7,7 @@ export class WorkflowEditorService {
     private history = [];
     private future  = [];
 
-    public putInHistory(model: WorkflowModel) {
+    putInHistory(model: WorkflowModel) {
         if (this.history.length > 20) {
             this.history.shift();
         }
@@ -16,21 +16,21 @@ export class WorkflowEditorService {
         this.future.length = 0;
     }
 
-    public historyUndo(model: WorkflowModel) {
+    historyUndo(model: WorkflowModel) {
         this.future.push(model.serializeEmbedded(true));
         return this.history.pop();
     }
 
-    public historyRedo(model: WorkflowModel) {
+    historyRedo(model: WorkflowModel) {
         this.history.push(model.serializeEmbedded(true));
         return this.future.pop();
     }
 
-    public canUndo() {
+    canUndo() {
         return this.history.length > 0;
     }
 
-    public canRedo() {
+    canRedo() {
         return this.future.length > 0;
     }
 

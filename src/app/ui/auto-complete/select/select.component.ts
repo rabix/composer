@@ -2,13 +2,14 @@ import {AfterViewInit, Component, ElementRef, Input, NgZone, OnDestroy, ViewChil
 import * as jQuery from "jquery";
 import "selectize";
 import {ObjectHelper} from "../../../helpers/object.helper";
+import {DirectiveBase} from "../../../util/directive-base/directive-base";
 
 @Component({
     template: "",
     selector: "ct-select",
     styleUrls: ["./select.component.scss"],
 })
-export class SelectComponent implements AfterViewInit, OnDestroy {
+export class SelectComponent extends DirectiveBase implements AfterViewInit, OnDestroy {
 
     // List of selected items
     private items = [];
@@ -39,7 +40,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     // The string to separate items by
     @Input()
-    public delimiter = ",";
+    delimiter = ",";
 
     /**
      * Option groups that options will be bucketed into.
@@ -47,19 +48,19 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
      * Make sure each object in the array has a property named whatever optgroupValueField is set to.
      */
     @Input()
-    public optgroups = [];
+    optgroups = [];
 
     /**
      * The name of the option group property that serves as its unique identifier.
      */
     @Input()
-    public optgroupValueField = "value";
+    optgroupValueField = "value";
 
     /**
      * The name of the property to render as an option group label (not needed when custom rendering functions are defined).
      */
     @Input()
-    public optgroupLabelField = "label";
+    optgroupLabelField = "label";
 
     /**
      * The name of the property to group items by.
@@ -69,61 +70,61 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
 
     // Allows the user to create new items that aren't in the initial list of options
     @Input()
-    public create = false;
+    create = false;
 
     // If true, when user exits the field (clicks outside of it), a new option is created and selected (if create = true)
     @Input()
-    public createOnBlur = false;
+    createOnBlur = false;
 
     // Specifies a RegExp or a string containing a regular expression that the current search filter must match to be
     // allowed to be created. May also be a predicate function that takes the filter text and returns whether it is allowed
     @Input()
-    public createFilter = null;
+    createFilter = null;
 
     // Match highlighting within the dropdown menu
     @Input()
-    public highlight = true;
+    highlight = true;
 
     // If false, items created by the user will not show up as available options once they are unselected
     @Input()
-    public persist = false;
+    persist = false;
 
     // Show the drop-down immediately when the control receives focus
     @Input()
-    public openOnFocus = true;
+    openOnFocus = true;
 
     // null for multi-select, 1 for mono-select
     @Input()
-    public maxItems = null;
+    maxItems = null;
 
     // Press the [backspace] key and go back to editing the item without it being fully removed.
     @Input()
-    public restoreOnBackSpace = true;
+    restoreOnBackSpace = true;
 
     // If true, the items that are currently selected will not be shown in the drop-down list
     @Input()
-    public hideSelected = true;
+    hideSelected = true;
 
     // If true, Selectize will treat any options with a "" value like normal
     @Input()
-    public allowEmptyOptions = false;
+    allowEmptyOptions = false;
 
     // If true, the "Add..." option is the default selection in the drop-down
     @Input()
-    public addPrecedence = true;
+    addPrecedence = true;
 
     // if true, the tab key will choose the currently selected item
     @Input()
-    public selectOnTab = false;
+    selectOnTab = false;
 
     // The name of the property to use as the value when an item is selected
     @Input()
-    public valueField = "value";
+    valueField = "value";
 
     // The name of the property to render as an option / item label
     // (not needed when custom rendering functions are defined)
     @Input()
-    public labelField = "text";
+    labelField = "text";
 
     // When onChange is triggered and this flag is false we know that change comes during items/options initializing process
     // and we should not propagate the change (if we would, we would always have form dirty flag set)
@@ -141,6 +142,7 @@ export class SelectComponent implements AfterViewInit, OnDestroy {
     protected component = null;
 
     constructor(protected zone: NgZone) {
+        super();
     }
 
     protected updateOptions(items?: any []) {

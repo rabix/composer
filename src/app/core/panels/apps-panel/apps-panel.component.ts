@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import {LocalRepositoryService} from "../../../repository/local-repository.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {take} from "rxjs/operators";
 
 @Component({
     selector: "ct-apps-panel",
@@ -34,7 +35,9 @@ export class AppsPanelComponent extends DirectiveBase {
     }
 
     ngOnInit() {
-        this.localRepository.getSelectedAppsPanel().take(1).subscribeTracked(this, panel => this.activeTab = panel);
+        this.localRepository.getSelectedAppsPanel().pipe(
+            take(1)
+        ).subscribeTracked(this, panel => this.activeTab = panel);
     }
 
 
