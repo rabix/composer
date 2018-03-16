@@ -56,13 +56,13 @@ $gradientDarken: 2%;
 }
 
 .btn:active {
-    outline-color: rgb(77, 144, 254);
+    outline-color: $element-focus-color;
 }
 
 .btn:focus {
-    outline-color: rgb(77, 144, 254);
+    outline-color: $element-focus-color;
 }
 
 .btn:focus:active {
-    outline-color: rgb(77, 144, 254);
+    outline-color: $element-focus-color;
 }
