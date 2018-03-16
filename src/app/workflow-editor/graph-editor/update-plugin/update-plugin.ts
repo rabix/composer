@@ -1,7 +1,6 @@
 import {PluginBase, Workflow, StepNode} from "cwl-svg";
 import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 import {AppHelper} from "../../../core/helpers/AppHelper";
-import {Observable} from "rxjs/Observable";
 import {ErrorWrapper} from "../../../core/helpers/error-wrapper";
 import {PlatformRepositoryService} from "../../../repository/platform-repository.service";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
@@ -10,6 +9,7 @@ import {StepModel} from "cwlts/models";
 import {Subject} from "rxjs/Subject";
 import {switchMap, map, filter} from "rxjs/operators";
 import {AuthService} from "../../../auth/auth.service";
+import {fromPromise} from "rxjs/observable/fromPromise";
 
 export class UpdatePlugin extends PluginBase {
     private css = {
@@ -36,7 +36,7 @@ export class UpdatePlugin extends PluginBase {
 
         const updateFlow = updateCheckIsDoable.pipe(
             map(() => this.getUpdateCandidateAppIDs()),
-            switchMap(appIDs => Observable.fromPromise(this.platformRepository.getUpdates(appIDs))),
+            switchMap(appIDs => fromPromise(this.platformRepository.getUpdates(appIDs))),
             map(updates => updates.reduce((acc, item) => {
                 const revisionlessID = AppHelper.getRevisionlessID(item.id);
                 return {...acc, [revisionlessID]: item.revision};
