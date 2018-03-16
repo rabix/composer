@@ -36,16 +36,14 @@ import {take} from "rxjs/operators";
                        [readonly]="readonly || disableLiteralTextInput || control.value.isExpression || control.disabled"
                        (click)="control.value.isExpression && editExpression()"/>
 
-                <span *ngIf="!readonly" class="input-group-btn">
-                    <button type="button" 
-                            class="btn btn-secondary btn-icon"
-                            data-test="edit-expr-button"
-                            (click)="control.value.isExpression ? clearExpression() : editExpression()">
-                        
-                        <i class="fa" [class.fa-times]="control.value.isExpression" [class.fa-code]="!control.value.isExpression"></i> 
-                    </button>
-                </span>
+                <button type="button"
+                        *ngIf="!readonly"
+                        class="btn btn-secondary btn-icon"
+                        data-test="edit-expr-button"
+                        (click)="control.value.isExpression ? clearExpression() : editExpression()">
 
+                    <i class="fa" [class.fa-times]="control.value.isExpression" [class.fa-code]="!control.value.isExpression"></i>
+                </button>
             </div>
 
         </div>
