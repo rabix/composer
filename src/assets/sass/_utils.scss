@@ -1,5 +1,13 @@
 @import "./mixins";
 
+:focus {
+    outline-color: $element-focus-color;
+}
+
+:focus:active {
+    outline-color: $element-focus-color;
+}
+
 .clickable {
     cursor: pointer;
 }
