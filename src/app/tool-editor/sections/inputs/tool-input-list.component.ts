@@ -207,7 +207,7 @@ export class ToolInputListComponent extends DirectiveBase {
     }
 
     updateInput(input: CommandInputParameterModel) {
-        input.validate(this.model.getContext(input.id)).then(noop, noop);
+        input.validate(this.model.getContext(input)).then(noop, noop);
         this.update.emit(this.model.inputs);
     }
 }
