@@ -25,7 +25,7 @@ import {debounceTime, combineLatest, map, take} from "rxjs/operators";
                 <div class="form-group">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" value="bundled" formControlName="choice" name="choice"/>
-                        Bundled (v1.0.4)
+                        Bundled (v1.0.5)
                     </label>
                 </div>
 
