@@ -75,9 +75,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     @Input()
     viewMode: "code" | string;
 
-    @ViewChild(RevisionListComponent)
-    revisionList: RevisionListComponent;
-
     validationState: AppValidityState;
 
     dataModel: CommandLineToolModel | WorkflowModel;
@@ -446,7 +443,6 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     ngAfterViewInit() {
         this.inspector.setHostView(this.inspectorHostView);
         super.ngAfterViewInit();
-
         this.bindExecutionQueue();
     }
 
@@ -496,10 +492,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
         return this.dataModel !== undefined;
     }
 
-    openRevision(revisionNumber: number | string | any): Promise<any> {
+    openRevision(revisionNumber: number | string | any, revisionList: RevisionListComponent): Promise<any> {
 
         const fid = AppHelper.getAppIDWithRevision(this.tabData.id, revisionNumber);
-
         /** @name revisionHackFlagSwitchOn */
         this.revisionChangingInProgress = true;
 
@@ -512,8 +507,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
             return result;
         }).catch(err => {
-            this.revisionChangingInProgress   = false;
-            this.revisionList.loadingRevision = false;
+            this.revisionChangingInProgress = false;
+            revisionList.loadingRevision    = false;
             this.notificationBar.showNotification("Cannot open revision. " + new ErrorWrapper(err));
         });
     }

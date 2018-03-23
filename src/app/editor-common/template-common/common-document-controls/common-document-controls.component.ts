@@ -24,7 +24,7 @@ import {Component, Input} from "@angular/core";
                                           #revisionList
                                           [beforeChange]="host.showModalIfAppIsDirtyBound"
                                           [revisions]="host.dataModel.customProps['sbg:revisionsInfo']"
-                                          (select)="host.openRevision($event)">
+                                          (select)="host.openRevision($event, revisionList)">
                         </ct-revision-list>
                     </ng-template>
                 </button>

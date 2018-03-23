@@ -54,6 +54,7 @@ import {
 } from "./reducers/actions";
 import {fromEvent} from "rxjs/observable/fromEvent";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {RevisionListComponent} from "../editor-common/components/revision-list/revision-list.component";
 
 export function appSaverFactory(comp: ToolEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -173,8 +174,8 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
         this.store.select(appTestData(this.appID)).subscribeTracked(this, this.testJob);
     }
 
-    openRevision(revisionNumber: number | string) {
-        return super.openRevision(revisionNumber).then(() => {
+    openRevision(revisionNumber: number | string, revisionListComponent: RevisionListComponent) {
+        return super.openRevision(revisionNumber, revisionListComponent).then(() => {
             this.toolGroup.reset();
         });
     }
