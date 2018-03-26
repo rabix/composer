@@ -1,7 +1,9 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Observable} from "rxjs/Observable";
 import {Subject} from "rxjs/Subject";
+import {of} from "rxjs/observable/of";
+import {combineLatest} from "rxjs/observable/combineLatest";
+import {switchMap, take, map, filter, distinctUntilChanged, skip} from "rxjs/operators";
 import {RecentAppTab} from "../../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../../electron/src/storage/types/tab-data-interface";
 import {AuthService} from "../../auth/auth.service";
@@ -12,10 +14,7 @@ import {DataGatewayService} from "../data-gateway/data-gateway.service";
 import {AppHelper} from "../helpers/AppHelper";
 import {Store} from "@ngrx/store";
 import {TabCloseAction} from "../actions/core.actions";
-import {switchMap, take, map, filter} from "rxjs/operators";
-import {of} from "rxjs/observable/of";
-import {combineLatest} from "rxjs/observable/combineLatest";
-
+import {AuthCredentials} from "../../auth/model/auth-credentials";
 
 @Injectable()
 export class WorkboxService {
@@ -55,6 +54,24 @@ export class WorkboxService {
             this.tabs.next(tabList);
             this.ensureActiveTab();
         });
+
+        // Close Welcome Tab when you connect to the platform
+        this.auth.getCredentials().pipe(
+            filter(() => {
+                    const tabs = this.tabs.getValue();
+                    return !!tabs.find((tab) => tab.id === "?welcome");
+            }),
+            distinctUntilChanged((a: AuthCredentials[], b: AuthCredentials[]) => !(a.length === 0 && b.length === 1)),
+            skip(1))
+            .subscribe(() => {
+
+                const welcomeTab = this.tabs.getValue().find((tab) => tab.id === "?welcome");
+
+                if (welcomeTab) {
+                    this.closeTab(welcomeTab);
+                }
+
+            });
     }
 
 
