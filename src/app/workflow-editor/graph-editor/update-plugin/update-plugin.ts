@@ -92,6 +92,7 @@ export class UpdatePlugin extends PluginBase {
 
     destroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.stopStatus();
     }
 
     private stopStatus() {
