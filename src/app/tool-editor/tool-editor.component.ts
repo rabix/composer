@@ -194,7 +194,15 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
             // create the workflow model that will be displayed on the test tab
             this.workflowWrapper = WorkflowFactory.from({cwlVersion: this.dataModel.cwlVersion} as any);
             // add this tool as its only step
-            this.workflowWrapper.addStepFromProcess(this.dataModel.serialize());
+            const step = this.workflowWrapper.addStepFromProcess(this.dataModel.serialize());
+            /**
+             * Adding a step sometimes generates a different id for that step than that of an app that it was made from.
+             * On graph job representation, step progress plugin knows about tool id, and will try to update execution state on it.
+             * If this representation has a different id, they will not match and step will not be found on the SVG.
+             * This is a place to fix that since this workflow is not a source of truth for the data, but just a utility
+             * to help us render a graph, so just patch the ID to ensure that it's exactly what we expect to find.
+             */
+            this.workflowWrapper.changeStepId(step, this.dataModel.id);
 
             // iterate through all inputs of the tool
             this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
