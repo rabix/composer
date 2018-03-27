@@ -3,6 +3,7 @@ import {Subject} from "rxjs/Subject";
 import {race} from "rxjs/observable/race";
 import {of} from "rxjs/observable/of";
 import {delay, take, filter, flatMap} from "rxjs/operators";
+import {never} from "rxjs/observable/never";
 
 export type NotificationContent = string | Type<Component>;
 export type NotificationType = "success" | "info" | "error" | "warning";
@@ -46,7 +47,12 @@ export class NotificationBarService {
                 // Dismiss notification when delay time passed or when its manually dismissed
                 return race(
                     of(notification).pipe(
-                        delay(notification.timeout)
+                        flatMap(notification => {
+                            if (notification.timeout === Infinity) {
+                                return never();
+                            }
+                            return of(notification).pipe(delay(notification.timeout));
+                        })
                     ),
                     this.dismissNotificationStream.pipe(
                         filter((n) => n === notification),
@@ -54,7 +60,7 @@ export class NotificationBarService {
                     )
                 );
             })
-        ).subscribe((notification) => {
+        ).subscribe((notification: Notification) => {
             this.dismiss(notification);
         });
     }
@@ -118,9 +124,9 @@ export class NotificationBarService {
         const notification = this.createNotification(notificationContent, options);
 
         const similarExists = this.notifications.find((n) => n.message === notification.message);
-
+        //
         if (!similarExists) {
-
+            //
             this.notifications.push(notification);
             if (this.notifications.length <= NotificationBarService.maxDisplay) {
                 // Display updated list with added notification

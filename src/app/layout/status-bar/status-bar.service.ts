@@ -72,7 +72,7 @@ export class StatusBarService {
         const p = this.getProcess(id);
 
         if (!p) {
-            console.error(`Process “${id}” doesn't exist.`);
+            // console.error(`Process “${id}” doesn't exist.`);
             return;
         }
 

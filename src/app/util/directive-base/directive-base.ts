@@ -2,6 +2,7 @@ import {AfterViewInit, OnDestroy} from "@angular/core";
 import {AsyncSubject} from "rxjs/AsyncSubject";
 import {Subscription} from "rxjs/Subscription";
 import "../rx-extensions/subscribe-tracked";
+import {Subject} from "rxjs/Subject";
 
 export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
 
@@ -11,6 +12,8 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
     private __disposables: { dispose: string, track: Object }[] = [];
 
     viewReady = new AsyncSubject();
+
+    componentDestruction = new Subject<any>();
 
     /**
      * Tracks the given value and disposes of it when the object gets destroyed
@@ -49,6 +52,8 @@ export abstract class DirectiveBase implements OnDestroy, AfterViewInit {
     }
 
     ngOnDestroy(): void {
+        this.componentDestruction.next(this);
+        this.componentDestruction.complete();
         this.__disposables.forEach(d => d.track[d.dispose]());
     }
 
