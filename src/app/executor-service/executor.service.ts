@@ -6,7 +6,7 @@ import {AppHelper} from "../core/helpers/AppHelper";
 import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
 import {IpcService} from "../services/ipc.service";
-import {distinctUntilChanged, switchMap, take, takeWhile, map} from "rxjs/operators";
+import {switchMap, take, takeWhile, map} from "rxjs/operators";
 
 @Injectable()
 export class ExecutorService {
@@ -32,7 +32,6 @@ export class ExecutorService {
      */
     getVersion(): Observable<string> {
         return this.getConfig("path").pipe(
-            distinctUntilChanged(),
             switchMap(path => this.ipc.request("probeExecutorVersion"))
         );
     }
