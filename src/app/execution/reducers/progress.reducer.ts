@@ -27,7 +27,7 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
         /**
          * When app tab is closed, execution state should be cleared so it doesn't show up again when the app is reopened
          *
-         * @name progress.reducer.tabClose
+         * @name progress.reducer.tabCloseCOM
          * @see progress.reducer.tabCloseTest
          */
         case TabCloseAction.type: {

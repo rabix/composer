@@ -67,8 +67,8 @@
              [class.text-success]="step.state === 'completed'">
 
             <i class="fa fa-fw"
-               [class.fa-clock-o]="!step.state || step.state === 'pending'"
-               [class.fa-spin]="step.state === 'started' || step.state === 'pending'"
+               [class.fa-circle-o]="!step.state || step.state === 'pending'"
+               [class.fa-spin]="step.state === 'started'"
                [class.fa-circle-o-notch]="step.state === 'started'"
                [class.fa-circle-thin]="step.state === 'stopped'"
                [class.fa-times-circle]="step.state === 'failed'"

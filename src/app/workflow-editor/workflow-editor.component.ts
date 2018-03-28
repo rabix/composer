@@ -1,6 +1,5 @@
 import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {WorkflowFactory, WorkflowModel} from "cwlts/models";
-import * as Yaml from "js-yaml";
 import {AppMetaManagerToken, appMetaManagerFactory} from "../core/app-meta/app-meta-manager-factory";
 import {CodeSwapService} from "../core/code-content-service/code-content.service";
 import {DataGatewayService} from "../core/data-gateway/data-gateway.service";
@@ -27,6 +26,7 @@ import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
 import {Store} from "@ngrx/store";
 import {AuthService} from "../auth/auth.service";
+import {serializeModel} from "../editor-common/utilities/model-serializer/model-serializer";
 import {AppInfoToken, appInfoFactory} from "../editor-common/factories/app-info.factory";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
@@ -156,10 +156,8 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
      * the text has been formatted by the GUI editor
      */
     protected getModelText(embed = false): string {
-        const wf = embed || this.tabData.dataSource === "app" ? this.dataModel.serializeEmbedded() : this.dataModel.serialize();
-
-        return this.tabData.language === "json" || this.tabData.dataSource === "app" ?
-            JSON.stringify(wf, null, 4) : Yaml.dump(wf);
+        const asYaml = !(this.tabData.language === "json" || this.tabData.dataSource === "app");
+        return serializeModel(this.dataModel, embed || this.tabData.dataSource === "app", asYaml);
     }
 
     onTabActivation(): void {

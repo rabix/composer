@@ -61,6 +61,7 @@ import {of} from "rxjs/observable/of";
 import {empty} from "rxjs/observable/empty";
 import {combineLatest} from "rxjs/observable/combineLatest";
 import {fixJobFilePaths} from "../utilities/imported-job-parser/imported-job-parser";
+import {serializeModel} from "../utilities/model-serializer/model-serializer";
 
 const path = require("path");
 
@@ -575,19 +576,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
     /** Serializes model to a string. */
     protected getModelText(embed = false): string {
-
-        let modelObject;
-        if (embed && this.dataModel instanceof WorkflowModel) {
-            modelObject = this.dataModel.serializeEmbedded();
-        } else {
-            modelObject = this.dataModel.serialize();
-        }
-
-        if (this.tabData.language === "json" || this.tabData.dataSource === "app") {
-            return JSON.stringify(modelObject, null, 4);
-        }
-
-        return Yaml.dump(modelObject);
+        return serializeModel(this.dataModel, embed, !(this.tabData.language === "json" || this.tabData.dataSource === "app"));
     }
 
     protected syncModelAndCode(resolveRDF = true): Promise<any> {

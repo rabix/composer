@@ -15,11 +15,11 @@ import {
     ExecutionStopAction,
 } from "../../actions/execution.actions";
 import {WorkflowModel, CommandLineToolModel} from "cwlts/models";
-import * as Yaml from "js-yaml";
 import {Actions} from "@ngrx/effects";
 import {filter, take} from "rxjs/operators";
 import {AppType} from "../../types";
 import {ExecutionError} from "../../models";
+import {serializeModel} from "../../../editor-common/utilities/model-serializer/model-serializer";
 
 const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
 const path            = window["require"]("path");
@@ -85,7 +85,7 @@ export class ExecutorService2 {
 
     execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath?: string, executionParams: Partial<ExecutorParamsConfig> = {}): Observable<any> {
 
-        const content  = this.serialize(model);
+        const content = serializeModel(model, true, false, true);
         const executor = new RabixExecutor(executorPath);
 
         const stepList = this.getStepList(model);
@@ -199,21 +199,6 @@ export class ExecutorService2 {
             /** @name executionUnsubscribe */
             return () => cleanup();
         });
-    }
-
-    private serialize(model: WorkflowModel | CommandLineToolModel): string {
-        let serialized;
-
-        if (model instanceof WorkflowModel) {
-            serialized = model.serializeEmbedded();
-        } else {
-            serialized = model.serialize();
-        }
-
-        // Bunny traverses mistakenly into this to look for actual inputs, it might have been resolved by now
-        delete serialized["sbg:job"];
-
-        return Yaml.dump(serialized);
     }
 
 }

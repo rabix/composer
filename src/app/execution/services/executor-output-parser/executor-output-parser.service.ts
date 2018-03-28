@@ -6,7 +6,8 @@ import {
     ExecutionStepFailedAction,
     ExecutionStepCompletedAction,
     ExecutionStepStartedAction,
-    ExecutionDockerPullTimeoutAction, ExecutionErrorAction
+    ExecutionDockerPullTimeoutAction,
+    ExecutionErrorAction
 } from "../../actions/execution.actions";
 import {Action} from "@ngrx/store";
 import {flatMap} from "rxjs/operators";
@@ -59,6 +60,7 @@ export class ExecutorOutputParser {
 
                     const stepParts        = stepId.split(".");
                     const firstLevelStepID = stepParts[1];
+                    const isSubstep = stepParts.length > 2;
 
                     if (!firstLevelStepID) {
                         if (status === "FAILED") {
@@ -69,7 +71,10 @@ export class ExecutorOutputParser {
 
                     switch (status) {
                         case "COMPLETED":
-                            return of(new ExecutionStepCompletedAction(appID, firstLevelStepID));
+                            if (!isSubstep) {
+                                return of(new ExecutionStepCompletedAction(appID, firstLevelStepID));
+                            }
+                            break;
                         case "FAILED":
                             return of(new ExecutionStepFailedAction(appID, firstLevelStepID, message));
                         case "READY":
