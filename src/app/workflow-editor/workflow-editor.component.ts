@@ -27,6 +27,7 @@ import {ExportAppService} from "../services/export-app/export-app.service";
 import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.component";
 import {Store} from "@ngrx/store";
 import {AuthService} from "../auth/auth.service";
+import {AppInfoToken, appInfoFactory} from "../editor-common/factories/app-info.factory";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -52,6 +53,11 @@ export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, 
         {
             provide: AppModelToken,
             useFactory: appModelFactory,
+            deps: [WorkflowEditorComponent]
+        },
+        {
+            provide: AppInfoToken,
+            useFactory: appInfoFactory,
             deps: [WorkflowEditorComponent]
         }
 
@@ -181,7 +187,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
             closeOnEscape: true
         });
 
-        hints.model = this.dataModel;
+        hints.model    = this.dataModel;
         hints.readonly = this.isReadonly;
     }
 }

@@ -10,7 +10,8 @@ import {
     SimpleChanges,
     TemplateRef,
     ViewChild,
-    ViewEncapsulation
+    ViewEncapsulation,
+    Inject
 } from "@angular/core";
 
 import {
@@ -47,6 +48,12 @@ import {NativeSystemService} from "../../../native/system/native-system.service"
 import {filter, take} from "rxjs/operators";
 import {of} from "rxjs/observable/of";
 import {AuthService} from "../../../auth/auth.service";
+import {AppInfo, AppInfoToken} from "../../../editor-common/factories/app-info.factory";
+import {Store} from "@ngrx/store";
+import {stepUpdateMap} from "../../state/selectors";
+import {AppState} from "../../state/types";
+import {StepUpdateCheckRequestAction, StepRevisionCheckErrorAction, StepRevisionCheckCancelAction} from "../../state/actions";
+import {ofType, Actions} from "@ngrx/effects";
 
 @Component({
     selector: "ct-workflow-graph-editor",
@@ -110,13 +117,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 private platformRepository: PlatformRepositoryService,
                 private fileRepository: FileRepositoryService,
                 private workflowEditorService: WorkflowEditorService,
-                private native: NativeSystemService) {
+                private native: NativeSystemService,
+                private store: Store<AppState>,
+                private actions: Actions,
+                @Inject(AppInfoToken) private appInfo: AppInfo) {
         super();
-    }
-
-    private canvasIsInFocus() {
-        const el = this.canvas.nativeElement;
-        return el.getClientRects().length > 0 && (document.activeElement === el || el.contains(document.activeElement));
     }
 
     ngAfterViewInit() {
@@ -129,6 +134,13 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             } else {
                 this.tryToFitWorkflowOnNextTabActivation = true;
             }
+        });
+
+        this.actions.pipe(
+            ofType<StepRevisionCheckErrorAction>(StepRevisionCheckErrorAction.type),
+            filter(() => !this.appInfo.isLocal)
+        ).subscribe(action => {
+            this.notificationBar.showNotification("Cannot fetch step updates. " + new ErrorWrapper(action.error));
         });
     }
 
@@ -146,7 +158,7 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
                 new SelectionPlugin(),
                 new ZoomPlugin(),
                 new DeletionPlugin(),
-                new UpdatePlugin(this.statusBar, this.auth, this.platformRepository, this.notificationBar)
+                new UpdatePlugin()
             ],
             editingEnabled: !this.readonly
         });
@@ -208,6 +220,11 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.resetInspectedNodeReference();
 
             this.modelChange.next(this.modelChangedFromHistory);
+        });
+
+
+        this.store.select(stepUpdateMap(this.appInfo.id)).subscribeTracked(this, (revisionMap) => {
+            this.graph.getPlugin(UpdatePlugin).applyRevisionMap(revisionMap);
         });
     }
 
@@ -289,9 +306,15 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             this.resetInspectedNodeReference();
         }
 
+
         if (this.graph && this.canvas && this.canDraw()) {
             this.graph.draw(this.model as any);
         }
+
+        if (changes.model) {
+            this.store.dispatch(new StepUpdateCheckRequestAction(this.appInfo.id, this.model.steps));
+        }
+
     }
 
     upscale() {
@@ -321,7 +344,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
     deleteSelectedElement() {
         this.graph.getPlugin(DeletionPlugin).deleteSelection();
     }
-
 
     /**
      * Triggers when app is dropped on canvas
@@ -446,31 +468,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
     }
 
-    /**
-     * Open node in object inspector
-     */
-    private openNodeInInspector(node: Element) {
-
-        let typeOfNode = "steps";
-
-        if (this.hasClassSvgElement(node, "input")) {
-            typeOfNode = "inputs";
-        } else if (this.hasClassSvgElement(node, "output")) {
-            typeOfNode = "outputs";
-        }
-
-        this.inspectedNode = this.model[typeOfNode].find((input) => input.id === node.getAttribute("data-id"));
-        this.inspector.show(this.inspectorTemplate, this.inspectedNode.id);
-    }
-
-    /**
-     * IE does not support classList property for old browsers and also SVG elements
-     */
-    private hasClassSvgElement(element: Element, className: string) {
-        const elementClass = element.getAttribute("class") || "";
-        return elementClass.split(" ").indexOf(className) > -1;
-    }
-
     ngOnDestroy() {
         super.ngOnDestroy();
 
@@ -481,6 +478,8 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         if (this.graph) {
             this.graph.destroy();
         }
+
+        this.store.dispatch(new StepRevisionCheckCancelAction(this.appInfo.id));
 
         this.workflowEditorService.emptyHistory();
         window.removeEventListener("keypress", this.historyHandler);
@@ -493,6 +492,10 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
             if (isLocked) {
                 this.graph.enableEditing(false);
                 return;
+            }
+
+            if (!this.graph.editingEnabled) {
+                this.store.dispatch(new StepUpdateCheckRequestAction(this.appInfo.id, this.model.steps));
             }
 
             this.graph.enableEditing(true);
@@ -551,6 +554,45 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
 
     }
 
+    /**
+     +     * Tells whether graph is empty (nothing to render on SVG)
+     +     */
+    isGraphEmpty() {
+
+        const hasNoStepsOrIO = !this.model.steps.length && !this.model.inputs.length && !this.model.outputs.length;
+        return this.model && hasNoStepsOrIO;
+    }
+
+    private canvasIsInFocus() {
+        const el = this.canvas.nativeElement;
+        return el.getClientRects().length > 0 && (document.activeElement === el || el.contains(document.activeElement));
+    }
+
+    /**
+     * Open node in object inspector
+     */
+    private openNodeInInspector(node: Element) {
+
+        let typeOfNode = "steps";
+
+        if (this.hasClassSvgElement(node, "input")) {
+            typeOfNode = "inputs";
+        } else if (this.hasClassSvgElement(node, "output")) {
+            typeOfNode = "outputs";
+        }
+
+        this.inspectedNode = this.model[typeOfNode].find((input) => input.id === node.getAttribute("data-id"));
+        this.inspector.show(this.inspectorTemplate, this.inspectedNode.id);
+    }
+
+    /**
+     * IE does not support classList property for old browsers and also SVG elements
+     */
+    private hasClassSvgElement(element: Element, className: string) {
+        const elementClass = element.getAttribute("class") || "";
+        return elementClass.split(" ").indexOf(className) > -1;
+    }
+
     private scheduleAfterRender(fn: Function) {
 
         if (this.graph) {
@@ -559,15 +601,6 @@ export class WorkflowGraphEditorComponent extends DirectiveBase implements OnCha
         }
 
         this.functionsWaitingForRender.push(fn);
-    }
-
-    /**
-     +     * Tells whether graph is empty (nothing to render on SVG)
-     +     */
-    isGraphEmpty() {
-
-        const hasNoStepsOrIO = !this.model.steps.length && !this.model.inputs.length && !this.model.outputs.length;
-        return this.model && hasNoStepsOrIO;
     }
 
     /**

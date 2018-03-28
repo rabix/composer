@@ -1,11 +1,9 @@
-export const TAB_CLOSE = "[Core] tab close";
-
 export class TabCloseAction {
 
-    type = TAB_CLOSE;
+    static readonly type = "[Core] tab close";
+    readonly type = TabCloseAction.type;
 
     constructor(public tabID: string) {
-
     }
 
 }

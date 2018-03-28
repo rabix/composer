@@ -16,7 +16,10 @@ import {UpdateStepModalComponent} from "./update-step-modal/update-step-modal.co
 import {WorkflowEditorComponent} from "./workflow-editor.component";
 import {WorkflowNotGraphEditorComponent} from "./workflow-not-graphic-editor/workflow-not-graph-editor.component";
 import {JobEditorModule} from "../job-editor/job-editor.module";
-
+import {StoreModule} from "@ngrx/store";
+import {EffectsModule} from "@ngrx/effects";
+import {StepUpdateService} from "./services/step-update/step-update.service";
+import {reducers} from "./state/reducers";
 
 @NgModule({
     declarations: [
@@ -37,6 +40,9 @@ import {JobEditorModule} from "../job-editor/job-editor.module";
     exports: [
         WorkflowEditorComponent
     ],
+    providers: [
+        StepUpdateService
+    ],
     imports: [
         BrowserModule,
         CWLModule,
@@ -46,6 +52,8 @@ import {JobEditorModule} from "../job-editor/job-editor.module";
         LayoutModule,
         ReactiveFormsModule,
         UIModule,
+        StoreModule.forFeature("workflowEditor", reducers),
+        EffectsModule.forFeature([StepUpdateService])
     ]
 })
 export class WorkflowEditorModule {

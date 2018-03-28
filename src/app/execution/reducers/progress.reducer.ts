@@ -17,7 +17,7 @@ import {
     ExecutionDockerPullTimeoutAction
 } from "../actions/execution.actions";
 import {ProgressState} from "./index";
-import {TAB_CLOSE, TabCloseAction} from "../../core/actions/core.actions";
+import {TabCloseAction} from "../../core/actions/core.actions";
 import {AppExecution, ExecutionError, ExecutionState, StepExecution} from "../models";
 
 export function reducer<T extends { type: string | any }>(state: ProgressState = {}, action: T): ProgressState {
@@ -30,7 +30,7 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
          * @name progress.reducer.tabClose
          * @see progress.reducer.tabCloseTest
          */
-        case TAB_CLOSE: {
+        case TabCloseAction.type: {
             const {tabID} = action as Partial<TabCloseAction>;
 
             if (!state[tabID]) {
