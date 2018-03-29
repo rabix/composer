@@ -1,25 +1,41 @@
 const path = require("path");
 
 export function ensureAbsolutePaths(rootPath: string, job: Object): Object {
-    const parsed = {...job};
 
-    Object.keys(parsed).forEach(key => {
-        const val = parsed[key];
+    return Object.keys(job).reduce((acc, key) => {
+        return Object.assign(acc, {[key]: deepEnsureAbsolutePaths(job[key], rootPath)});
+    }, {});
+}
 
-        const isFileOrDir = val && val.class && ~["File", "Directory"].indexOf(val.class);
+function deepEnsureAbsolutePaths(entry, rootPath) {
+    if (Array.isArray(entry)) {
+        return entry.map(value => deepEnsureAbsolutePaths(value, rootPath));
+    } else if (Object.prototype.isPrototypeOf(entry)) {
 
-        if (isFileOrDir) {
-            if (val.path && !isAbsolutePath(val.path)) {
-                val.path = path.normalize(rootPath + path.sep + val.path);
-            }
-
-            if (Array.isArray(val.secondaryFiles)) {
-                val.secondaryFiles = val.secondaryFiles.map(el => path.normalize(rootPath + path.sep + el.path));
-            }
+        if (!isFileOrDir(entry)) {
+            return Object.keys(entry).reduce((acc, key) =>
+                Object.assign(acc, {[key]: deepEnsureAbsolutePaths(entry[key], rootPath)}), {}
+            );
         }
-    });
 
-    return parsed;
+        const updated = {...entry};
+        if (updated.path) {
+            updated.path = path.resolve(rootPath, updated.path);
+        }
+
+        if (Array.isArray(updated.secondaryFiles)) {
+            updated.secondaryFiles = updated.secondaryFiles.map(el =>
+                path.normalize(rootPath + path.sep + el.path)
+            );
+        }
+        return updated;
+    }
+
+    return entry;
+}
+
+function isFileOrDir(entry): boolean {
+    return entry && (entry.class === "File" || entry.class === "Directory") && typeof entry.path === "string";
 }
 
 function isAbsolutePath(p: string) {
