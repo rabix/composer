@@ -2,14 +2,16 @@ import {spawn} from "child_process";
 
 export function open(target) {
 
-    let opener = "nautilus";
+    const isWindows = process.platform === "win32";
+    const isMac     = process.platform === "darwin";
 
-    if (process.platform === "darwin") {
-        opener = "open"
-    } else if (process.platform === "win32") {
-        opener = "start";
+    // Windows does not recognize start as a program, but as a command
+    // Calling it works in cmd, but not through spawning a process in that manner
+    // So we need to invoke “start” through cmd
+    if (isWindows) {
+        spawn("cmd", ["/s", "/c", "start", target], {detached: true});
+        return;
     }
 
-    spawn(opener, [target], {detached: true});
-
+    spawn(isMac ? "open" : "nautilus", [target], {detached: true});
 }
