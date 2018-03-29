@@ -139,17 +139,26 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
                 return state;
             }
 
+            const actionToStateMap = {
+                [EXECUTION_STEP_STARTED]: "started",
+                [EXECUTION_STEP_COMPLETED]: "completed",
+                [EXECUTION_STEP_FAILED]: "failed"
+            };
+
+            const step = app.stepExecution.find((step) => step.id === stepID);
+
+            if (!step || actionToStateMap[action.type] === step.state) {
+                return state;
+            }
+
             const update = app.update({
                 stepExecution: app.stepExecution.map(step => {
                     if (step.id === stepID) {
 
                         let state: ExecutionState;
-                        if (action.type === EXECUTION_STEP_STARTED) {
-                            state = "started";
-                        } else if (action.type === EXECUTION_STEP_COMPLETED) {
-                            state = "completed";
-                        } else if (action.type === EXECUTION_STEP_FAILED) {
-                            state = "failed";
+
+                        if (actionToStateMap[action.type]) {
+                            state = actionToStateMap[action.type];
                         }
 
                         return step.transitionTo(state);
