@@ -19,8 +19,8 @@ function deepEnsureAbsolutePaths(entry, rootPath) {
         }
 
         const updated = {...entry};
-        if (updated.path && !isAbsolutePath(updated.path)) {
-            updated.path = path.normalize(rootPath + path.sep + updated.path);
+        if (updated.path) {
+            updated.path = path.resolve(rootPath, updated.path);
         }
 
         if (Array.isArray(updated.secondaryFiles)) {
