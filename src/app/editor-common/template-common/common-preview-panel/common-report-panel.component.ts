@@ -1,4 +1,7 @@
-import {AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild, OnInit} from "@angular/core";
+import {
+    AfterViewInit, Component, ElementRef, HostBinding, Input, ViewChild, OnInit,
+    ChangeDetectorRef
+} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {DomEventService} from "../../../services/dom/dom-event.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
@@ -7,7 +10,7 @@ import {AppEditorBase} from "../../app-editor-base/app-editor-base";
 import {ExecutionStatusComponent} from "../../../execution/components/execution-status/execution-status.component";
 import {appSelector} from "../../../execution/reducers/selectors";
 import {AppExecution} from "../../../execution/models";
-import {map, skip, takeUntil, take, last, withLatestFrom} from "rxjs/operators";
+import {skip, takeUntil, take, last, withLatestFrom, tap} from "rxjs/operators";
 
 @Component({
     selector: "ct-common-report-panel",
@@ -56,7 +59,7 @@ export class CommonReportPanelComponent extends DirectiveBase implements OnInit,
 
     appProgressSlice: Observable<Partial<AppExecution>>;
 
-    constructor(private domEvents: DomEventService, private element: ElementRef) {
+    constructor(private domEvents: DomEventService, private element: ElementRef, private cdr: ChangeDetectorRef) {
         super();
     }
 
@@ -64,8 +67,11 @@ export class CommonReportPanelComponent extends DirectiveBase implements OnInit,
 
         this.appType = this.host instanceof WorkflowEditorComponent ? "Workflow" : "CommandLineTool";
 
-        this.appProgressSlice = this.host.store.pipe(
-            map(appSelector(this.host.tabData.id)),
+        this.appProgressSlice = this.host.store.select(appSelector(this.host.tabData.id)).pipe(
+            tap(() => {
+                this.cdr.markForCheck();
+                this.cdr.detectChanges();
+            })
         );
 
     }
