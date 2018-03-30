@@ -286,7 +286,8 @@ export class WorkflowStepInspectorInputEntryComponent implements OnChanges, OnIn
                     ...this.input,
                     type: {
                         ...this.input.type,
-                        type: this.input.type.items
+                        type: this.input.type.items,
+                        symbols: this.input.type.symbols
                     }
                 };
             }
