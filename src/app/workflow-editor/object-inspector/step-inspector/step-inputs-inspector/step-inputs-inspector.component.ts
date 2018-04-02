@@ -99,6 +99,22 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                                               class="mb-0">
                             </ct-workflow-step-inspector-entry>
 
+
+                            <!--Link Merge Method Group-->
+                            <div class="form-group">
+
+                                <label class="input-label text-muted">Link Merge Method</label>
+                                    
+                                <select class="form-control" [disabled]="readonly"
+                                        [ngModel]="input.linkMerge.value"
+                                        (ngModelChange)="input.linkMerge.value = $event; change.emit()"
+                                        [ngModelOptions]="{standalone: true}">
+                                    <option value="merge_nested">Nested</option>
+                                    <option value="merge_flattened">Flattened</option>
+                                </select>
+                                
+                            </div>
+
                             <!--Connections-->
                             <div>
 
@@ -155,20 +171,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                             </ct-tooltip-content>
 
-                            <div class="form-group">
-                                
-                                <label class="form-control-label">Link Merge Method</label>
-                                
-                                <select class="form-control" [disabled]="readonly" 
-                                        [ngModel]="input.linkMerge.value" 
-                                        (ngModelChange)="input.linkMerge.value = $event; change.emit()" 
-                                        [ngModelOptions]="{standalone: true}">
-                                    <option value="merge_nested">Nested</option>
-                                    <option value="merge_flattened">Flattened</option>
-                                </select>
-                            </div>
-
+                            
+                            
                         </div>
+                        
                     </form>
                 </div>
             </ct-form-panel>
