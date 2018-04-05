@@ -201,8 +201,12 @@ export class ToolEditorComponent extends AppEditorBase implements OnInit {
              * If this representation has a different id, they will not match and step will not be found on the SVG.
              * This is a place to fix that since this workflow is not a source of truth for the data, but just a utility
              * to help us render a graph, so just patch the ID to ensure that it's exactly what we expect to find.
+             *
+             * However, ID is not required by CWL, so this applies only if dataModel has one.
              */
-            this.workflowWrapper.changeStepId(step, this.dataModel.id);
+            if (this.dataModel.id) {
+                this.workflowWrapper.changeStepId(step, this.dataModel.id);
+            }
 
             // iterate through all inputs of the tool
             this.workflowWrapper.steps[0].in.forEach((input: WorkflowStepInputModel) => {
