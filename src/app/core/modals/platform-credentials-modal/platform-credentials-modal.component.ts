@@ -226,7 +226,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                         if (this.platformList.map(e => e.value).indexOf(val) === -1) {
                             try {
                                 const url = new URL(val);
-                                if(url.hostname.endsWith("-vayu.sbgenomics.com")){
+                                if(url.hostname.endsWith(".sbgenomics.com")){
                                     return null;
                                 } else {
                                     return {name: true};
