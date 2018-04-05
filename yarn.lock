@@ -3094,9 +3094,9 @@ cwl-svg@2.0.1:
   dependencies:
     core-js "^2.5.1"
 
-cwlts@1.15.23:
-  version "1.15.23"
-  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.23.tgz#31bd7c375cebbc96a9c0c812af1f2d2b845a8a72"
+cwlts@1.15.24:
+  version "1.15.24"
+  resolved "https://registry.yarnpkg.com/cwlts/-/cwlts-1.15.24.tgz#a7c2826d404efd21d0778ce2ae47aeb3bfff013c"
   dependencies:
     ajv "^6.1.1"
     js-yaml "^3.10.0"
