@@ -30,6 +30,7 @@ import {HintsModalComponent} from "../core/modals/hints-modal/hints-modal.compon
 import {Store} from "@ngrx/store";
 import {AuthCredentials} from "../auth/model/auth-credentials";
 import {AuthService} from "../auth/auth.service";
+import {tap, filter} from "rxjs/operators";
 
 export function appSaverFactory(comp: WorkflowEditorComponent, ipc: IpcService, modal: ModalService, platformRepository: PlatformRepositoryService) {
 
@@ -108,31 +109,31 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
         this.inspectorService = inspector;
 
-        this.updateService.update
-            .do(async () => {
+        this.updateService.update.pipe(
+                tap(async () => {
 
-                // If model has not been created, attempt to create it, because we potentially need to update steps
-                if (!this.dataModel) {
-                    await this.resolveCurrentContent();
-                }
-            })
-            .filter((data: {id: string, app: any}) => {
-
-                /**
-                 *  Perform filter to see if updated app is a part of this workflow - all local workflows
-                 *  and platform workflows that have the 'sbg:id" property should be updated if necessary
-                 */
-                let filterFn = (step) => false;
-                if (this.tabData.dataSource === "local") {
-                    filterFn = (step) => {
-                        return this.getStepAbsolutePath(step.customProps["sbg:rdfId"]) === data.id || this.getStepAbsolutePath(step.runPath) === data.id;
+                    // If model has not been created, attempt to create it, because we potentially need to update steps
+                    if (!this.dataModel) {
+                        await this.resolveCurrentContent();
                     }
-                } else if (data.id && !AppHelper.isLocal(data.id)) {
-                    filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
-                }
-                return this.dataModel && this.dataModel.steps.filter(filterFn).length > 0;
-            })
-            .subscribeTracked(this, (data: {id: string, app: any}) => {
+                }),
+                filter((data: {id: string, app: any}) => {
+
+                    /**
+                     *  Perform filter to see if updated app is a part of this workflow - all local workflows
+                     *  and platform workflows that have the 'sbg:id" property should be updated if necessary
+                     */
+                    let filterFn = (step) => false;
+                    if (this.tabData.dataSource === "local") {
+                        filterFn = (step) => {
+                            return this.getStepAbsolutePath(step.customProps["sbg:rdfId"]) === data.id || this.getStepAbsolutePath(step.runPath) === data.id;
+                        }
+                    } else if (data.id && !AppHelper.isLocal(data.id)) {
+                        filterFn = (step) => AppHelper.getRevisionlessID(step.run.customProps["sbg:id"] || "") === AppHelper.getRevisionlessID(data.id);
+                    }
+                    return this.dataModel && this.dataModel.steps.filter(filterFn).length > 0;
+                })
+            ).subscribeTracked(this, (data: {id: string, app: any}) => {
 
                 if (this.tabData.dataSource === "local") {
                     let steps;
@@ -265,7 +266,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         let wfPathSplit = this.tabData.id.split("/");
 
         if (path.indexOf("./") === 0) {
-            return path.replace(".", wfPathSplit.slice(0, wfPathSplit.length - 1).join("/") + "/")
+            return path.replace(".", wfPathSplit.slice(0, wfPathSplit.length - 1).join("/"));
         }
 
         // Find string of only '../' sequences, up to the first time the '../' sequence does not show up, ie. folder name

@@ -267,7 +267,8 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
             }
 
             // We have to resolve after validation if app is a workflow with invalid steps
-            const continuation: Promise<any> = this.tabData.dataSource === "local" && (this.isWorkflowWithInvalidSteps() || !this.dataModel) ?
+            const continuation: Promise<any> = (this.tabData.dataSource === "local" && this.isWorkflowWithInvalidSteps()
+                && !this.isResolved) || !this.dataModel ?
                 this.resolveToModel(code) : Promise.resolve();
 
             continuation.then(() => {
