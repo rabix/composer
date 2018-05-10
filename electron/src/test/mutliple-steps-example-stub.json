@@ -1,0 +1,15 @@
+{
+    "class": "Workflow",
+    "inputs": [],
+    "outputs": [],
+    "steps": [
+        {
+            "id": "step",
+            "run": "tool-stub.json"
+        },
+        {
+            "id": "step",
+            "run": "tool-stub.json"
+        }
+    ]
+}

@@ -130,4 +130,23 @@ describe("Schema salad resolver", () => {
 
     });
 
+    it("should not detect multiple uses of a tool nested inside workflows as being recursive (#394)", function(done) {
+        const original = {
+            "class": "Workflow",
+            "inputs": [],
+            "outputs": [],
+            "steps": [
+                {
+                    "id": "step",
+                    "run": "test/mutliple-steps-example-stub.json"
+                }
+            ]
+        };
+
+        const originalSerialized = JSON.stringify(original, null, 4);
+
+        resolver.resolveContent(originalSerialized, __dirname).then(() => {
+            done();
+        }).catch(done);
+    })
 });
