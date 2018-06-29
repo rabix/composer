@@ -13,5 +13,5 @@ export function open(target) {
         return;
     }
 
-    spawn(isMac ? "open" : "nautilus", [target], {detached: true});
+    spawn(isMac ? "open" : "xdg-open", [target], {detached: true});
 }
