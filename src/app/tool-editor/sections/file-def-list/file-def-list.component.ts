@@ -19,7 +19,7 @@ import {take, delay, map} from "rxjs/operators";
 
                 <!--Blank Tool Screen-->
                 <ct-blank-state *ngIf="!readonly && !fileRequirement.listing?.length" (buttonClick)="addFile()"
-                                [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#files'"
+                                [learnMoreURL]="'http://docs.rabix.io/the-tool-editor#file-requirements'"
                                 [hasAction]="true">
                     <section tc-button-text>Create a File</section>
                     <section tc-description>
