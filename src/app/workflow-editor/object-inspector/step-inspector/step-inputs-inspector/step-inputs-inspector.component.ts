@@ -85,8 +85,8 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 </div>
                             </div>
-                            
-                            
+
+
 
                             <!--Input-->
                             <ct-workflow-step-inspector-entry [input]="input"
@@ -104,7 +104,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                             <div class="form-group">
 
                                 <label class="input-label text-muted">Link Merge Method</label>
-                                    
+
                                 <select class="form-control" [disabled]="readonly"
                                         [ngModel]="input.linkMerge.value"
                                         (ngModelChange)="input.linkMerge.value = $event; change.emit()"
@@ -112,7 +112,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                     <option value="merge_nested">Nested</option>
                                     <option value="merge_flattened">Flattened</option>
                                 </select>
-                                
+
                             </div>
 
                             <!--Connections-->
@@ -123,7 +123,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                     <span class="text-warning" *ngIf="input.type.isNullable">
                                         <i class="fa fa-warning fa-fw"></i> This port is not connected
                                     </span>
-    
+
                                     <span class="text-danger" *ngIf="!input.type.isNullable">
                                         <i class="fa fa-times-circle fa-fw"></i> This required port is not connected
                                     </span>
@@ -131,7 +131,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                                 <!--List of connections-->
                                 <div *ngIf="input.source.length > 0" class="text-muted">
-                                    Connections: {{ input.source.join(", ") }}
+                                    Connections: {{ input.source.length > 1 ? input.source.join(", ") : input.source.join(", ")[0]}}
                                 </div>
                             </div>
 
@@ -144,7 +144,7 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
                                 <div *ngIf="input.description" class="value">
                                     {{input.description}}
                                 </div>
-                                
+
                                 <div *ngIf="input.customProps['sbg:toolDefaultValue']">
                                     <span class="title">Suggested Value:</span>
                                     <span class="valueindent">{{input.customProps["sbg:toolDefaultValue"]}}</span>
@@ -171,10 +171,10 @@ import {DirectiveBase} from "../../../../util/directive-base/directive-base";
 
                             </ct-tooltip-content>
 
-                            
-                            
+
+
                         </div>
-                        
+
                     </form>
                 </div>
             </ct-form-panel>

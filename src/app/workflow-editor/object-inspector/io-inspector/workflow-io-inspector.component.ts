@@ -58,7 +58,7 @@ import {debounceTime} from "rxjs/operators";
 
             <!--List of connections-->
             <div *ngIf="port['source'].length > 0" class="text-muted small">
-                Connections: {{ port['source'].join(", ") }}
+                Connections: {{ port['source'].length === 1 ?  port['source'][0] : port['source'].join(", ") }}
             </div>
         </div>
 
@@ -111,7 +111,7 @@ import {debounceTime} from "rxjs/operators";
             </label>
 
             <!--Batch select-->
-            <select class="form-control" 
+            <select class="form-control"
                     data-test="batch-select"
                     *ngIf="!workflowModel.batchInput || workflowModel.batchInput === port.id"
                     [formControl]="form.controls['batchType']">
