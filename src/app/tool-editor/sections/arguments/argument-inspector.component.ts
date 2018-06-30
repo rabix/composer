@@ -145,7 +145,7 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit,
                 this.argument.updateBinding({
                     position: form.position ? parseInt(form.position, 10) : 0,
                     separate: form.separate,
-                    prefix: form.prefix,
+                    prefix: form.prefix != '' ? form.prefix : null,
                     shellQuote: form.shellQuote,
                     valueFrom: form.valueFrom.serialize && form.valueFrom.serialize()
                 });
@@ -186,4 +186,3 @@ export class ArgumentInspectorComponent extends DirectiveBase implements OnInit,
         this.addUseCommandLineBindingToggleDecorator();
     }
 }
-
