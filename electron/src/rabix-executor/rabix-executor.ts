@@ -69,10 +69,10 @@ export class RabixExecutor {
 
         const outDir = executionParams.outDir;
 
-        const appFilePath    = `${outDir}/app.cwl`;
-        const jobFilePath    = `${outDir}/job.json`;
-        const stdoutFilePath = `${outDir}/stdout.log`;
-        const stderrFilePath = `${outDir}/stderr.log`;
+        const appFilePath    = path.join(outDir, "app.cwl");
+        const jobFilePath    = path.join(outDir, "job.json");
+        const stdoutFilePath = path.join(outDir, "stdout.log");
+        const stderrFilePath = path.join(outDir, "stderr.log");
 
         return Promise.all([
             this.assertJava(),
