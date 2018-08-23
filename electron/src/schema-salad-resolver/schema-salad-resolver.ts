@@ -81,7 +81,7 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
             } else if (isExternalResource) {
                 future.push(new Promise((resolveExternalResource, rejectExternalResource) => {
 
-                    let externalPath = path.normalize(source.split("/").slice(0, -1).concat(entry).join("/"));
+                    let externalPath = path.normalize(source.split(path.sep).slice(0, -1).concat(entry).join(path.sep));
 
                     if (isUrl(entry) || (!isUrl(source) && isLocalFile(entry))) {
                         externalPath = entry;
