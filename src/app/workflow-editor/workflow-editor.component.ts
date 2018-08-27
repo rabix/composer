@@ -187,5 +187,9 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
 
         hints.model    = this.dataModel;
         hints.readonly = this.isReadonly;
+
+        hints.update.subscribeTracked(hints, () => {
+            this.syncModelAndCode(false);
+        });
     }
 }
