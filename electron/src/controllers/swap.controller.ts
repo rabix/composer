@@ -47,7 +47,15 @@ export class SwapController {
                 return callback(err);
             }
 
-            callback(null, true);
+            fs.close(fd, (error) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, true);
+
+            });
         });
     }
 
