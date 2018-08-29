@@ -159,8 +159,9 @@ export class GraphJobEditorComponent extends DirectiveBase implements AfterViewI
         this.draw.emit(this);
 
         this.jobControl.valueChanges.pipe(
-            map(v => this.normalizeJob(v)),
-            distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
+            map(v => this.normalizeJob(v))
+            // comment for now because JSON.stringify returns null for NaN and Infinity (then not working for numbers)
+            // distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
         ).subscribeTracked(this, changes => {
             this.graph.getPlugin(SVGJobFileDropPlugin).updateToJobState(changes);
             this.metaManager.patchAppMeta("job", changes);
