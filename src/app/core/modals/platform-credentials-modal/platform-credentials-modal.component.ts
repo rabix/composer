@@ -134,6 +134,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
         {text: "Cavatica", value: "https://cavatica-api.sbgenomics.com"},
+        {text: "Fair4Cures", value: "https://ffc-api.sbgenomics.com"}
     ];
 
     constructor(private system: SystemService,
