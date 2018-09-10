@@ -15,7 +15,6 @@ import {BasicOutputSectionComponent} from "./object-inspector/output-inspector/o
 import {OutputEvalSectionComponent} from "./object-inspector/output-inspector/output-eval-section/output-eval.component";
 import {OutputMetaDataSectionComponent} from "./object-inspector/output-inspector/output-metadata-section/output-metadata.component";
 import {ToolOutputInspectorComponent} from "./object-inspector/output-inspector/tool-output-inspector.component";
-import {SecondaryFilesComponent} from "./object-inspector/secondary-files/secondary-files.component";
 import {ArgumentInspectorComponent} from "./sections/arguments/argument-inspector.component";
 import {ArgumentListComponent} from "./sections/arguments/argument-list.component";
 import {BaseCommandEditorComponent} from "./sections/base-command-editor/base-command-editor.component";
@@ -56,7 +55,6 @@ import {EffectsModule} from "@ngrx/effects";
         OutputEvalSectionComponent,
         OutputMetaDataSectionComponent,
         ResourcesComponent,
-        SecondaryFilesComponent,
         StageInputSectionComponent,
         ToolInputInspectorComponent,
         ToolInputListComponent,

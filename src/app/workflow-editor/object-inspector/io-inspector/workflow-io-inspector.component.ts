@@ -140,6 +140,13 @@ import {debounceTime} from "rxjs/operators";
                       [formControl]="form.controls['description']"></textarea>
         </div>
 
+        <!--Secondary Files-->
+        <ct-secondary-file
+            *ngIf="isFileType()"
+            [formControl]="form.controls['secondaryFiles']"
+            [readonly]="readonly"
+            [port]="port">
+        </ct-secondary-file>
     `
 
 })
@@ -230,14 +237,20 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
                 }
 
                 this.form.patchValue({
-                    isRequired: !newIO.type.isNullable,
-                    id: newIO.id,
-                    label: newIO.label,
-                    typeForm: newIO.type,
-                    symbols: newIO.type.symbols || this.initSymbolsList,
-                    description: newIO.description,
-                    fileTypes: newIO.fileTypes
-                });
+                        isRequired: !newIO.type.isNullable,
+                        id: newIO.id,
+                        label: newIO.label,
+                        typeForm: newIO.type,
+                        symbols: newIO.type.symbols || this.initSymbolsList,
+                        description: newIO.description,
+                        fileTypes: newIO.fileTypes,
+                        secondaryFiles: newIO.secondaryFiles
+                    },
+                    {
+                        emitEvent: false,
+                        onlySelf: true
+                    }
+                );
             }
 
             if (changes["workflow"]) {
@@ -295,7 +308,8 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
             symbols: [{value: this.port.type.symbols || this.initSymbolsList, disabled: this.readonly}],
             description: [{value: this.port.description, disabled: this.readonly}],
             fileTypes: [{value: this.port.fileTypes, disabled: this.readonly}],
-            batchType: [this.selectedBatchByOption]
+            batchType: [this.selectedBatchByOption],
+            secondaryFiles: [{value: this.port.secondaryFiles || [], disabled: this.readonly}]
         });
 
         this.form.valueChanges.pipe(
@@ -337,6 +351,14 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
         });
 
         this.form.controls["typeForm"].valueChanges.subscribeTracked(this, (value) => {
+
+            if (!this.isFileType()) {
+                this.form.controls["secondaryFiles"].setValue([], {onlySelf: true, emitEvent: false});
+                this.form.controls["secondaryFiles"].disable({onlySelf: true, emitEvent: false});
+            } else {
+                this.form.controls["secondaryFiles"].enable({onlySelf: true, emitEvent: false});
+            }
+
             this.workflowModel.validateConnectionsForIOPort(this.port);
         });
 
@@ -347,6 +369,10 @@ export class WorkflowIOInspectorComponent extends DirectiveBase implements OnIni
 
         this.form.controls["description"].valueChanges.subscribeTracked(this, (description) => {
             this.port.description = description;
+        });
+
+        this.form.controls["secondaryFiles"].valueChanges.subscribeTracked(this, (files) => {
+            this.port.secondaryFiles = files;
         });
 
         this.form.controls["batchType"].valueChanges.subscribeTracked(this, (batchType) => {

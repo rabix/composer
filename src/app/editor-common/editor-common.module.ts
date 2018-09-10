@@ -42,6 +42,7 @@ import {CommonStatusControlsComponent} from "./template-common/common-status-con
 import {ExecutionModule} from "../execution/execution.module";
 import {FileMetadataModalComponent} from "./file-metadata-modal/file-metadata-modal.component";
 import {InputValueEditorComponent} from "./input-value-editor/input-value-editor.component";
+import {SecondaryFilesComponent} from "./components/secondary-files/secondary-files.component";
 
 
 @NgModule({
@@ -78,6 +79,7 @@ import {InputValueEditorComponent} from "./input-value-editor/input-value-editor
         QuickPickComponent,
         RequirementInputComponent,
         RevisionListComponent,
+        SecondaryFilesComponent,
         SymbolsComponent,
         ValidationClassDirective,
         ValidationPreviewComponent,
@@ -113,6 +115,7 @@ import {InputValueEditorComponent} from "./input-value-editor/input-value-editor
         QuickPickComponent,
         RequirementInputComponent,
         RevisionListComponent,
+        SecondaryFilesComponent,
         SymbolsComponent,
         ValidationClassDirective,
         ValidationPreviewComponent,

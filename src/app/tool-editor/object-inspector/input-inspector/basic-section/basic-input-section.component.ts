@@ -138,6 +138,10 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
                 this.input.type.name = this.input.id;
             }
 
+            if (this.isType("enum") || this.isType("record")) {
+                this.input.type.name = this.input.id;
+            }
+
             // If type is changed nullify job value for that input
             this.appMetaManager.getAppMeta("job").pipe(take(1)).subscribe((job) => {
 
@@ -147,6 +151,10 @@ export class BasicInputSectionComponent extends DirectiveBase implements Control
 
             });
 
+        });
+
+        this.form.controls["secondaryFiles"].valueChanges.subscribeTracked(this, (files) => {
+            this.input.secondaryFiles = files;
         });
 
         this.tracked = this.form.valueChanges.subscribe(() => {
