@@ -90,7 +90,7 @@ function traverse(data, source, root, rootPath, graph = {}, traversedExternalPat
                     let patchFn;
 
                     // Each root external resource pass Set to nesting structures to avoid infinite recursion
-                    const traversed = traversedExternalPaths || new Set<string>([rootPath]);
+                    const traversed = traversedExternalPaths ? new Set<string>(traversedExternalPaths) : new Set<string>([rootPath]);
 
                     // Avoid recursive nesting
                     if (traversed.has(externalPath)) {
