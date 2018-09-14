@@ -24,8 +24,9 @@ function deepEnsureAbsolutePaths(entry, rootPath) {
         }
 
         if (Array.isArray(updated.secondaryFiles)) {
-            updated.secondaryFiles = updated.secondaryFiles.map(el =>
-                path.normalize(rootPath + path.sep + el.path)
+            updated.secondaryFiles = updated.secondaryFiles.map(el => {
+                    return {...el, ["path"]: path.normalize(rootPath + path.sep + el.path)}
+                }
             );
         }
         return updated;
