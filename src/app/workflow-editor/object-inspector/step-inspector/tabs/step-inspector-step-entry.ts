@@ -39,9 +39,10 @@ import {ObjectHelper} from "../../../../helpers/object.helper";
 
                 <!--Enums-->
                 <ng-template ngSwitchCase="enum">
-                    <select [value]="value" class="form-control"
+                    <select [value]="value || ''" class="form-control"
                             [attr.prefix]="prefix"
                             [attr.fieldType]="inputType">
+                        <option value="">-- none --</option>
                         <option *ngFor="let val of input.type.symbols"
                                 [disabled]="readonly"
                                 [value]="val"> {{ val }}
