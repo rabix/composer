@@ -14,6 +14,7 @@ import {NotificationBarComponent} from "./notification-bar/notification-bar.comp
 import {NotificationBarService} from "./notification-bar/notification-bar.service";
 import {NotificationComponent} from "./notification-bar/notification.component";
 import {GetStartedNotificationComponent} from "./notification-bar/dynamic-notifications/get-started-notification/get-started-notification.component";
+import {ProxySettingsComponent} from "./settings/proxy-settings/proxy-settings.component";
 
 @NgModule({
     imports: [
@@ -33,7 +34,8 @@ import {GetStartedNotificationComponent} from "./notification-bar/dynamic-notifi
         NotificationBarComponent,
         ExecutorConfigComponent,
         NotificationComponent,
-        GetStartedNotificationComponent
+        GetStartedNotificationComponent,
+        ProxySettingsComponent,
     ],
     entryComponents: [
         GetStartedNotificationComponent

@@ -3,6 +3,7 @@ import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 import {TabData} from "./tab-data-interface";
 import {defaultExecutionOutputDirectory} from "../../controllers/execution-results.controller";
+import {ProxySettings} from "./proxy-settings";
 
 export interface CredentialsCache {
     id: string;
@@ -29,6 +30,15 @@ export class LocalRepository extends RepositoryType {
         path: "",
         choice: "bundled",
         outDir: defaultExecutionOutputDirectory
+    };
+
+    proxySettings: ProxySettings = {
+        useProxy: false,
+        server: "",
+        port: null,
+        useAuth: false,
+        username: "",
+        password: ""
     };
 
     openTabs: TabData<any> [] = [{

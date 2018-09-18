@@ -45,6 +45,9 @@ const ensurePlatformUser = () => {
     });
 };
 
+const getSBGClient = (url, token) => {
+    return new SBGClient(url, token, repository.local.proxySettings);
+};
 
 export function loadDataRepository() {
     repository = new DataRepository(app.getPath("userData") + path.sep + "profiles");
@@ -114,7 +117,7 @@ export function resolve(filepath, callback: (err?: Error, result?: Object) => vo
 }
 
 export function getUserByToken(data: { url, token }, callback) {
-    const api = new SBGClient(data.url, data.token);
+    const api = getSBGClient(data.url, data.token);
     api.getUser().then(result => {
         callback(null, result);
     }, err => callback(err));
@@ -152,7 +155,7 @@ export function getProject(projectSlug: string, callback) {
     ensurePlatformUser().then(repo => {
         const {url, token} = repo.local.activeCredentials;
 
-        const api = new SBGClient(url, token);
+        const api = getSBGClient(url, token);
 
         return api.getProject(projectSlug).then(result => {
             callback(null, result);
@@ -162,13 +165,13 @@ export function getProject(projectSlug: string, callback) {
 }
 
 export function getProjects(data: { url: string; token: string }, callback) {
-    new SBGClient(data.url, data.token).projects.all().then(response => {
+    getSBGClient(data.url, data.token).projects.all().then(response => {
         callback(null, response.filter(project => project.type === "v2"));
     }, rejection => callback(rejection));
 }
 
 export function getApps(data: { url: string, token: string, query?: AppQueryParams }, callback) {
-    new SBGClient(data.url, data.token).apps.private(data.query || {})
+    getSBGClient(data.url, data.token).apps.private(data.query || {})
         .then(
             response => callback(null, response),
             reject => callback(reject)
@@ -314,7 +317,7 @@ export function fetchPlatformData(data: {
 
         const {url, token} = targetCredentials;
 
-        const client = new SBGClient(url, token);
+        const client = getSBGClient(url, token);
 
         const projectsPromise   = client.getAllProjects();
         const appsPromise       = client.getAllUserApps();
@@ -368,7 +371,7 @@ export function getPlatformApp(data: { id: string, forceFetch?: boolean }, callb
         }
 
         if (data.forceFetch) {
-            const api = new SBGClient(credentials.url, credentials.token);
+            const api = getSBGClient(credentials.url, credentials.token);
             api.getApp(data.id).then(response => {
                 callback(null, JSON.stringify(response.raw, null, 4));
             }, err => callback(err));
@@ -385,7 +388,7 @@ export function getPlatformApp(data: { id: string, forceFetch?: boolean }, callb
                     return;
                 }
 
-                const api = new SBGClient(credentials.url, credentials.token);
+                const api = getSBGClient(credentials.url, credentials.token);
                 api.getApp(data.id).then(response => {
                     callback(null, JSON.stringify(response.raw, null, 4));
                 }, err => callback(err));
@@ -441,7 +444,7 @@ export function saveAppRevision(data: {
     ensurePlatformUser().then(repo => {
         const {url, token} = repo.local.activeCredentials;
 
-        const api = new SBGClient(url, token);
+        const api = getSBGClient(url, token);
 
         api.apps.save(data.id, data.content).then(response => {
             callback(null, response);
@@ -455,7 +458,7 @@ export function createPlatformApp(data: { id: string, content: string }, callbac
     ensurePlatformUser().then(repo => {
         const {url, token} = repo.local.activeCredentials;
 
-        const api = new SBGClient(url, token);
+        const api = getSBGClient(url, token);
 
         return api.apps.create(data.id, data.content).then((response) => {
             callback(null, JSON.parse(response));
@@ -485,7 +488,7 @@ export function sendFeedback(data: { type: string, text: string }, callback) {
     ensurePlatformUser().then(repo => {
         const {url, token} = repo.local.activeCredentials;
 
-        const api = new SBGClient(url, token);
+        const api = getSBGClient(url, token);
 
         const referrer = `Cottontail ${process.platform}`;
 
@@ -519,7 +522,7 @@ export function getAppUpdates(data: { appIDs: string[] }, callback) {
     ensurePlatformUser().then(repo => {
         const {url, token} = repo.local.activeCredentials;
 
-        const api = new SBGClient(url, token);
+        const api = getSBGClient(url, token);
 
         return api.apps.private({
             id: data.appIDs,

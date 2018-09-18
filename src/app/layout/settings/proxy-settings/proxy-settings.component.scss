@@ -1,0 +1,14 @@
+:host {
+    display: block;
+
+    .align-right {
+        flex: 1;
+        text-align: right;
+    }
+
+    .proxy-options-wrapper {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+}
+

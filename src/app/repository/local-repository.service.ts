@@ -8,6 +8,7 @@ import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
 import {AppMeta, AppMetaEntry} from "../../../electron/src/storage/types/app-meta";
 import {take, flatMap, map} from "rxjs/operators";
+import {ProxySettings} from "../../../electron/src/storage/types/proxy-settings";
 
 @Injectable()
 export class LocalRepositoryService {
@@ -23,6 +24,7 @@ export class LocalRepositoryService {
     private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
     private ignoredUpdateVersion: ReplaySubject<string>               = new ReplaySubject(1);
     private appMeta: ReplaySubject<AppMeta[]>                         = new ReplaySubject(1);
+    private proxySettings: ReplaySubject<ProxySettings>               = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -35,6 +37,7 @@ export class LocalRepositoryService {
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
+        this.listen("proxySettings").subscribe(this.proxySettings);
 
         this.listen("activeCredentials").pipe(
             map(cred => AuthCredentials.from(cred))
@@ -212,6 +215,16 @@ export class LocalRepositoryService {
 
     setExecutorConfig(executorConfig: ExecutorConfig): Promise<any> {
         return this.patch({executorConfig}).pipe(
+            take(1)
+        ).toPromise();
+    }
+
+    getProxySettings(): Observable<ProxySettings> {
+        return this.proxySettings;
+    }
+
+    setProxySettings(proxySettings: ProxySettings) {
+        return this.patch({proxySettings}).pipe(
             take(1)
         ).toPromise();
     }

@@ -8,6 +8,7 @@ import {RequestError, StatusCodeError, TransformError} from "request-promise-nat
 import {Project, User} from "./interfaces";
 import {App} from "./interfaces/app";
 import {AppQueryParams, QueryParams} from "./interfaces/queries";
+import {ProxySettings} from "../storage/types/proxy-settings";
 
 export interface SBGClientPromise<T, K> {
     /**
@@ -31,10 +32,9 @@ export class SBGClient {
         return new SBGClient(url, token);
     }
 
-    constructor(url: string, token: string) {
+    constructor(url: string, token: string, proxySettings?: ProxySettings) {
 
-        this.apiRequest = requestPromise.defaults({
-
+        const options: any = {
             baseUrl: url + "/v2/",
             timeout: 300000,
             json: true,
@@ -43,7 +43,20 @@ export class SBGClient {
                 "Content-Type": "application/json",
                 "User-Agent": `Rabix Composer ${app.getVersion()} (${os.type()} ${os.release()})`
             },
-        });
+        };
+
+        if (proxySettings && proxySettings.useProxy) {
+            options.proxy = proxySettings.server + (proxySettings.port ? `:${proxySettings.port}` : "");
+
+            if (proxySettings.useAuth) {
+                const username = proxySettings.username;
+                const password = proxySettings.password;
+                options.headers["Proxy-Authorization"] =
+                    `Basic ${new Buffer(username + ":" + password).toString('base64')}`
+            }
+        }
+
+        this.apiRequest = requestPromise.defaults(options);
     }
 
     getUser(): SBGClientResponse<User> {

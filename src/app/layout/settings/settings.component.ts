@@ -87,6 +87,13 @@ import {take} from "rxjs/operators";
                 <ct-executor-config></ct-executor-config>
             </div>
         </ct-form-panel>
+
+        <ct-form-panel class="m-2">
+            <div class="tc-header">Proxy Settings</div>
+            <div class="tc-body p-1">
+                <ct-proxy-settings></ct-proxy-settings>
+            </div>
+        </ct-form-panel>
     `
 })
 export class SettingsComponent extends DirectiveBase {
