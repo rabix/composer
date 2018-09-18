@@ -182,7 +182,7 @@ export class LiteralExpressionInputComponent extends DirectiveBase implements Co
                 }
 
                 this.model.cloneStatus(editor.model);
-
+                this.onChange(this.model);
                 this.modal.close();
             });
         }
