@@ -78,7 +78,7 @@ export class NativeSystemService {
 
     exploreFolder(path: string): void {
         const remote = this.electron.getRemote();
-        remote.require("./src/utils/file-explorer-opener").open(path);
+        remote.shell.openItem(path);
     }
 
 }
