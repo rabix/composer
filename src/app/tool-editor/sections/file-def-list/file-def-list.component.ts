@@ -108,6 +108,7 @@ import {take, delay, map} from "rxjs/operators";
                                 <div class="tc-body">
                                     <ct-file-def-inspector
                                         (save)="updateFileDef($event, i)"
+                                        [isSBDraft2]="isSBDraft2"
                                         [context]="context"
                                         [dirent]="entry"
                                         [readonly]="readonly">
@@ -238,9 +239,10 @@ export class FileDefListComponent extends DirectiveBase implements OnInit {
 
     }
 
-    updateFileDef(newDef: { entryName, entry }, index: number) {
+    updateFileDef(newDef: { entryName, entry, writable }, index: number) {
         this.fileRequirement.listing[index]["entryName"].setValue(newDef.entryName.serialize(), newDef.entryName.type);
         this.fileRequirement.listing[index]["entry"].setValue(newDef.entry.serialize(), newDef.entry.type);
+        this.fileRequirement.listing[index]["writable"] = newDef.writable;
 
         this.cdr.markForCheck();
         this.update.next(this.fileRequirement.listing);

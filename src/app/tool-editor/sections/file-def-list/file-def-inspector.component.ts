@@ -9,6 +9,15 @@ import {DirectiveBase} from "../../../util/directive-base/directive-base";
     selector: "ct-file-def-inspector",
     template: `
         <form *ngIf="form">
+            <div class="form-group flex-container" *ngIf="!isSBDraft2">
+                <label class="form-control-label">Writable</label>
+                <span class="align-right">
+                                <ct-toggle-slider class="align-right"
+                                                  [formControl]="form.controls['writable']">
+                </ct-toggle-slider>
+                </span>
+            </div>
+            
             <div class="form-group file-name">
                 <label class="form-control-label">File Name</label>
                 <ct-expression-input [formControl]="form.controls['entryName']"
@@ -38,8 +47,11 @@ export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
     @Input()
     context: { $job?: any } = {};
 
+    @Input()
+    isSBDraft2;
+
     @Output()
-    save = new Subject<{ entryName, entry }>();
+    save = new Subject<{ entryName, entry, writable }>();
 
     form: FormGroup;
 
@@ -60,13 +72,15 @@ export class FileDefInspectorComponent extends DirectiveBase implements OnInit {
     ngOnInit() {
         this.form = new FormGroup({
             entryName: new FormControl(this.dirent.entryName),
-            entry: new FormControl(this.dirent.entry)
+            entry: new FormControl(this.dirent.entry),
+            writable: new FormControl(this.dirent.writable)
         });
 
         this.tracked = this.form.valueChanges.subscribe(change => {
             this.save.next({
                 entryName: change.entryName,
-                entry: change.entry
+                entry: change.entry,
+                writable: change.writable
             });
         });
     }
