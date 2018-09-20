@@ -1,6 +1,6 @@
 {
     "name": "rabix-composer",
-    "version": "1.0.0",
+    "version": "1.0.1-rc.1",
     "executorVersion": "1.0.5",
     "executorDownloadURL": "https://github.com/rabix/bunny/releases/download/v1.0.5-1/rabix-1.0.5.tar.gz",
     "license": "Apache-2.0",
