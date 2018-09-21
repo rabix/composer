@@ -9,7 +9,7 @@ export class AppGeneratorService {
     static generate(version: "d2sb" | "v1.0", type: "CommandLineTool" | "Workflow", id: string, label: string): Object {
         const app: any = {
             $namespaces: {
-              sbg: "https://www.sevenbridges.com"
+              sbg: "https://www.sevenbridges.com/"
             },
             id,
             label,
