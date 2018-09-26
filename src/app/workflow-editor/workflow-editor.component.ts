@@ -118,7 +118,7 @@ export class WorkflowEditorComponent extends AppEditorBase implements OnDestroy,
         this.dataModel = WorkflowFactory.from(json as any, "document");
 
         if (!this.dataModel.namespaces.has("sbg")) {
-            this.dataModel.namespaces.set("sbg", "https://www.sevenbridges.com");
+            this.dataModel.namespaces.set("sbg", "https://www.sevenbridges.com/");
         }
 
         this.dataModel.setValidationCallback(this.afterModelValidation.bind(this));
