@@ -1,6 +1,6 @@
 {
     "name": "rabix-composer",
-    "version": "1.0.0",
+    "version": "1.0.1-rc.1",
     "executorVersion": "1.0.5",
     "executorDownloadURL": "https://github.com/rabix/bunny/releases/download/v1.0.5-1/rabix-1.0.5.tar.gz",
     "license": "Apache-2.0",
@@ -57,7 +57,7 @@
         "brace": "^0.11.0",
         "core-js": "^2.5.3",
         "cwl-svg": "2.0.1",
-        "cwlts": "1.15.27",
+        "cwlts": "1.15.28",
         "font-awesome": "^4.7.0",
         "jquery": "^3.2.1",
         "js-yaml": "^3.10.0",
