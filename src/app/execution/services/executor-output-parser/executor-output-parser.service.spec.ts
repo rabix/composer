@@ -11,7 +11,7 @@ import {
 import {ReplaySubject} from "rxjs/ReplaySubject";
 import objectContaining = jasmine.objectContaining;
 
-describe("ExecutorOutputParserService", () => {
+xdescribe("ExecutorOutputParserService", () => {
 
     let service: ExecutorOutputParser;
     let dispatch: (action: Action) => void;
