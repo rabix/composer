@@ -2,10 +2,23 @@
 
 # Rabix Composer
 [![Build Status](https://travis-ci.org/rabix/composer.svg?branch=master)](https://travis-ci.org/rabix/composer)
-[![Build status](https://ci.appveyor.com/api/projects/status/y4ksxv9uah0xmjy9?svg=true)](https://ci.appveyor.com/project/ivanbatic/composer)
 
+Rabix Composer is an open source editor for [Common Workflow Language](https://github.com/common-workflow-language/common-workflow-language) 
+documents. 
 
-The Rabix Composer (codename Cottontail) is a graphical and code editor specially designed to work with the [Common Workflow Language](https://github.com/common-workflow-language/common-workflow-language). It is currently in beta testing. This repo includes the code for running Rabix Composer locally in dev mode and for building OS specific binaries.
+It has a graphical mode allowing drag and drop creation of workflows
+and wizard type creation of individual tools.
+
+<video autoplay loop>
+    <source src="http://rabix.io/images/workflows.webm" type="video/webm">
+</video>
+
+It also has a text mode for entering CWL code directly. The graphical and text
+modes work seamlessly together.
+
+<video autoplay loop>
+    <source src="http://rabix.io/images/visual_text.webm" type="video/webm">
+</video>
 
 ## Dependencies
 
