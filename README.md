@@ -9,16 +9,12 @@ documents.
 It has a graphical mode allowing drag and drop creation of workflows
 and wizard type creation of individual tools.
 
-<video autoplay loop>
-    <source src="http://rabix.io/images/workflows.webm" type="video/webm">
-</video>
+<video src="http://rabix.io/images/workflows.mp4" style="width:100%" autoplay loop></video>
 
 It also has a text mode for entering CWL code directly. The graphical and text
 modes work seamlessly together.
 
-<video autoplay loop>
-    <source src="http://rabix.io/images/visual_text.webm" type="video/webm">
-</video>
+<video src="http://rabix.io/images/visual_text.mp4" style="width:100%" autoplay loop></video>
 
 ## Dependencies
 
