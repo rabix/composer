@@ -219,7 +219,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     Validators.required,
                     (ctrl: AbstractControl) => {
                         const val = ctrl.value;
-                        if (this.platformList.map(e => e.value).indexOf(val) === -1) {
+                        if (!(val in AuthCredentials.platformLookupByAPIURL)) {
                             try {
                                 const url = new URL(val);
                                 if(url.hostname.endsWith(".sbgenomics.com")){
