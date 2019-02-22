@@ -132,6 +132,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
     platformList = [
         {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
         {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
+        {text: "Seven Bridges (China)", value: "https://api.sevenbridges.cn/"},
         {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
         {text: "Cavatica", value: "https://cavatica-api.sbgenomics.com"},
         {text: "Fair4Cures", value: "https://f4c-api.sbgenomics.com"}
