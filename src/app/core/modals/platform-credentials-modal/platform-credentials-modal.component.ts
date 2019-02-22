@@ -129,14 +129,8 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** FormGroup for modal inputs */
     form: FormGroup;
 
-    platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
-        {text: "Seven Bridges (China)", value: "https://api.sevenbridges.cn/"},
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
-        {text: "Cavatica", value: "https://cavatica-api.sbgenomics.com"},
-        {text: "Fair4Cures", value: "https://f4c-api.sbgenomics.com"}
-    ];
+    platformList = AuthCredentials.getPlatformList()
+
 
     constructor(private system: SystemService,
                 private auth: AuthService,
@@ -289,14 +283,12 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
     openTokenPage() {
         const apiURL: string = this.form.get("url").value;
-        const apiSubdomain   = apiURL.slice("https://".length, apiURL.length - ".sbgenomics.com".length);
-
-        let platformSubdomain = "igor";
-        if (apiSubdomain.endsWith("-api")) {
-            platformSubdomain = apiSubdomain.slice(0, apiSubdomain.length - ".com".length);
+        if(apiURL in AuthCredentials.platformLookupByAPIURL) {
+            this.system.openLink(AuthCredentials.platformLookupByAPIURL[apiURL]["devTokenURL"])
+        } else {
+            // Most likely a vayu
+            this.system.openLink("https://igor.sbgenomics.com/developer#token")
         }
-        const url = `https://${platformSubdomain}.sbgenomics.com/developer#token`;
-        this.system.openLink(url);
     }
 
     close() {

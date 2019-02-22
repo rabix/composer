@@ -7,6 +7,39 @@ export class AuthCredentials implements UserPlatformIdentifier {
 
     static readonly TOKEN_VALIDATION_REGEXP = "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$";
 
+    static readonly platformLookupByAPIURL = {
+        "https://api.sbgenomics.com": {
+            "name": "Seven Bridges",
+            "shortName": "SBG",
+            "devTokenURL": "https://igor.sbgenomics.com/developer#token",
+        },
+        "https://eu-api.sbgenomics.com": {
+            "name": "Seven Bridges (EU)",
+            "shortName": "SBG-EU",
+            "devTokenURL": "https://eu.sbgenomics.com/developer#token",
+        },
+        "https://api.sevenbridges.cn": {
+            "name": "Seven Bridges (China)",
+            "shortName": "SBG-CN",
+            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
+        },
+        "https://cgc-api.sbgenomics.com": {
+            "name": "Cancer Genomics Cloud",
+            "shortName": "CGC",
+            "devTokenURL": "https://cgc.sbgenomics.com/developer#token",
+        },
+        "https://cavatica-api.sbgenomics.com": {
+            "name": "Cavatica",
+            "shortName": "CAVATICA",
+            "devTokenURL": "https://cavatica.sbgenomics.com/developer#token",
+        },
+        "https://f4c-api.sbgenomics.com": {
+            "name": "Fair4Cures",
+            "shortName": "F4C",
+            "devTokenURL": "https://f4c.sbgenomics.com/developer#token",
+        },
+    }
+
     id: string;
     user: User;
     url: string;
@@ -35,35 +68,30 @@ export class AuthCredentials implements UserPlatformIdentifier {
         return url.slice(8, url.length - 15);
     }
 
+    static getPlatformList(): Array<Map<string, string>> {
+        let lu = this.platformLookupByAPIURL
+        let platformList = []
+        for (let apiURL in lu) {
+            platformList.push({text: lu[apiURL]["name"], value: apiURL})
+        }
+        return platformList
+    }
+
     static getPlatformShortName(url: string): string {
-        const subdomain = AuthCredentials.getSubdomain(url);
-        switch (subdomain) {
-            case "api":
-                return "SBG";
-            case "eu-api":
-                return "EU";
-            case "cgc-api":
-                return "CGC";
-            case "cavatica-api":
-                return "CAVATICA";
-            default:
-                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
+        if(url in this.platformLookupByAPIURL) {
+            return this.platformLookupByAPIURL[url]["shortName"]
+        } else {
+            const subdomain = AuthCredentials.getSubdomain(url)
+            return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]
         }
     }
 
     static getPlatformLabel(url: string): string {
-        const subdomain = AuthCredentials.getSubdomain(url);
-        switch (subdomain) {
-            case "api":
-                return "Seven Bridges";
-            case "eu-api":
-                return "Seven Bridges (EU)";
-            case "cgc-api":
-                return "Cancer Genomics Cloud";
-            case "cavatica-api":
-                return "Cavatica";
-            default:
-                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
+        if(url in this.platformLookupByAPIURL) {
+            return this.platformLookupByAPIURL[url]["name"]
+        } else {
+            const subdomain = AuthCredentials.getSubdomain(url)
+            return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]
         }
     }
 
