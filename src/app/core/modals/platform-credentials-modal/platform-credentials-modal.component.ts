@@ -129,8 +129,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** FormGroup for modal inputs */
     form: FormGroup;
 
-    platformList = AuthCredentials.getPlatformList()
-
+    platformList = [];
 
     constructor(private system: SystemService,
                 private auth: AuthService,
@@ -138,6 +137,14 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 private data: DataGatewayService,
                 private notificationBarService: NotificationBarService,
                 private modal: ModalService) {
+
+        const platformLookupByAPIURL = AuthCredentials.platformLookupByAPIURL;
+
+        this.platformList = Object.keys(platformLookupByAPIURL).map((item) => {
+            return {
+                text: platformLookupByAPIURL[item].name, value: item
+            }
+        });
     }
 
     applyChanges(): void {
@@ -282,13 +289,14 @@ export class PlatformCredentialsModalComponent implements OnInit {
     }
 
     openTokenPage() {
+
         const apiURL: string = this.form.get("url").value;
-        if(apiURL in AuthCredentials.platformLookupByAPIURL) {
-            this.system.openLink(AuthCredentials.platformLookupByAPIURL[apiURL]["devTokenURL"])
-        } else {
-            // Most likely a vayu
-            this.system.openLink("https://igor.sbgenomics.com/developer#token")
-        }
+
+        const platform = AuthCredentials.platformLookupByAPIURL[apiURL];
+        const url = platform ? platform.devTokenURL : "https://igor.sbgenomics.com/developer#token";
+
+        this.system.openLink(url);
+
     }
 
     close() {

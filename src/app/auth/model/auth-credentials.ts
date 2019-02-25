@@ -1,13 +1,19 @@
 import {User} from "../../../../electron/src/sbg-api-client/interfaces/user";
 import {UserPlatformIdentifier} from "./user-platform-identifier";
 
+interface PlatformEntry {
+    name: string;
+    shortName: string;
+    devTokenURL: string;
+}
+
 export class AuthCredentials implements UserPlatformIdentifier {
 
     static readonly URL_VALIDATION_REGEXP = "^(https:\/\/)(.+)(\.sbgenomics\.com)$";
 
     static readonly TOKEN_VALIDATION_REGEXP = "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$";
 
-    static readonly platformLookupByAPIURL = {
+    static readonly platformLookupByAPIURL: { [key: string]: PlatformEntry } = {
         "https://api.sbgenomics.com": {
             "name": "Seven Bridges",
             "shortName": "SBG",
@@ -38,7 +44,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "shortName": "F4C",
             "devTokenURL": "https://f4c.sbgenomics.com/developer#token",
         },
-    }
+    };
 
     id: string;
     user: User;
@@ -68,31 +74,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         return url.slice(8, url.length - 15);
     }
 
-    static getPlatformList(): Array<Map<string, string>> {
-        let lu = this.platformLookupByAPIURL
-        let platformList = []
-        for (let apiURL in lu) {
-            platformList.push({text: lu[apiURL]["name"], value: apiURL})
-        }
-        return platformList
-    }
-
     static getPlatformShortName(url: string): string {
-        if(url in this.platformLookupByAPIURL) {
-            return this.platformLookupByAPIURL[url]["shortName"]
-        } else {
-            const subdomain = AuthCredentials.getSubdomain(url)
-            return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]
-        }
+        return AuthCredentials.getPlatformPropertyValue(url, "shortName");
     }
 
     static getPlatformLabel(url: string): string {
-        if(url in this.platformLookupByAPIURL) {
-            return this.platformLookupByAPIURL[url]["name"]
-        } else {
-            const subdomain = AuthCredentials.getSubdomain(url)
-            return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]
-        }
+        return AuthCredentials.getPlatformPropertyValue(url, "name");
     }
 
     static from(obj?: UserPlatformIdentifier): AuthCredentials | undefined {
@@ -160,4 +147,14 @@ export class AuthCredentials implements UserPlatformIdentifier {
             throw new Error("Invalid platform URL: " + url);
         }
     }
+
+    private static getPlatformPropertyValue(url: string, property: keyof PlatformEntry): string {
+
+        const platform = this.platformLookupByAPIURL[url];
+        const subdomain = AuthCredentials.getSubdomain(url);
+
+        return platform ? platform[property]
+            : (subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]);
+    }
+
 }
