@@ -76,7 +76,7 @@ builder.build({
             target: ["nsis"],
         },
         linux: {
-            target: ["AppImage"]
+            target: ["AppImage"],
         },
         nsis: {
             oneClick: false,
