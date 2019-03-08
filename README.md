@@ -52,6 +52,28 @@ yarn run build
 yarn test
 ```
 
+## Running a released version of the Composer
+
+Donwload the releases packaged for the environment you are using:
+
+### MacOs
+
+Download the `rabix-composer-VERSION.dmg`, and double click on it
+
+### Windows
+
+Download the `rabix-composer.Setup.VERSION.exe` and double click on it
+
+### Linux
+
+Donwload the `rabix-composer-VERSION-x86_64.AppImage`, make it executable and then
+launch it via the commandline (or double click on it, and execute it).
+
+```
+    chmod +x rabix-composer-VERSION-x86_64.AppImage
+    ./rabix-composer-VERSION-x86_64.AppImage
+```
+
 ## Documentation
 
 Now you can read the [Rabix Composer documentation](http://docs.rabix.io/) to learn more about Rabix Composer.

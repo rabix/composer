@@ -76,8 +76,7 @@ builder.build({
             target: ["nsis"],
         },
         linux: {
-            target: ["AppImage"],
-            artifactName : "${productName}-${version}-${arch}.sh"
+            target: ["AppImage"]
         },
         nsis: {
             oneClick: false,
