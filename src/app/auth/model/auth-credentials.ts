@@ -1,11 +1,50 @@
 import {User} from "../../../../electron/src/sbg-api-client/interfaces/user";
 import {UserPlatformIdentifier} from "./user-platform-identifier";
 
+interface PlatformEntry {
+    name: string;
+    shortName: string;
+    devTokenURL: string;
+}
+
 export class AuthCredentials implements UserPlatformIdentifier {
 
     static readonly URL_VALIDATION_REGEXP = "^(https:\/\/)(.+)(\.sbgenomics\.com)$";
 
     static readonly TOKEN_VALIDATION_REGEXP = "^[0-9a-f]{8}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{12}$";
+
+    static readonly platformLookupByAPIURL: { [key: string]: PlatformEntry } = {
+        "https://api.sbgenomics.com": {
+            "name": "Seven Bridges",
+            "shortName": "SBG",
+            "devTokenURL": "https://igor.sbgenomics.com/developer#token",
+        },
+        "https://eu-api.sbgenomics.com": {
+            "name": "Seven Bridges (EU)",
+            "shortName": "SBG-EU",
+            "devTokenURL": "https://eu.sbgenomics.com/developer#token",
+        },
+        "https://api.sevenbridges.cn": {
+            "name": "Seven Bridges (China)",
+            "shortName": "SBG-CN",
+            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
+        },
+        "https://cgc-api.sbgenomics.com": {
+            "name": "Cancer Genomics Cloud",
+            "shortName": "CGC",
+            "devTokenURL": "https://cgc.sbgenomics.com/developer#token",
+        },
+        "https://cavatica-api.sbgenomics.com": {
+            "name": "Cavatica",
+            "shortName": "CAVATICA",
+            "devTokenURL": "https://cavatica.sbgenomics.com/developer#token",
+        },
+        "https://f4c-api.sbgenomics.com": {
+            "name": "Fair4Cures",
+            "shortName": "F4C",
+            "devTokenURL": "https://f4c.sbgenomics.com/developer#token",
+        },
+    };
 
     id: string;
     user: User;
@@ -36,35 +75,11 @@ export class AuthCredentials implements UserPlatformIdentifier {
     }
 
     static getPlatformShortName(url: string): string {
-        const subdomain = AuthCredentials.getSubdomain(url);
-        switch (subdomain) {
-            case "api":
-                return "SBG";
-            case "eu-api":
-                return "EU";
-            case "cgc-api":
-                return "CGC";
-            case "cavatica-api":
-                return "CAVATICA";
-            default:
-                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
-        }
+        return AuthCredentials.getPlatformPropertyValue(url, "shortName");
     }
 
     static getPlatformLabel(url: string): string {
-        const subdomain = AuthCredentials.getSubdomain(url);
-        switch (subdomain) {
-            case "api":
-                return "Seven Bridges";
-            case "eu-api":
-                return "Seven Bridges (EU)";
-            case "cgc-api":
-                return "Cancer Genomics Cloud";
-            case "cavatica-api":
-                return "Cavatica";
-            default:
-                return subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0];
-        }
+        return AuthCredentials.getPlatformPropertyValue(url, "name");
     }
 
     static from(obj?: UserPlatformIdentifier): AuthCredentials | undefined {
@@ -132,4 +147,14 @@ export class AuthCredentials implements UserPlatformIdentifier {
             throw new Error("Invalid platform URL: " + url);
         }
     }
+
+    private static getPlatformPropertyValue(url: string, property: keyof PlatformEntry): string {
+
+        const platform = this.platformLookupByAPIURL[url];
+        const subdomain = AuthCredentials.getSubdomain(url);
+
+        return platform ? platform[property]
+            : (subdomain.indexOf("vayu") === -1 ? subdomain : subdomain.split(".")[0]);
+    }
+
 }

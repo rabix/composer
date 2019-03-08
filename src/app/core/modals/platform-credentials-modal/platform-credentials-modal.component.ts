@@ -129,13 +129,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
     /** FormGroup for modal inputs */
     form: FormGroup;
 
-    platformList = [
-        {text: "Seven Bridges (Default)", value: "https://api.sbgenomics.com"},
-        {text: "Seven Bridges (EU)", value: "https://eu-api.sbgenomics.com"},
-        {text: "Cancer Genomics Cloud", value: "https://cgc-api.sbgenomics.com"},
-        {text: "Cavatica", value: "https://cavatica-api.sbgenomics.com"},
-        {text: "Fair4Cures", value: "https://f4c-api.sbgenomics.com"}
-    ];
+    platformList = [];
 
     constructor(private system: SystemService,
                 private auth: AuthService,
@@ -143,6 +137,14 @@ export class PlatformCredentialsModalComponent implements OnInit {
                 private data: DataGatewayService,
                 private notificationBarService: NotificationBarService,
                 private modal: ModalService) {
+
+        const platformLookupByAPIURL = AuthCredentials.platformLookupByAPIURL;
+
+        this.platformList = Object.keys(platformLookupByAPIURL).map((item) => {
+            return {
+                text: platformLookupByAPIURL[item].name, value: item
+            }
+        });
     }
 
     applyChanges(): void {
@@ -224,7 +226,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                     Validators.required,
                     (ctrl: AbstractControl) => {
                         const val = ctrl.value;
-                        if (this.platformList.map(e => e.value).indexOf(val) === -1) {
+                        if (!(val in AuthCredentials.platformLookupByAPIURL)) {
                             try {
                                 const url = new URL(val);
                                 if(url.hostname.endsWith(".sbgenomics.com")){
@@ -287,15 +289,14 @@ export class PlatformCredentialsModalComponent implements OnInit {
     }
 
     openTokenPage() {
-        const apiURL: string = this.form.get("url").value;
-        const apiSubdomain   = apiURL.slice("https://".length, apiURL.length - ".sbgenomics.com".length);
 
-        let platformSubdomain = "igor";
-        if (apiSubdomain.endsWith("-api")) {
-            platformSubdomain = apiSubdomain.slice(0, apiSubdomain.length - ".com".length);
-        }
-        const url = `https://${platformSubdomain}.sbgenomics.com/developer#token`;
+        const apiURL: string = this.form.get("url").value;
+
+        const platform = AuthCredentials.platformLookupByAPIURL[apiURL];
+        const url = platform ? platform.devTokenURL : "https://igor.sbgenomics.com/developer#token";
+
         this.system.openLink(url);
+
     }
 
     close() {
