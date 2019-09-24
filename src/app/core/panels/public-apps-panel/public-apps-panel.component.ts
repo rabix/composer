@@ -193,23 +193,23 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
 
                     return {
                         id: AppHelper.getRevisionlessID(app.id),
-                        icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                        title: app.name,
+                        icon: app["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                        title: app.label,
                         label: app.id.split("/").join(" → "),
                         relevance: 1.5,
 
                         tabData: {
                             id: AppHelper.getRevisionlessID(app.id),
                             isWritable: false,
-                            label: app.name,
+                            label: app.label,
                             language: "json",
-                            type: app.raw["class"],
+                            type: app["class"],
                         } as TabData<any>,
 
                         dragEnabled: true,
                         dragTransferData: {name: app.id, type: "cwl"},
-                        dragLabel: app.name,
-                        dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                        dragLabel: app.label,
+                        dragImageClass: app["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                         dragDropZones: ["graph-editor"]
                     };
                 });
@@ -251,7 +251,7 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
         appOpening.subscribeTracked(this, (node: TreeNode<App>) => {
 
             const app = node.data;
-            if (!app.raw || !app.raw.class) {
+            if (!app || !app.class) {
                 return;
             }
 
@@ -259,8 +259,8 @@ export class PublicAppsPanelComponent extends DirectiveBase implements OnInit, A
                 id: AppHelper.getRevisionlessID(app.id),
                 language: "json",
                 isWritable: false,
-                type: app.raw.class,
-                label: app.name
+                type: app.class,
+                label: app.label
             });
 
             this.workbox.openTab(tab);

@@ -27,6 +27,7 @@ export type IPCRoute =
     | "getPlatformApp"
     | "getProject"
     | "getProjects"
+    | "getAppsForProjects"
     | "getSetting"
     | "getUserByToken"
     | "getUserRepository"

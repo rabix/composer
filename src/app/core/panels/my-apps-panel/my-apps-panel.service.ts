@@ -218,14 +218,14 @@ export class MyAppsPanelService extends AppsPanelService {
             return {
                 id: revisionlessID,
                 data: {...app, isWritable},
-                label: app.name,
+                label: app.label,
                 type: "app",
-                icon: app.raw.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
+                icon: app.class === "CommandLineTool" ? "fa-terminal" : "fa-share-alt",
                 dragEnabled: true,
                 dragTransferData: {name: revisionlessID, type: "cwl"},
                 dragDropZones: ["graph-editor"],
-                dragLabel: app.name,
-                dragImageClass: app.raw.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                dragLabel: app.label,
+                dragImageClass: app.class === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
             };
         });
     }
