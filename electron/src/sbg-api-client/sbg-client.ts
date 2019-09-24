@@ -69,11 +69,15 @@ export class SBGClient {
         return this.apiRequest(`projects/${projectSlug}`);
     }
 
-    getAllProjects(): Promise<Project[]> {
-        return this.fetchAll<Project>("projects?fields=_all")
-            .then((projects: Project[]) => {
-                return projects.filter(project => project.type === "v2")
-            });
+    getProjects(): Promise<Project[]> {
+        return this.apiRequest.get("projects?fields=_all")
+            .then(projects => projects.items)
+    }
+
+    searchProjects(name: string): Promise<Project[]> {
+        return this.apiRequest.get("projects", {
+            qs: {name: name, fields: "_all"}
+        }).then(res => res.items);
     }
 
     /**
@@ -85,18 +89,32 @@ export class SBGClient {
         };
     }
 
-
-    /**
-     * @deprecated use {@link getAllProjects}
-     */
-    get projects() {
-        return {
-            all: () => this.getAllProjects()
-        }
+    getUserApps(projectId: string, query: AppQueryParams = {fields: "id,name,project,class,revision,label"}) {
+        return this.getUserAppsForProjects([projectId], query);
     }
 
-    getAllUserApps(query: AppQueryParams = {fields: "id,name,project,raw.class,revision"}) {
-        return this.fetchAll<App>("apps", query);
+    getUserAppsForProjects(projectIds: string[], query: AppQueryParams = {fields: "id,name,project,class,revision,label"}) {
+        const load = (offset: number) => this.apiRequest.post("action/internal/app_containers", {
+            qs: {...query, offset, limit: SBGClient.MAX_QUERY_LIMIT},
+            resolveWithFullResponse: true,
+            body: {
+                projects: projectIds
+            }
+        });
+
+        return this.fetchAllSequentially<App>(load);
+    }
+
+    getAppUpdates(appSlugs: string[], query: AppQueryParams = {fields: "id,revision,name"}) {
+        const load = (offset: number) => this.apiRequest.post("action/internal/app_containers", {
+            qs: {...query, offset, limit: SBGClient.MAX_QUERY_LIMIT},
+            resolveWithFullResponse: true,
+            body: {
+                apps: appSlugs
+            }
+        });
+
+        return this.fetchAllSequentially<App>(load);
     }
 
     getApp(appID: string) {
@@ -108,16 +126,22 @@ export class SBGClient {
         fields: [
             "id",
             "name",
+            "label",
             "project",
             "revision",
-            "raw.class",
-            "raw.sbg:blackbox",
-            "raw.sbg:categories",
-            "raw.sbg:toolkit",
-            "raw.sbg:toolkitVersion"
+            "class",
+            "sbg:blackbox",
+            "sbg:categories",
+            "sbg:toolkit",
+            "sbg:toolkitVersion"
         ].join(",")
     }) {
-        return this.fetchAll<App>("apps", query);
+        const load = (offset: number) => this.apiRequest.get("action/internal/app_containers", {
+            qs: {...query, offset, limit: SBGClient.MAX_QUERY_LIMIT},
+            resolveWithFullResponse: true
+        });
+
+        return this.fetchAllSequentially<App>(load);
     }
 
     saveAppRevision(appID: string, content: string) {
@@ -160,8 +184,6 @@ export class SBGClient {
 
     get apps() {
         return {
-            /** @deprecated use {@link getAllUserApps} */
-            private: (query: AppQueryParams = {fields: "id,name,project,raw.class,revision"}) => this.getAllUserApps(query),
             /** @deprecated use {@link getApp} */
             get: (appID: string) => this.getApp(appID),
             /** @deprecated use {@link getAllPublicApps} */
@@ -170,13 +192,14 @@ export class SBGClient {
                 fields: [
                     "id",
                     "name",
+                    "label",
                     "project",
                     "revision",
-                    "raw.class",
-                    "raw.sbg:blackbox",
-                    "raw.sbg:categories",
-                    "raw.sbg:toolkit",
-                    "raw.sbg:toolkitVersion"
+                    "class",
+                    "sbg:blackbox",
+                    "sbg:categories",
+                    "sbg:toolkit",
+                    "sbg:toolkitVersion"
                 ].join(",")
             }) => this.getAllPublicApps(),
 
@@ -188,38 +211,33 @@ export class SBGClient {
         }
     }
 
-    private fetchAll<T>(endpoint: string, qs?: QueryParams): SBGClientResponse<T[]> {
-        const load = (offset = 0) => this.apiRequest.defaults({
+    private fetchAllSequentially<T>(load: (offset: number) => Promise<any>): SBGClientResponse<T[]> {
+        return new Promise<T[]>((resolve, reject) => {
 
-            qs: {...qs, offset, limit: SBGClient.MAX_QUERY_LIMIT},
-            useQuerystring: true,
-            resolveWithFullResponse: true,
-            qsStringifyOptions: {
-                arrayFormat: "repeat"
-            }
-        })(endpoint);
-
-        return new Promise((resolve, reject) => {
-
-            load().then((result: IncomingMessage & { body: any }) => {
+            load(0).then((result: IncomingMessage & { body: any }) => {
                 const total = Number(result.headers["x-total-matching-query"]);
-                const items = result.body.items;
+                const items: T[] = result.body.items;
 
                 if (items.length === total) {
                     return resolve(items);
                 }
 
-                const allItems: any[]     = items;
                 const additionalCallCount = Math.ceil(total / SBGClient.MAX_QUERY_LIMIT) - 1;
-                const additionalCalls     = [];
+                const additionalCalls: Array<() => Promise<any>> = [];
 
                 for (let i = 1; i <= additionalCallCount; i++) {
-                    additionalCalls.push(load(i * SBGClient.MAX_QUERY_LIMIT));
+                    additionalCalls.push(() => load(i * SBGClient.MAX_QUERY_LIMIT));
                 }
 
-                return Promise.all(additionalCalls).then(results => {
-                    resolve(allItems.concat(...results.map(r => r.body.items)));
-                }, reject);
+                const sequence = additionalCalls.reduce((chain, call) => {
+                    return chain.then(chainResult => {
+                        return call().then(callResult => [...chainResult, callResult])
+                    })
+                }, Promise.resolve([]));
+
+                sequence.then(results => {
+                    resolve(items.concat(...results.map(r => r.body.items)));
+                });
             }, reject);
         });
     }
