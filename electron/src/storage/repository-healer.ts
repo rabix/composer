@@ -42,6 +42,19 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
             fixes.push(Promise.all(checks));
         }
 
+        if (key === "cwlExecutorConfig" || !key) {
+
+            if (!repository.cwlExecutorConfig.outDir) {
+                fixes.push(new Promise((res, rej) => {
+
+                    repository.cwlExecutorConfig.outDir = defaultExecutionOutputDirectory;
+                    modified = true;
+
+                    res();
+                }));
+            }
+        }
+
         if (key === "executorConfig" || !key) {
 
             if (!repository.executorConfig.outDir) {

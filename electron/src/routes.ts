@@ -3,6 +3,7 @@ import * as path from "path";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import * as GitHubClient from "./github-api-client/github-client";
+import {CWLExecutor} from "./cwl-executor/cwl-executor";
 import {RabixExecutor} from "./rabix-executor/rabix-executor";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
@@ -586,16 +587,16 @@ export const patchAppMeta: AppMetaPatcher = (data: {
     }, callback);
 };
 
-export function probeExecutorVersion(data: { path: string }, callback) {
+export function probeExecutorVersion(data: { executorPath: string }, callback) {
     repositoryLoad.then(() => {
-        const rabix = new RabixExecutor(repository.local.executorConfig.path);
+        const executor = new CWLExecutor(repository.local.cwlExecutorConfig.executorPath);
 
-        rabix.getVersion((err: any, version) => {
+        executor.getVersion((err: any, version) => {
             if (err) {
                 if (err.code === "ENOENT") {
                     return callback(null, "");
                 } else if (err.code === "EACCESS") {
-                    return callback(null, `No execution permissions on ${data.path}`);
+                    return callback(null, `No execution permissions on ${data.executorPath}`);
                 } else {
                     return callback(null, err.message);
                 }
@@ -604,5 +605,4 @@ export function probeExecutorVersion(data: { path: string }, callback) {
             callback(null, `Version: ${version}`);
         });
     });
-
-}
+};

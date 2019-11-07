@@ -1,4 +1,5 @@
-import {User} from "../../sbg-api-client/interfaces";
+import { User } from "../../sbg-api-client/interfaces";
+import {CWLExecutorConfig} from "./cwl-executor-config";
 import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 import {TabData} from "./tab-data-interface";
@@ -25,6 +26,11 @@ export class LocalRepository extends RepositoryType {
     selectedAppsPanel: "myApps" | "publicApps" = "myApps";
 
     sidebarHidden = false;
+
+    cwlExecutorConfig: CWLExecutorConfig = {
+        executorPath: "/usr/local/bin/cwl-runner",
+        outDir: defaultExecutionOutputDirectory
+    };
 
     executorConfig: ExecutorConfig = {
         path: "",

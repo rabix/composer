@@ -755,23 +755,23 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     private runOnExecutor(): Observable<string | Object> {
 
         const metaManager    = this.injector.get<AppMetaManager>(AppMetaManagerToken);
-        const executorConfig = this.localRepository.getExecutorConfig();
+        const cwlExecutorConfig = this.localRepository.getCWLExecutorConfig();
         const job            = metaManager.getAppMeta("job");
         const user           = this.auth.getActive().pipe(
             map(user => user ? user.id : "local")
         );
 
-        return combineLatest(job, executorConfig, user).pipe(
+        return combineLatest(job, cwlExecutorConfig, user).pipe(
             take(1),
             switchMap(data => {
 
-                const [job, executorConfig, user] = data;
+                const [job, cwlExecutorConfig, user] = data;
 
-                const appID        = this.tabData.id;
-                const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
-                const executor     = this.injector.get(ExecutorService2);
+                const appID = this.tabData.id;
+                const executorPath = cwlExecutorConfig.executorPath;
+                const executor = this.injector.get(ExecutorService2);
                 const appIsLocal   = AppHelper.isLocal(appID);
-                const outDir       = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
+                const outDir       = executor.makeOutputDirectoryName(cwlExecutorConfig.outDir, appID, appIsLocal ? "local" : user);
 
                 const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 

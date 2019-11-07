@@ -47,7 +47,7 @@ export class CommonReportPanelComponent extends DirectiveBase implements OnInit,
     host: AppEditorBase;
 
     @HostBinding("style.flexBasis.px")
-    private flexBasis = 160;
+    private flexBasis = 400;
 
     @ViewChild("resizeHandle")
     resizeHandle: ElementRef;

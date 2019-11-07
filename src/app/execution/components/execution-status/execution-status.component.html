@@ -42,8 +42,8 @@
     <div *ngIf="!execution?.stepExecution" #output class="p-1">
         Check here for the progress of your execution.
         <br/>
-        Before executing an analysis, make sure that Docker is running and that you have Java Runtime
-        Environment version 8+ installed.
+        Before executing an analysis, make sure that Docker is running and that
+        you have installed and configured a CWL executor.
     </div>
 
     <div *ngIf="dockerPullTimeoutCountdown" class="docker-pull-timeout">

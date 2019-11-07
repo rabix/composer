@@ -82,9 +82,9 @@ import {take} from "rxjs/operators";
         </ct-form-panel>
 
         <ct-form-panel class="m-2">
-            <div class="tc-header">Rabix Executor</div>
+            <div class="tc-header">Execution</div>
             <div class="tc-body p-1">
-                <ct-executor-config></ct-executor-config>
+                <ct-cwl-executor-config></ct-cwl-executor-config>
             </div>
         </ct-form-panel>
 
