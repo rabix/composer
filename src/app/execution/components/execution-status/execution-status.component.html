@@ -39,62 +39,66 @@
 </div>
 
 <div class="status">
-    <div *ngIf="!execution?.stepExecution" #output class="p-1">
-        Check here for the progress of your execution.
-        <br/>
-        Before executing an analysis, make sure that Docker is running and that
-        you have installed and configured a CWL executor.
+    <div class="status-top">
+      <div *ngIf="!execution?.stepExecution" #output class="p-1">
+          Check here for the progress of your execution.
+          <br/>
+          Before executing an analysis, make sure that Docker is running and that
+          you have installed and configured a CWL executor.
+      </div>
+
+      <div *ngIf="dockerPullTimeoutCountdown" class="docker-pull-timeout">
+          <ng-container *ngIf="isOffline">You are offline.</ng-container>
+          <ng-container>Cannot pull Docker image. Retrying in {{ dockerPullTimeoutCountdown }} seconds.</ng-container>
+      </div>
+
+      <div *ngIf="execution?.error" class="execution-failure">
+          Execution failed with exit code {{ execution?.error.code }}
+      </div>
+
+      <div *ngIf="execution?.error && execution?.error.message" class="p-1">
+          {{ execution?.error.message }}
+      </div>
     </div>
 
-    <div *ngIf="dockerPullTimeoutCountdown" class="docker-pull-timeout">
-        <ng-container *ngIf="isOffline">You are offline.</ng-container>
-        <ng-container>Cannot pull Docker image. Retrying in {{ dockerPullTimeoutCountdown }} seconds.</ng-container>
-    </div>
+    <div class="status-body" (scroll)="scrolled($event)" #scrollFrame>
+        <!-- <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
 
-    <div *ngIf="execution?.error" class="execution-failure">
-        Execution failed with exit code {{ execution?.error.code }}
-    </div>
+            <div *ngFor="let step of execution?.stepExecution"
+                [class.text-error]="step.state === 'failed'"
+                [class.text-info]="step.state === 'started'"
+                [class.text-success]="step.state === 'completed'">
 
-    <div *ngIf="execution?.error && execution?.error.message" class="p-1">
-        {{ execution?.error.message }}
-    </div>
+                <i class="fa fa-fw"
+                  [class.fa-circle-o]="!step.state || step.state === 'pending'"
+                  [class.fa-spin]="step.state === 'started'"
+                  [class.fa-circle-o-notch]="step.state === 'started'"
+                  [class.fa-circle-thin]="step.state === 'stopped'"
+                  [class.fa-times-circle]="step.state === 'failed'"
+                  [class.fa-check-circle]="step.state === 'completed'"></i>
 
-    <!-- <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
+                {{ step?.label || step.id }}
 
-        <div *ngFor="let step of execution?.stepExecution"
-             [class.text-error]="step.state === 'failed'"
-             [class.text-info]="step.state === 'started'"
-             [class.text-success]="step.state === 'completed'">
+                <span class="text-muted">
+                    {{ step.state }}
 
-            <i class="fa fa-fw"
-               [class.fa-circle-o]="!step.state || step.state === 'pending'"
-               [class.fa-spin]="step.state === 'started'"
-               [class.fa-circle-o-notch]="step.state === 'started'"
-               [class.fa-circle-thin]="step.state === 'stopped'"
-               [class.fa-times-circle]="step.state === 'failed'"
-               [class.fa-check-circle]="step.state === 'completed'"></i>
+                    <ng-container *ngIf="step.state === 'started' && step.startTime">
+                        {{ step.startTime | amTimeAgo:false }}
+                    </ng-container>
 
-            {{ step?.label || step.id }}
+                    <ng-container
+                        *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
+                        in {{ (step.endTime - step.startTime) | executionDuration }}
+                    </ng-container>
+                </span>
+            </div>
+        </div> -->
 
-            <span class="text-muted">
-                {{ step.state }}
-
-                <ng-container *ngIf="step.state === 'started' && step.startTime">
-                    {{ step.startTime | amTimeAgo:false }}
-                </ng-container>
-
-                <ng-container
-                    *ngIf="(step.state === 'completed' || step.state === 'failed') && step.endTime && step.startTime">
-                    in {{ (step.endTime - step.startTime) | executionDuration }}
-                </ng-container>
-            </span>
+        <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
+          <div *ngIf="executionLogs; else executionLogsEmpty" class="execution-logs">{{ executionLogs }}</div>
+          <ng-template #executionLogsEmpty>
+              Your execution logs will appear here.
+          </ng-template>
         </div>
-    </div> -->
-
-    <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
-      <div *ngIf="executionLogs; else executionLogsEmpty" class="execution-logs">{{ executionLogs }}</div>
-      <ng-template #executionLogsEmpty>
-          Your execution logs will appear here.
-      </ng-template>
     </div>
 </div>

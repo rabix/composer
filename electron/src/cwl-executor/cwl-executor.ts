@@ -74,6 +74,7 @@ export class CWLExecutor {
         const stderrFilePath = path.join(outDir, "stderr.log");
 
         return Promise.all([
+            this.assertExecutor(),
             this.assertDocker()
         ]).then(() => Promise.all([
             this.dumpApp(appFilePath, content),
@@ -104,6 +105,27 @@ export class CWLExecutor {
         if (typeof callback === "function") {
             callback();
         }
+    }
+
+    private assertExecutor(): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            const executor = spawn(this.executorPath, ["--version"]);
+            executor.on("close", (exitCode) => {
+
+                if (exitCode !== 0) {
+                    reject(new Error("A valid CWL executor path needs to be given in order to execute apps."));
+                    return;
+                }
+
+                resolve();
+            });
+
+            executor.on("error", () => {
+                reject(new Error("A valid CWL executor path needs to be given in order to execute apps."));
+            });
+
+        });
     }
 
     private assertDocker(): Promise<any> {

@@ -1,4 +1,4 @@
-import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges} from "@angular/core";
+import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges, ViewChild, ElementRef, AfterViewChecked} from "@angular/core";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppExecution, ExecutionState} from "../../models";
 import {DirectoryExplorerToken, DirectoryExplorer, FileOpenerToken, FileOpener} from "../../interfaces";
@@ -12,7 +12,7 @@ import {ExecutionStopAction} from "../../actions/execution.actions";
     styleUrls: ["./execution-status.component.scss"],
     templateUrl: "./execution-status.component.html"
 })
-export class ExecutionStatusComponent extends DirectiveBase implements OnChanges {
+export class ExecutionStatusComponent extends DirectiveBase implements OnChanges, AfterViewChecked  {
 
     @Input()
     appID: string;
@@ -34,6 +34,10 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
     dockerPullTimeoutCountdown: number;
     dockerPullTimeoutID;
 
+    @ViewChild("scrollFrame")
+    private scrollFrame: ElementRef;
+    private scrollContainer: any;
+    private isNearBottom = true;
     executionLogs: string = "";
 
     constructor(private store: Store<AppState>,
@@ -55,9 +59,33 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
             this.setupDockerTimeout();
 
             if (this.execution && this.execution.logs) {
-                this.executionLogs = this.execution.logs + this.executionLogs;
+                this.executionLogs += this.execution.logs;
             }
         }
+    }
+
+    ngAfterViewChecked() {
+        this.scrollContainer = this.scrollFrame.nativeElement;
+        if (this.isNearBottom) {
+            this.scrollToBottom();
+        }
+    }
+
+    private scrollToBottom(): void {
+        try {
+            this.scrollContainer.scrollTop = this.scrollContainer.scrollHeight;
+        } catch(err) { }
+    }
+
+    private isUserNearBottom(): boolean {
+        const threshold = 10;
+        const position = this.scrollContainer.scrollTop + this.scrollContainer.offsetHeight;
+        const height = this.scrollContainer.scrollHeight;
+        return position > height - threshold;
+    }
+
+    scrolled(event: any): void {
+        this.isNearBottom = this.isUserNearBottom();
     }
 
     openFile(filePath: string, language: string): void {
