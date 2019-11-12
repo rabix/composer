@@ -16,6 +16,10 @@ export class CWLExecutor {
     }
 
     getVersion(callback?: ProcessCallback, emitter?: EventEmitter) {
+        if (!this.executorPath) {
+            return callback(new Error("Please enter the path to the CWL executor."));
+        }
+
         const child = spawn(this.executorPath, ["--version"]);
 
         let output = "";

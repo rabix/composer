@@ -39,6 +39,12 @@
         padding: .5em;
     }
 
+    .execution-logs {
+        white-space: pre-line; /*This is how to preserve line breaks*/
+        font-size: 12px; /*Obtained from code editor styles*/
+        font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace; /*Obtained from code editor styles*/
+    }
+
     .docker-pull-timeout {
         background: $brand-warning;
         color: white;

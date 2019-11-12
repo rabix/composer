@@ -34,6 +34,8 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
     dockerPullTimeoutCountdown: number;
     dockerPullTimeoutID;
 
+    executionLogs: string = "";
+
     constructor(private store: Store<AppState>,
                 @DIOptional() @Inject(DirectoryExplorerToken) directoryExplorer: DirectoryExplorer,
                 @DIOptional() @Inject(FileOpenerToken) fileOpener: FileOpener) {
@@ -52,6 +54,9 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
             this.setupDockerTimeout();
 
+            if (this.execution && this.execution.logs) {
+                this.executionLogs = this.execution.logs + this.executionLogs;
+            }
         }
     }
 

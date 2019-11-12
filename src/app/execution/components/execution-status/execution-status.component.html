@@ -59,7 +59,7 @@
         {{ execution?.error.message }}
     </div>
 
-    <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
+    <!-- <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
 
         <div *ngFor="let step of execution?.stepExecution"
              [class.text-error]="step.state === 'failed'"
@@ -89,5 +89,12 @@
                 </ng-container>
             </span>
         </div>
+    </div> -->
+
+    <div *ngIf="execution?.stepExecution && (!execution?.error || execution?.error?.type === 'execution')" class="p-1">
+      <div *ngIf="executionLogs; else executionLogsEmpty" class="execution-logs">{{ executionLogs }}</div>
+      <ng-template #executionLogsEmpty>
+          Your execution logs will appear here.
+      </ng-template>
     </div>
 </div>

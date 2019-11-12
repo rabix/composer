@@ -80,7 +80,7 @@ import {Component, Input} from "@angular/core";
                 <button type="button" class="btn btn-primary"
                         *ngIf="!host.isExecuting"
                         [disabled]="!host.appIsRunnable()"
-                        ct-tooltip="Run with Rabix Executor"
+                        ct-tooltip="Run with the CWL Executor"
                         tooltipPlacement="bottom"
                         (click)="host.scheduleExecution()">
                     <i class="fa fa-fw fa-play"></i> Run
