@@ -1,6 +1,7 @@
 export interface CWLExecutorConfig {
     executorPath: string;
-    outDir: string;
+    outDir: CWLExecutorParamsOutDir;
+    executorParams: string;
 }
 
 export interface AppExecutionContext {
@@ -9,11 +10,11 @@ export interface AppExecutionContext {
 }
 
 export interface CWLExecutorParamsConfig {
-    baseDir: string;
-    configurationDir: string;
-    cacheDir: string;
-    noContainer: boolean;
-    quiet: boolean;
-    verbose: boolean;
-    outDir: string;
+    executorParams: string;
+    outDir: CWLExecutorParamsOutDir;
+}
+
+export interface CWLExecutorParamsOutDir {
+    prefix?: string;
+    value: string;
 }

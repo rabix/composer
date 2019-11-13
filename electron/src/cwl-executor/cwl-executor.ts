@@ -66,12 +66,12 @@ export class CWLExecutor {
 
     execute(content: string, jobValue: Object = {}, executionParams: Partial<CWLExecutorParamsConfig> = {}): Promise<Execution> {
 
-        const outDir = executionParams.outDir;
+        const outDirValue = executionParams.outDir.value;
 
-        const appFilePath    = path.join(outDir, "app.cwl");
-        const jobFilePath    = path.join(outDir, "job.json");
-        const stdoutFilePath = path.join(outDir, "stdout.log");
-        const stderrFilePath = path.join(outDir, "stderr.log");
+        const appFilePath    = path.join(outDirValue, "app.cwl");
+        const jobFilePath    = path.join(outDirValue, "job.json");
+        const stdoutFilePath = path.join(outDirValue, "stdout.log");
+        const stderrFilePath = path.join(outDirValue, "stderr.log");
 
         return Promise.all([
             this.assertExecutor(),

@@ -771,12 +771,15 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const executorPath = cwlExecutorConfig.executorPath;
                 const executor = this.injector.get(ExecutorService2);
                 const appIsLocal   = AppHelper.isLocal(appID);
-                const outDir       = executor.makeOutputDirectoryName(cwlExecutorConfig.outDir, appID, appIsLocal ? "local" : user);
+                const outDir = {
+                    value: executor.makeOutputDirectoryName(cwlExecutorConfig.outDir.value, appID, appIsLocal ? "local" : user)
+                }
+                const executorParams = cwlExecutorConfig.executorParams;
 
                 const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 
-                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).pipe(
-                    finalize(() => this.fileRepository.reloadPath(outDir))
+                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir, executorParams}).pipe(
+                    finalize(() => this.fileRepository.reloadPath(outDir.value))
                 );
             })
         );

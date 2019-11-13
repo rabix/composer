@@ -1,0 +1,6 @@
+file 1
+mystring
+file 2
+mystring
+file 3
+mystring

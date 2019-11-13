@@ -1,4 +1,18 @@
 :host {
+
+    .output-folder-container {
+        display: flex;
+
+        label {
+            font-size: 90%;
+        }
+
+        .output-folder-prefix-input {
+            width: 80px;
+            margin-right: 0.4rem;
+        }
+    }
+
     .add-output-folder-btn {
         border: none;
         padding: 0;

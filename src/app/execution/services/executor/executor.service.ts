@@ -101,7 +101,7 @@ export class ExecutorService2 {
                 appID,
                 model.class as AppType,
                 stepList,
-                executionParams.outDir
+                executionParams.outDir.value
             ));
 
             const startRunner = executor.execute(content, jobValue, executionParams).catch(ex => {

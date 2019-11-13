@@ -88,32 +88,12 @@ export class Execution {
             params = {};
         }
 
-        if (params.baseDir) {
-            output.push("--basedir", params.baseDir);
+        if (params.executorParams) {
+            output.push(params.executorParams.split(' '));
         }
 
-        if (params.verbose) {
-            output.push("--verbose");
-        }
-
-        if (params.quiet) {
-            output.push("--quiet");
-        }
-
-        if (params.noContainer) {
-            output.push("--no-container");
-        }
-
-        if (params.cacheDir) {
-            output.push("--cachedir", params.cacheDir);
-        }
-
-        if (params.configurationDir) {
-            output.push("--configuration-dir", params.configurationDir);
-        }
-
-        if (params.outDir) {
-            output.push("--outdir", params.outDir);
+        if (params.outDir.prefix && params.outDir.value) {
+            output.push(params.outDir.prefix, params.outDir.value);
         }
 
         return output;

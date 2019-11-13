@@ -1,5 +1,6 @@
 import * as fs from "fs-extra";
 import {LocalRepository} from "./types/local-repository";
+import {defaultCWLExecutionOutputDirectory} from "../controllers/cwl-execution-results.controller";
 import {defaultExecutionOutputDirectory} from "../controllers/execution-results.controller";
 
 export function heal(repository: LocalRepository, key?: keyof LocalRepository): Promise<boolean> {
@@ -47,7 +48,7 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
             if (!repository.cwlExecutorConfig.outDir) {
                 fixes.push(new Promise((res, rej) => {
 
-                    repository.cwlExecutorConfig.outDir = defaultExecutionOutputDirectory;
+                    repository.cwlExecutorConfig.outDir = defaultCWLExecutionOutputDirectory;
                     modified = true;
 
                     res();

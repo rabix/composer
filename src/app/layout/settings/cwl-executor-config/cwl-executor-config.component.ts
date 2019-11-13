@@ -22,22 +22,42 @@ import {debounceTime, combineLatest, map, take} from "rxjs/operators";
 
             <div class="form-check">
 
-                <label>CWL executor path:</label>
+                <label>Executor path:</label>
                 <input formControlName="executorPath"
                        class="form-control"
                        type="text"/>
                 <p class="form-text text-muted">{{ versionMessage }}</p>
 
                 <label>Output folder:</label>
-                <ct-native-file-browser-form-field class="input-group"
-                                                   formControlName="outDir"
-                                                   [disableTextInput]="true"
-                                                   [hidden]=""
-                                                   selectionType="directory">
-                </ct-native-file-browser-form-field>
-                <button *ngIf="outDirExistsInTree | async" class="btn btn-link add-output-folder-btn" (click)="addOutputFolderToTree()">
-                    Add this folder to the file tree
-                </button>
+                <div>
+                    <div formGroupName="outDir" class="output-folder-container">
+                        <div>
+                            <label>Prefix:</label>
+                            <input formControlName="prefix"
+                                   class="form-control output-folder-prefix-input"
+                                   type="text"/>
+                        </div>
+                        <div>
+                            <label>Folder:</label>
+                            <ct-native-file-browser-form-field class="input-group"
+                                                               formControlName="value"
+                                                               [disableTextInput]="false"
+                                                               [hidden]=""
+                                                               selectionType="directory">
+                            </ct-native-file-browser-form-field>
+                        </div>
+                    </div>
+                    <button *ngIf="outDirExistsInTree | async" class="btn btn-link add-output-folder-btn" (click)="addOutputFolderToTree()">
+                        Add this folder to the file tree
+                    </button>
+                    <p class="form-text text-muted">Configure prefix according to the given executor requirements.</p>
+                </div>
+
+                <label>Other parameters:</label>
+                <input formControlName="executorParams"
+                       class="form-control"
+                       type="text"/>
+                <p class="form-text text-muted">Specify additional parameters to be passed to the executor.</p>
             </div>
 
         </form>
@@ -68,7 +88,11 @@ export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit 
 
             this.form = new FormGroup({
                 executorPath: new FormControl(config.executorPath, [Validators.required]),
-                outDir: new FormControl(config.outDir)
+                outDir: new FormGroup({
+                    prefix: new FormControl(config.outDir.prefix),
+                    value: new FormControl(config.outDir.value)
+                }),
+                executorParams: new FormControl(config.executorParams)
             });
 
             const changes = this.form.valueChanges;
@@ -79,7 +103,7 @@ export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit 
                 )),
                 map(result => {
                     const [folders, outDir] = result;
-                    return !~folders.indexOf(outDir);
+                    return outDir.value && !~folders.indexOf(outDir.value);
                 })
             );
 
@@ -100,9 +124,9 @@ export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit 
     }
 
     addOutputFolderToTree() {
-        this.electronProxy.getRemote().require("fs-extra").ensureDir((this.form.get("outDir").value))
+        this.electronProxy.getRemote().require("fs-extra").ensureDir((this.form.get("outDir.value").value))
             .then(() => {
-                this.localRepository.addLocalFolders([this.form.get("outDir").value], true)
+                this.localRepository.addLocalFolders([this.form.get("outDir.value").value], true)
                     .then(() => {
                     });
             }).catch((err) => console.warn(err));

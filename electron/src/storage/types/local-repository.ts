@@ -3,6 +3,7 @@ import {CWLExecutorConfig} from "./cwl-executor-config";
 import {ExecutorConfig} from "./executor-config";
 import {RepositoryType} from "./repository-type";
 import {TabData} from "./tab-data-interface";
+import {defaultCWLExecutionOutputDirectory} from "../../controllers/cwl-execution-results.controller";
 import {defaultExecutionOutputDirectory} from "../../controllers/execution-results.controller";
 import {ProxySettings} from "./proxy-settings";
 
@@ -29,7 +30,8 @@ export class LocalRepository extends RepositoryType {
 
     cwlExecutorConfig: CWLExecutorConfig = {
         executorPath: "/usr/local/bin/cwl-runner",
-        outDir: defaultExecutionOutputDirectory
+        outDir: defaultCWLExecutionOutputDirectory,
+        executorParams: "--timestamps"
     };
 
     executorConfig: ExecutorConfig = {
