@@ -772,6 +772,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
                 const executor = this.injector.get(ExecutorService2);
                 const appIsLocal   = AppHelper.isLocal(appID);
                 const outDir = {
+                    prefix: cwlExecutorConfig.outDir.prefix,
                     value: executor.makeOutputDirectoryName(cwlExecutorConfig.outDir.value, appID, appIsLocal ? "local" : user)
                 }
                 const executorParams = cwlExecutorConfig.executorParams;
