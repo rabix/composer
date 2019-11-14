@@ -89,7 +89,7 @@ export class Execution {
         }
 
         if (params.executorParams) {
-            output.push(params.executorParams.split(' '));
+            output.push(...params.executorParams.split(/\s+/));
         }
 
         if (params.outDir.prefix && params.outDir.value) {
