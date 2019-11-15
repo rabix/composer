@@ -58,6 +58,13 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
             this.setupDockerTimeout();
 
+            /**
+             * Clear the logs every execution not to fill up the memory
+             */
+            if (this.execution && !this.execution.startTime) {
+                this.executionLogs = "";
+            }
+
             if (this.execution && this.execution.logs) {
                 this.executionLogs += this.execution.logs;
             }
@@ -71,12 +78,22 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
         }
     }
 
+    /**
+     * Scroll the container storing execution logs to bottom to inspect
+     * the most current log printed.
+     */
     private scrollToBottom(): void {
         try {
             this.scrollContainer.scrollTop = this.scrollContainer.scrollHeight;
         } catch(err) { }
     }
 
+    /**
+     * Determines if the user scrolled near to the bottom of the frame.
+     * If so, auto-scroll to bottom will run, otherwise, scrollbar will
+     * be kept in its current position to allow inspecting during a
+     * running execution.
+     */
     private isUserNearBottom(): boolean {
         const threshold = 10;
         const position = this.scrollContainer.scrollTop + this.scrollContainer.offsetHeight;
@@ -84,6 +101,11 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
         return position > height - threshold;
     }
 
+    /**
+     * Update boolean flag as the container is scrolled.
+     *
+     * @param event
+     */
     scrolled(event: any): void {
         this.isNearBottom = this.isUserNearBottom();
     }
