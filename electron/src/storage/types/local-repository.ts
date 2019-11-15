@@ -34,6 +34,8 @@ export class LocalRepository extends RepositoryType {
         executorParams: "--timestamps"
     };
 
+    cwlExecutorConfigHistory: CWLExecutorConfig[] = [];
+
     executorConfig: ExecutorConfig = {
         path: "",
         choice: "bundled",

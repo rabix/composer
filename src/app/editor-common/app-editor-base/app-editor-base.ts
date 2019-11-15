@@ -767,6 +767,9 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 const [job, cwlExecutorConfig, user] = data;
 
+                /** Store the running executor config for later use */
+                this.localRepository.setCWLExecutorConfigHistory(cwlExecutorConfig);
+
                 const appID = this.tabData.id;
                 const executorPath = cwlExecutorConfig.executorPath;
                 const executor = this.injector.get(ExecutorService2);

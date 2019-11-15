@@ -18,6 +18,16 @@ import {debounceTime, combineLatest, map, take} from "rxjs/operators";
         }`
     ],
     template: `
+        <form [formGroup]="formHistory" *ngIf="formHistory">
+            <label>Configurations from past executions:</label>
+            <select formControlName="config" class="form-control">
+                <option value="">-- none --</option>
+                <option *ngFor="let config of configHistory" [ngValue]="config">
+                    {{config.executorPath +' '+ config.outDir.prefix +' '+ config.outDir.value +' '+ config.executorParams}}
+                </option>
+            </select>
+            <p></p>
+        </form>
         <form [formGroup]="form" *ngIf="form">
 
             <div class="form-check">
@@ -66,10 +76,14 @@ import {debounceTime, combineLatest, map, take} from "rxjs/operators";
 export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     form: FormGroup;
+    formHistory: FormGroup;
 
     versionMessage = "checking...";
 
     outDirExistsInTree: Observable<boolean>;
+
+    config;
+    configHistory = [];
 
     constructor(private localRepository: LocalRepositoryService,
                 private notificationBar: NotificationBarService,
@@ -82,20 +96,61 @@ export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit 
 
         const showErr = (err) => this.notificationBar.showNotification(new ErrorWrapper(err).toString());
 
+        this.localRepository.getCWLExecutorConfigHistory().pipe(
+            take(1)
+        ).subscribeTracked(this, configs => {
+            this.configHistory = configs;
+        });
+
         this.localRepository.getCWLExecutorConfig().pipe(
             take(1)
         ).subscribeTracked(this, config => {
+            this.config = config;
+
+            this.formHistory = new FormGroup({
+                config: new FormControl("")
+            })
+
+            const changesHistory = this.formHistory.valueChanges;
+
+            changesHistory.pipe(
+                debounceTime(300)
+            ).subscribeTracked(this, () => {
+                /** Update the form with a past execution config, otherwise
+                use the current config */
+                if (this.formHistory.get("config").value) {
+                    this.form.patchValue(this.formHistory.get("config").value);
+                } else {
+                    this.form.patchValue(this.config);
+                }
+            }, showErr);
 
             this.form = new FormGroup({
-                executorPath: new FormControl(config.executorPath, [Validators.required]),
+                executorPath: new FormControl(this.config.executorPath, [Validators.required]),
                 outDir: new FormGroup({
-                    prefix: new FormControl(config.outDir.prefix),
-                    value: new FormControl(config.outDir.value)
+                    prefix: new FormControl(this.config.outDir.prefix),
+                    value: new FormControl(this.config.outDir.value)
                 }),
-                executorParams: new FormControl(config.executorParams)
+                executorParams: new FormControl(this.config.executorParams)
+            });
+
+            this.form.get("executorPath").valueChanges.subscribeTracked(this, () => {
+                this.versionMessage = "checking...";
+                this.checkVersion();
             });
 
             const changes = this.form.valueChanges;
+
+            changes.pipe(
+                debounceTime(300)
+            ).subscribeTracked(this, () => {
+                /** Update current config when user is not currently
+                viewing a past execution config */
+                if (!this.formHistory.get("config").value) {
+                    this.config = this.form.getRawValue();
+                }
+                this.localRepository.setCWLExecutorConfig(this.form.getRawValue());
+            }, showErr);
 
             this.outDirExistsInTree = this.localRepository.getLocalFolders().pipe(
                 combineLatest(this.localRepository.getCWLExecutorConfig().pipe(
@@ -106,17 +161,6 @@ export class CWLExecutorConfigComponent extends DirectiveBase implements OnInit 
                     return outDir.value && !~folders.indexOf(outDir.value);
                 })
             );
-
-            this.form.get("executorPath").valueChanges.subscribeTracked(this, () => {
-                this.versionMessage = "checking...";
-            });
-
-            changes.pipe(
-                debounceTime(300)
-            ).subscribeTracked(this, () => {
-                this.localRepository.setCWLExecutorConfig(this.form.getRawValue());
-                this.checkVersion();
-            }, showErr);
 
         }, showErr);
 

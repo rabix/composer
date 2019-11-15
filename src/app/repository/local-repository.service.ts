@@ -20,6 +20,7 @@ export class LocalRepositoryService {
     private recentApps: ReplaySubject<RecentAppTab[]>                 = new ReplaySubject(1);
     private credentials: ReplaySubject<AuthCredentials[]> = new ReplaySubject(1);
     private cwlExecutorConfig: ReplaySubject<CWLExecutorConfig>       = new ReplaySubject(1);
+    private cwlExecutorConfigHistory: ReplaySubject<CWLExecutorConfig[]> = new ReplaySubject(1);
     private executorConfig: ReplaySubject<ExecutorConfig>             = new ReplaySubject(1);
     private activeCredentials: ReplaySubject<AuthCredentials>         = new ReplaySubject(1);
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
@@ -36,6 +37,7 @@ export class LocalRepositoryService {
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
         this.listen("cwlExecutorConfig").subscribe(this.cwlExecutorConfig);
+        this.listen("cwlExecutorConfigHistory").subscribe(this.cwlExecutorConfigHistory);
         this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
@@ -220,6 +222,27 @@ export class LocalRepositoryService {
         return this.patch({cwlExecutorConfig}).pipe(
             take(1)
         ).toPromise();
+    }
+
+    getCWLExecutorConfigHistory(): Observable<CWLExecutorConfig[]> {
+        return this.cwlExecutorConfigHistory;
+    }
+
+    setCWLExecutorConfigHistory(cwlExecutorConfig: CWLExecutorConfig, limit = 5): Promise<any> {
+        return this.getCWLExecutorConfigHistory().pipe(
+            take(1)
+        ).toPromise().then((entries) => {
+            const update = [cwlExecutorConfig].concat(entries).filter((val, idx, arr) => {
+                const duplicateIndex = arr.findIndex(el => {
+                    return el.executorPath === val.executorPath &&
+                           el.outDir.value === val.outDir.value &&
+                           el.executorParams === val.executorParams;
+                });
+                return duplicateIndex === idx;
+            }).slice(0, limit);
+
+            return this.patch({cwlExecutorConfigHistory: update}).toPromise();
+        });
     }
 
     getExecutorConfig(): Observable<ExecutorConfig> {

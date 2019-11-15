@@ -26,7 +26,7 @@ export class CWLExecutor {
         let error  = "";
 
         child.stdout.on("data", data => {
-            output += data
+            output += data;
         });
 
         // some executors post their versions to stderr
@@ -36,7 +36,7 @@ export class CWLExecutor {
         });
 
         child.stderr.on("error", err => {
-            error += err + "\n"
+            error += err + "\n";
         });
 
         child.on("error", err => {
