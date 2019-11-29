@@ -47,8 +47,8 @@ export class PublicAppsPanelService extends AppsPanelService {
             map(apps => {
 
                 const toolkits = apps.reduce((acc, app) => {
-                    const tk        = (app.raw && app.raw["sbg:toolkit"]) || "";
-                    const tkVersion = (app.raw && app.raw["sbg:toolkitVersion"]) || "";
+                    const tk        = (app && app["sbg:toolkit"]) || "";
+                    const tkVersion = (app && app["sbg:toolkitVersion"]) || "";
 
                     const fullToolkitName = `${tk} ${tkVersion}`.trim();
 
@@ -102,7 +102,7 @@ export class PublicAppsPanelService extends AppsPanelService {
             map(apps => {
 
                 const categories = apps.reduce((acc, app) => {
-                    const appCategories = (app.raw && app.raw["sbg:categories"]) || ["__uncategorized__"];
+                    const appCategories = (app && app["sbg:categories"]) || ["__uncategorized__"];
 
                     appCategories.forEach(category => {
                         if (!acc[category]) {
@@ -158,8 +158,8 @@ export class PublicAppsPanelService extends AppsPanelService {
         let icon       = "fa-question";
         let imageClass = "";
 
-        if (app.raw && app.raw.class) {
-            appType = app.raw.class;
+        if (app && app.class) {
+            appType = app.class;
         }
 
         if (appType === "CommandLineTool") {
@@ -172,15 +172,15 @@ export class PublicAppsPanelService extends AppsPanelService {
             imageClass = "icon-workflow";
         }
 
-        const tkVersion = (app.raw && app.raw["sbg:toolkitVersion"]) || "";
+        const tkVersion = (app && app["sbg:toolkitVersion"]) || "";
 
         return {
             id: AppHelper.getRevisionlessID(app.id),
             data: app,
             type: "app",
-            label: `${app.name} ${tkVersion}`,
+            label: `${app.label} ${tkVersion}`,
             dragEnabled: true,
-            dragLabel: app.name,
+            dragLabel: app.label,
             dragDropZones: ["graph-editor"],
             dragTransferData: {name: app.id, type: "cwl"},
             icon: icon,

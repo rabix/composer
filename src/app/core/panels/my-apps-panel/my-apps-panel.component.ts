@@ -164,23 +164,23 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
                     return {
                         id: revisionlessID,
-                        icon: app.raw["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
-                        title: app.name,
+                        icon: app["class"] === "Workflow" ? "fa-share-alt" : "fa-terminal",
+                        title: app.label,
                         label: app.id.split("/").join(" → "),
                         relevance: 1.5,
 
                         tabData: {
                             id: revisionlessID,
                             isWritable: project.permissions.write,
-                            label: app.name,
+                            label: app.label,
                             language: "json",
-                            type: app.raw["class"],
+                            type: app["class"],
                         } as TabData<any>,
 
                         dragEnabled: true,
                         dragTransferData: {name: revisionlessID, type: "cwl"},
-                        dragLabel: app.name,
-                        dragImageClass: app.raw["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
+                        dragLabel: app.label,
+                        dragImageClass: app["class"] === "CommandLineTool" ? "icon-command-line-tool" : "icon-workflow",
                         dragDropZones: ["graph-editor"]
                     };
                 });
@@ -226,8 +226,8 @@ export class MyAppsPanelComponent extends DirectiveBase implements AfterContentI
 
         appOpening.subscribe(node => {
 
-            const label = node.data.name;
-            const type  = node.data.raw.class === "CommandLineTool" ? "CommandLineTool" : "Workflow";
+            const label = node.data.label;
+            const type  = node.data.class === "CommandLineTool" ? "CommandLineTool" : "Workflow";
 
             const tab = this.workbox.getOrCreateAppTab({
                 id: AppHelper.getRevisionlessID(node.data.id),
