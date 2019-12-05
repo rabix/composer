@@ -1,8 +1,17 @@
 import * as os from "os";
+import { CWLExecutionParamsConfig, CWLExecutionOutDirConfig } from "../storage/types/cwl-executor-config";
 
 const path = require("path");
 
-export const defaultExecutionOutputDirectory = [os.homedir(), "RabixComposer", "Executions"].join(path.sep);
+export const defaultCWLExecutionOutDir: CWLExecutionOutDirConfig = {
+    prefix: '--outdir',
+    value: [os.homedir(), "RabixComposer", "Executions"].join(path.sep)
+};
+
+export const defaultCWLExecutionParams: CWLExecutionParamsConfig = {
+    outDir: defaultCWLExecutionOutDir,
+    extras: "--timestamps"
+};
 
 export function makeOutputDirectoryName(outputDir, appID, user = "local", time = new Date()) {
 

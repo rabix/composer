@@ -1,13 +1,13 @@
 const spawn = require("child_process").spawn;
 import * as fs from "fs-extra";
 import * as path from "path";
-import {RabixExecutorParamsConfig} from "../storage/types/rabix-executor-config";
+import {CWLExecutionParamsConfig} from "../storage/types/cwl-executor-config";
 import {Execution} from "./execution";
 import EventEmitter = NodeJS.EventEmitter;
 
 export type ProcessCallback = (err?: Error, stdout?: string, stderr?: string) => void;
 
-export function findDefaultExecutorJar() {
+export function findRabixExecutorPath() {
     const basePath  = path.normalize(__dirname + "/../../executor/lib/rabix-cli.jar");
     const fixedAsar = basePath.replace("app.asar", "app.asar.unpacked");
 
@@ -17,16 +17,18 @@ export function findDefaultExecutorJar() {
     );
 }
 
-export class RabixExecutor {
+export class CWLExecutor {
 
-    jarPath = "";
-    jrePath = "java";
+    jrePath: string = "java";
+    jarPath: string = "";
+    executorPath: string = "";
 
-    constructor(jarPath = findDefaultExecutorJar()) {
+    constructor({ jarPath = findRabixExecutorPath(), executorPath = "/usr/local/bin/cwl-runner" }) {
         this.jarPath = path.normalize(jarPath);
+        this.executorPath = executorPath;
     }
 
-    getVersion(callback?: ProcessCallback, emitter?: EventEmitter) {
+    getRabixExecutorVersion(callback?: ProcessCallback, emitter?: EventEmitter) {
         const child = spawn(this.jrePath, ["-jar", this.jarPath, "--version"]);
 
         let output = "";
@@ -65,20 +67,76 @@ export class RabixExecutor {
         }
     }
 
-    execute(content: string, jobValue: Object = {}, executionParams: Partial<RabixExecutorParamsConfig> = {}): Promise<Execution> {
+    getVersion(callback?: ProcessCallback, emitter?: EventEmitter) {
+        if (!this.executorPath) {
+            return callback(new Error("Please enter the path to the CWL executor."));
+        }
 
-        const outDir = executionParams.outDir;
+        const child = spawn(this.executorPath, ["--version"]);
 
-        const appFilePath    = path.join(outDir, "app.cwl");
-        const jobFilePath    = path.join(outDir, "job.json");
-        const stdoutFilePath = path.join(outDir, "stdout.log");
-        const stderrFilePath = path.join(outDir, "stderr.log");
+        let output = "";
+        let error  = "";
 
-        return Promise.all([
-            this.assertJava(),
+        child.stdout.on("data", data => {
+            output += data;
+        });
+
+        // some executors post their versions to stderr
+        // as data, so also capture those e.g. toil-cwl-runner
+        child.stderr.on("data", (data) => {
+            output += data;
+        });
+
+        child.stderr.on("error", err => {
+            error += err + "\n";
+        });
+
+        child.on("error", err => {
+
+            callback(new Error("Cannot start the CWL executor."));
+        });
+
+        child.on("close", () => {
+            if (error) {
+                callback(new Error(error));
+                return;
+            }
+
+            const version = output.match(/\d+\.\d+\.\d+/);
+            if (!version) {
+                return callback(null, null);
+            }
+
+            return callback(null, version[0]);
+        });
+
+
+        if (emitter && child.connected) {
+            emitter.on("stop", () => this.killChild(child));
+        }
+    }
+
+    execute(appContent: string, jobValue: Object = {}, executionParams: Partial<CWLExecutionParamsConfig> = {}): Promise<Execution> {
+
+        const outDirValue = executionParams.outDir.value;
+        const app = JSON.parse(appContent);
+        const isLegacy = app.cwlVersion === "sbg:draft-2";
+        let asserts = [];
+
+        if (isLegacy) {
+            asserts = asserts.concat([this.assertNonWindows, this.assertJava()]);
+        }
+
+        const appFilePath    = path.join(outDirValue, "app.cwl");
+        const jobFilePath    = path.join(outDirValue, "job.json");
+        const stdoutFilePath = path.join(outDirValue, "stdout.log");
+        const stderrFilePath = path.join(outDirValue, "stderr.log");
+
+        return Promise.all(asserts.concat([
+            this.assertExecutor(),
             this.assertDocker()
-        ]).then(() => Promise.all([
-            this.dumpApp(appFilePath, content),
+        ])).then(() => Promise.all([
+            this.dumpApp(appFilePath, appContent),
             this.dumpJob(jobFilePath, jobValue),
             this.ensureFile(stdoutFilePath),
             this.ensureFile(stderrFilePath)
@@ -86,10 +144,10 @@ export class RabixExecutor {
 
             const [appPath, jobPath] = filePaths;
 
-            const execution = new Execution(this.jrePath, this.jarPath, appPath, jobPath);
+            const execution = new Execution(this.jrePath, this.jarPath, this.executorPath, appPath, jobPath, isLegacy);
             execution.setStdout(stdoutFilePath);
             execution.setStderr(stderrFilePath);
-            execution.setExecutionParams(executionParams);
+            execution.setCWLExecutionParams(executionParams);
 
             return execution;
         });
@@ -106,6 +164,15 @@ export class RabixExecutor {
         if (typeof callback === "function") {
             callback();
         }
+    }
+
+    private assertNonWindows(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            if (process.platform === "win32") {
+                reject(new Error("Rabix Executor does not support executing sbg:draft-2 apps on Windows."));
+            }
+            resolve();
+        });
     }
 
     private assertJava(versionRequirement = 1.8): Promise<any> {
@@ -132,6 +199,27 @@ export class RabixExecutor {
                     reject(new Error("Please install Java 8 or higher in order to execute apps."));
                 }
             });
+        });
+    }
+
+    private assertExecutor(): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            const executor = spawn(this.executorPath, ["--version"]);
+            executor.on("close", (exitCode) => {
+
+                if (exitCode !== 0) {
+                    reject(new Error("A valid CWL executor path needs to be given in order to execute apps."));
+                    return;
+                }
+
+                resolve();
+            });
+
+            executor.on("error", () => {
+                reject(new Error("A valid CWL executor path needs to be given in order to execute apps."));
+            });
+
         });
     }
 

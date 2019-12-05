@@ -1,5 +1,5 @@
-import {Component} from "@angular/core";
-import {SystemService} from "../../../platform-providers/system.service";
+import { Component } from "@angular/core";
+import { SystemService } from "../../../platform-providers/system.service";
 
 @Component({
     selector: "ct-about-page-modal-component",
@@ -96,7 +96,7 @@ import {SystemService} from "../../../platform-providers/system.service";
                 <hr>
 
                 <span class="text-muted">
-                    Copyright 2017 Seven Bridges
+                    Copyright 2017-2020 Seven Bridges
                 </span>
             </div>
 

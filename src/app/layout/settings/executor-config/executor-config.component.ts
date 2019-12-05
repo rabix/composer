@@ -67,7 +67,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
     form: FormGroup;
 
-    versionMessage = "Version: checking...";
+    versionMessage = "CWL executor version: checking...";
 
     outDirExistsInTree: Observable<boolean>;
 
@@ -82,7 +82,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
 
         const showErr = (err) => this.notificationBar.showNotification(new ErrorWrapper(err).toString());
 
-        this.localRepository.getExecutorConfig().pipe(
+        this.localRepository.getRabixExecutorConfig().pipe(
             take(1)
         ).subscribeTracked(this, config => {
 
@@ -95,7 +95,7 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
             const changes = this.form.valueChanges;
 
             this.outDirExistsInTree = this.localRepository.getLocalFolders().pipe(
-                combineLatest(this.localRepository.getExecutorConfig().pipe(
+                combineLatest(this.localRepository.getRabixExecutorConfig().pipe(
                     map(config => config.outDir)
                 )),
                 map(result => {
@@ -104,21 +104,21 @@ export class ExecutorConfigComponent extends DirectiveBase implements OnInit {
                 })
             );
 
-            this.form.get("path").valueChanges.subscribeTracked(this, () => this.versionMessage = "checking...");
+            this.form.get("path").valueChanges.subscribeTracked(this, () => this.versionMessage = "CWL executor version: checking...");
 
             changes.pipe(
                 debounceTime(300)
             ).subscribeTracked(this, () => {
-                this.localRepository.setExecutorConfig(this.form.getRawValue());
+                this.localRepository.setRabixExecutorConfig(this.form.getRawValue());
             }, showErr);
 
         }, showErr);
 
-        this.executorService.getVersion().subscribeTracked(this, version => {
+        this.executorService.getRabixExecutorVersion().subscribeTracked(this, version => {
 
             this.versionMessage = version || "Version: not available";
 
-            if (version.startsWith("Version")) {
+            if (version.startsWith("Rabix Executor version: ")) {
                 this.form.get("path").setErrors(null);
             } else {
                 this.form.get("path").setErrors({probe: version});
