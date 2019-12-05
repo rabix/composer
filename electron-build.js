@@ -71,6 +71,10 @@ builder.build({
         }],
         mac: {
             target: ["dmg"],
+            hardenedRuntime: true,
+            gatekeeperAssess: false,
+            entitlements: electronDir + "/config/entitlements.mac.plist",
+            entitlementsInherit: electronDir + "/config/entitlements.mac.plist",
         },
         win: {
             target: ["nsis"],
@@ -87,8 +91,11 @@ builder.build({
         fileAssociations: [{
             ext: "cwl",
             name: "CWL"
-        }]
-
+        }],
+        afterSign: projectRoot + "/build-scripts/notarize.js",
+        dmg: {
+            sign: false
+        }
     }
 });
 
