@@ -1,13 +1,16 @@
 
 
 # Rabix Composer
-[![Build Status](https://travis-ci.org/rabix/composer.svg?branch=master)](https://travis-ci.org/rabix/composer)
+[![Tests](https://github.com/rabix/composer/workflows/Tests/badge.svg)](https://github.com/rabix/composer/actions?query=workflow%3ATests)
+[![Tests](https://github.com/rabix/composer/workflows/Release/badge.svg)](https://github.com/rabix/composer/actions?query=workflow%3ARelease)
 
-Rabix Composer is an open source editor for [Common Workflow Language](https://github.com/common-workflow-language/common-workflow-language) 
-documents. 
+
+Rabix Composer is an open source visual editor for [Common Workflow
+Language](https://github.com/common-workflow-language/common-workflow-language)
+documents.
 
 It has a graphical mode allowing drag and drop creation of workflows
-and wizard type creation of individual tools.
+and a wizard for creation of individual tools.
 
 ![Workflows!](doc/images/workflows.gif)
 
@@ -22,6 +25,17 @@ modes work seamlessly together.
 - [yarn](https://yarnpkg.com/en/)
 
 ## Installation
+
+**The current release requires Node 8 to build properly. In an upcoming release we
+will update the code and dependencies so that they will work on the latest
+node.** 
+
+The [npm package `n`][npm-n] can be helpful in managing node versions, especially on
+macOS Catalina, where Python2 has been removed.
+
+[npm-n]: https://www.npmjs.com/package/n
+
+**The following commands should all be done using node8**
 
 ```bash
 git clone https://github.com/rabix/composer
@@ -46,6 +60,7 @@ yarn run start:electron // opens the app shell
 ```bash
 yarn run build
 ```
+
 
 ## Running the tests
 ```bash

@@ -29,7 +29,7 @@
         "install-executor": "node build-scripts/bundle-executor.js",
         "serve": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng serve -aot",
         "start:electron": "./node_modules/.bin/electron ./electron",
-        "test": "yarn run test:electron && yarn run test:angular",
+        "test": "yarn run test:electron",
         "test:angular": "./node_modules/@angular/cli/bin/ng test --watch false",
         "test:angular:watch": "./node_modules/@angular/cli/bin/ng test",
         "test:spectron": "node ./node_modules/mocha/bin/_mocha --timeout 30000 -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
