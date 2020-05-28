@@ -1,5 +1,5 @@
-import {User} from "../../../../electron/src/sbg-api-client/interfaces/user";
-import {UserPlatformIdentifier} from "./user-platform-identifier";
+import { User } from "../../../../electron/src/sbg-api-client/interfaces/user";
+import { UserPlatformIdentifier } from "./user-platform-identifier";
 
 interface PlatformEntry {
     name: string;
@@ -24,10 +24,10 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "shortName": "SBG-EU",
             "devTokenURL": "https://eu.sbgenomics.com/developer#token",
         },
-        "https://api.sevenbridges.cn": {
-            "name": "Seven Bridges (China)",
-            "shortName": "SBG-CN",
-            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
+        "https://api.sb.biodatacatalyst.nhlbi.nih.gov": {
+            "name": "BioData Catalyst",
+            "shortName": "BDCatalyst",
+            "devTokenURL": "https://platform.sb.biodatacatalyst.nhlbi.nih.gov/developer/#token",
         },
         "https://cgc-api.sbgenomics.com": {
             "name": "Cancer Genomics Cloud",
@@ -39,10 +39,10 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "shortName": "CAVATICA",
             "devTokenURL": "https://cavatica.sbgenomics.com/developer#token",
         },
-        "https://f4c-api.sbgenomics.com": {
-            "name": "Fair4Cures",
-            "shortName": "F4C",
-            "devTokenURL": "https://f4c.sbgenomics.com/developer#token",
+        "https://api.sevenbridges.cn": {
+            "name": "Seven Bridges (China)",
+            "shortName": "SBG-CN",
+            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
         },
     };
 
@@ -55,9 +55,9 @@ export class AuthCredentials implements UserPlatformIdentifier {
         // this.ensureValidURL(url);
         // this.ensureValidToken(token);
 
-        this.url   = url;
+        this.url = url;
         this.token = token;
-        this.user  = user;
+        this.user = user;
 
         this.id = this.getHash();
     }
@@ -96,8 +96,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
      * @see {@link AuthCredentials.equals} Instance method for comparing equality to another instance
      */
     static isSimilar(x?: AuthCredentials, y?: AuthCredentials): boolean {
-        const onlyXExists  = x !== undefined && y === undefined;
-        const onlyYExists  = y !== undefined && x === undefined;
+        const onlyXExists = x !== undefined && y === undefined;
+        const onlyYExists = y !== undefined && x === undefined;
         const neitherExist = x === undefined && y === undefined;
 
         if (onlyXExists || onlyYExists) {
@@ -131,9 +131,9 @@ export class AuthCredentials implements UserPlatformIdentifier {
     }
 
     updateToMatch(credentials: AuthCredentials): void {
-        this.url   = credentials.url;
+        this.url = credentials.url;
         this.token = credentials.token;
-        this.user  = credentials.user;
+        this.user = credentials.user;
     }
 
     private ensureValidToken(token: string): void {
