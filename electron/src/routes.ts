@@ -144,6 +144,19 @@ export function searchLocalProjects(data: { term: string, limit: number, folders
     }).catch(callback);
 }
 
+export function searchUserProjects(name: string, callback) {
+    ensurePlatformUser().then(repo => {
+        const {url, token} = repo.local.activeCredentials;
+
+        const api = getSBGClient(url, token);
+
+        return api.searchProjects(name).then(result => {
+            callback(null, result);
+        }, callback);
+
+    }).catch(callback);
+}
+
 export function deepLinkingHandler(data, callback) {
     deepLinkingProtocolController.register(callback);
 }
@@ -165,18 +178,28 @@ export function getProject(projectSlug: string, callback) {
     }).catch(callback);
 }
 
-export function getProjects(data: { url: string; token: string }, callback) {
-    getSBGClient(data.url, data.token).projects.all().then(response => {
-        callback(null, response.filter(project => project.type === "v2"));
-    }, rejection => callback(rejection));
+export function getProjects(data: any, callback) {
+    ensurePlatformUser().then(repo => {
+        const {url, token} = repo.local.activeCredentials;
+
+        getSBGClient(url, token).getProjects()
+            .then(
+                response => callback(null, response),
+                reject => callback(reject)
+            )
+    }).catch(callback);
 }
 
-export function getApps(data: { url: string, token: string, query?: AppQueryParams }, callback) {
-    getSBGClient(data.url, data.token).apps.private(data.query || {})
-        .then(
-            response => callback(null, response),
-            reject => callback(reject)
-        );
+export function getAppsForProjects(projectIds: string[], callback) {
+    ensurePlatformUser().then(repo => {
+        const {url, token} = repo.local.activeCredentials;
+
+        getSBGClient(url, token).getUserAppsForProjects(projectIds)
+            .then(
+                response => callback(null, response),
+                reject => callback(reject)
+            )
+    }).catch(callback);
 }
 
 export function getLocalRepository(data: { key?: string } = {}, callback) {
@@ -320,20 +343,27 @@ export function fetchPlatformData(data: {
 
         const client = getSBGClient(url, token);
 
-        const projectsPromise   = client.getAllProjects();
-        const appsPromise       = client.getAllUserApps();
+        const openProjectIds = repository.user.openProjects;
+        const projects = openProjectIds.map(projectId => {
+            return repository.user.projects.find(project => project.id === projectId);
+        });
+
+        const appsPromise = openProjectIds.length > 0
+            ? client.getUserAppsForProjects(openProjectIds)
+            : Promise.resolve([]);
+
         const publicAppsPromise = client.getAllPublicApps();
 
-        const call = Promise.all([projectsPromise, appsPromise, publicAppsPromise]).then(results => {
+        const call = Promise.all([appsPromise, publicAppsPromise]).then(results => {
 
-            const [projects, apps, publicApps] = results;
+            const [apps, publicApps] = results;
             const timestamp                    = Date.now();
 
             return new Promise((resolve, reject) => {
                 repository.updateUser({
                     apps,
                     projects,
-                    publicApps: publicApps.filter((app) => !app.raw["sbg:blackbox"]),
+                    publicApps: publicApps.filter((app) => !app["sbg:blackbox"]),
                     appFetchTimestamp: timestamp,
                     projectFetchTimestamp: timestamp
                 }, (err, data) => {
@@ -468,10 +498,7 @@ export function createPlatformApp(data: { id: string, content: string }, callbac
 
             const project = idParts.slice(0, 2).join("/");
 
-            api.apps.private({
-                project,
-                fields: "id,name,project,raw.class,revision"
-            }).then((projectApps) => {
+            api.getUserApps(project).then((projectApps) => {
                 const newAppList = repo.user.apps.filter(app => app.project !== project).concat(projectApps);
                 repo.updateUser({
                     apps: newAppList
@@ -525,8 +552,7 @@ export function getAppUpdates(data: { appIDs: string[] }, callback) {
 
         const api = getSBGClient(url, token);
 
-        return api.apps.private({
-            id: data.appIDs,
+        return api.getAppUpdates(data.appIDs, {
             fields: "id,revision,name"
         }).then(result => {
             callback(null, result);

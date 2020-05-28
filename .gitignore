@@ -18,6 +18,7 @@ coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
+build/
 
 # Users Environment Variables
 .lock-wscript
@@ -50,6 +51,7 @@ npm-debug.log
 /src/*/dist/
 /dist/**
 .webpack.json
+ng-dist/
 
 
 # IDE #

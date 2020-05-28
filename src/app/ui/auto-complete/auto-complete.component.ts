@@ -11,8 +11,14 @@ import {distinctUntilChanged} from "rxjs/operators";
         provide: NG_VALUE_ACCESSOR,
         useExisting: forwardRef(() => AutoCompleteComponent), multi: true
     }],
-    template: `<input #el [placeholder]="placeholder">`,
-    styleUrls: ["./auto-complete.component.scss"],
+    template: `
+        <input #el [placeholder]="placeholder">
+        <ct-circular-loader *ngIf="loading" class="loader-75 mt-1"></ct-circular-loader>
+        <ng-container *ngIf="(resultObservable | async) as res">
+            <div *ngIf="!loading && res.items.length === 0">No results for '{{res.query}}'</div>
+        </ng-container>
+    `,
+    styleUrls: ["./auto-complete.component.scss"]
 })
 export class AutoCompleteComponent extends SelectComponent implements ControlValueAccessor, OnInit {
 
