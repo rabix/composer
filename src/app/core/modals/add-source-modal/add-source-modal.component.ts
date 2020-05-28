@@ -7,8 +7,10 @@ import {ModalService} from "../../../ui/modal/modal.service";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {WorkboxService} from "../../workbox/workbox.service";
 import {PlatformCredentialsModalComponent} from "../platform-credentials-modal/platform-credentials-modal.component";
-import {Observable} from "rxjs/Observable";
-import {map, take} from "rxjs/operators";
+import {catchError, map, take, tap, withLatestFrom} from "rxjs/operators";
+import {Project} from "../../../../../electron/src/sbg-api-client/interfaces";
+import {of} from "rxjs/observable/of";
+import {StatusBarService} from "../../../layout/status-bar/status-bar.service";
 
 @Component({
     selector: "ct-add-source-modal",
@@ -37,26 +39,12 @@ import {map, take} from "rxjs/operators";
                 <!--If we have an active connection we should show the choice of projects to add-->
                 <div class="dialog-content dialog-connection" *ngIf="auth.active | async; else noActiveConnection">
 
-                    <!--Projects are loaded-->
-                    <ng-container *ngIf="(platformRepository.getProjects() | async) !== null; else projectsNotLoadedYet">
-
-                        <ng-container *ngIf="allProjectsCount | async; else userHasNoProjects">
-                            
-                            <!--Offer projects so users can choose which to add-->
-                            <div *ngIf="closedProjectOptions.length > 0; else allProjectsAreAdded">
-                                <p>Choose projects to add to your workspace:</p>
-                                <div>
-                                    <ct-auto-complete data-test="add-source-modal-add-project"
-                                                      [(ngModel)]="selectedProjects"
-                                                      [options]="closedProjectOptions"></ct-auto-complete>
-                                </div>
-                            </div>
-                            
-                        </ng-container>
-                        
-
-                    </ng-container>
-
+                    <p>Choose projects to add to your workspace:</p>
+                    <div>
+                        <ct-auto-complete data-test="add-source-modal-add-project"
+                                          [(ngModel)]="selectedProjects"
+                                          [searchFn]="searchProjectsFn()"></ct-auto-complete>
+                    </div>
 
                 </div>
             </ng-container>
@@ -116,33 +104,16 @@ export class AddSourceModalComponent extends DirectiveBase {
 
     selectedProjects  = [];
     localFoldersToAdd = [];
-    allProjectsCount: Observable<number>;
-
-    closedProjectOptions: { value: string, text: string }[] = null;
 
     constructor(public modal: ModalService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService,
                 private workbox: WorkboxService,
                 private native: NativeSystemService,
-                public auth: AuthService) {
-
+                public auth: AuthService,
+                public statusBar: StatusBarService
+    ) {
         super();
-
-        this.allProjectsCount = this.platformRepository.getProjects().pipe(
-            map(projects => projects ? projects.length : 0)
-        );
-
-        this.platformRepository.getClosedProjects().pipe(
-            map(p => p || [])
-        ).subscribeTracked(this, projects => {
-            this.closedProjectOptions = projects.map(project => {
-                return {
-                    value: project.id,
-                    text: project.name
-                };
-            });
-        });
     }
 
     onDone() {
@@ -155,6 +126,15 @@ export class AddSourceModalComponent extends DirectiveBase {
             }
 
             this.platformRepository.addOpenProjects(this.selectedProjects, true).then(() => {
+                const process = this.statusBar.startProcess("Fetching apps for projects. You might not see up-to-date information while sync is in progress.");
+                this.platformRepository.fetchAppsForProjects(this.selectedProjects)
+                    .pipe(take(1))
+                    .subscribe(() => {
+                        this.statusBar.stopProcess(process, "Fetched Apps");
+                    }, () => {
+                        this.statusBar.stopProcess(process, "Failed to fetch Apps");
+                    });
+
                 this.modal.close();
             });
 
@@ -187,5 +167,40 @@ export class AddSourceModalComponent extends DirectiveBase {
     openSettingsTab() {
         this.workbox.openSettingsTab();
         this.modal.close();
+    }
+
+    searchProjectsFn() {
+        const cache = this.platformRepository.getProjects();
+
+        const cacheAllSearchedProjects = (projects) => of(projects)
+            .pipe(
+                withLatestFrom(cache),
+                map(([searchedProjects, cachedProjects]) => {
+                    const allWithLatest = [...cachedProjects, ...searchedProjects];
+                    const cacheMap = new Map();
+
+                    allWithLatest.forEach(project => cacheMap.set(project.id, project));
+
+                    return Array.from(cacheMap.values());
+                })
+            ).subscribe(allProjects => {
+                this.platformRepository.setProjects(allProjects);
+            }).unsubscribe();
+
+        return (query: string) => {
+            return this.platformRepository.searchProjects(query)
+                .pipe(
+                    catchError(() => []),
+                    tap<Project[]>(projects => {
+                        cacheAllSearchedProjects(projects);
+                    }),
+                    map<Project[], Array<{ value: string, text: string }>>(projects => {
+                        return projects.map(p => ({
+                            value: p.id,
+                            text: p.name
+                        }));
+                    })
+                );
+        };
     }
 }

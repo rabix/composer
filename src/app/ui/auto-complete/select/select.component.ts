@@ -1,8 +1,20 @@
-import {AfterViewInit, Component, ElementRef, Input, NgZone, OnDestroy, ViewChild} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    Input,
+    NgZone,
+    OnDestroy,
+    ViewChild
+} from "@angular/core";
 import * as jQuery from "jquery";
 import "selectize";
 import {ObjectHelper} from "../../../helpers/object.helper";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import {Observable} from "rxjs/Observable";
+import {debounceTime, filter, map, switchMap, tap, withLatestFrom} from "rxjs/operators";
+import {Subject} from "rxjs/Subject";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Component({
     template: "",
@@ -136,10 +148,23 @@ export class SelectComponent extends DirectiveBase implements AfterViewInit, OnD
     @Input()
     sortDirection: "asc" | "desc" = "asc";
 
+    @Input()
+    searchFn: (query: string) => Observable<any[]>;
+
     @ViewChild("el", {read: ElementRef})
     private el;
 
+    private searchQuerySubject = new BehaviorSubject<string>("");
+
+    private loadCallbackFn: Function = null;
+
+    private resultSubject = new Subject<any[]>();
+
     protected component = null;
+
+    loading = false;
+
+    resultObservable: Observable<{ query: string, items: any[] }>;
 
     constructor(protected zone: NgZone) {
         super();
@@ -201,7 +226,7 @@ export class SelectComponent extends DirectiveBase implements AfterViewInit, OnD
                 plugins.push("restore_on_backspace");
             }
 
-            const selectizeOptions = {
+            const selectizeOptions: Selectize.IOptions<any, any> = {
                 plugins,
                 delimiter: this.delimiter,
                 create: this.create,
@@ -225,7 +250,14 @@ export class SelectComponent extends DirectiveBase implements AfterViewInit, OnD
                     field: this.sortField,
                     direction: this.sortDirection || "asc"
                 } : undefined],
-                onChange: this.onChange.bind(this)
+                onChange: this.onChange.bind(this),
+                load: (query: string, callback: Function) => {
+                    this.searchQuerySubject.next(query);
+
+                    if (!this.loadCallbackFn) {
+                        this.loadCallbackFn = callback;
+                    }
+                }
             };
 
             this.component = jQuery(this.el.nativeElement).selectize(selectizeOptions)[0].selectize;
@@ -242,6 +274,31 @@ export class SelectComponent extends DirectiveBase implements AfterViewInit, OnD
                 this.component.lock();
             }
         });
+
+        if (this.searchFn) {
+            this.searchQuerySubject
+                .pipe(
+                    filter(query => query.length > 0),
+                    debounceTime(1000),
+                    tap(() => this.loading = true),
+                    switchMap(this.searchFn)
+                )
+                .subscribeTracked(this, (projects) => {
+                    this.resultSubject.next(projects);
+                    this.loadCallbackFn(projects);
+                    this.loading = false;
+                });
+
+            this.resultObservable = this.resultSubject.pipe(
+                withLatestFrom(this.searchQuerySubject),
+                map(([items, query]) => {
+                   return {
+                       query: query,
+                       items: items
+                   };
+                })
+            );
+        }
     }
 
     setDisabled(disabled: boolean) {

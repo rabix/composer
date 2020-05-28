@@ -13,8 +13,17 @@ import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
 import {IpcService} from "../services/ipc.service";
 import {AuthService} from "../auth/auth.service";
-import {map, take, flatMap} from "rxjs/operators";
+import {
+    map,
+    take,
+    flatMap,
+    catchError,
+    switchMap,
+    withLatestFrom
+} from "rxjs/operators";
 import {combineLatest} from "rxjs/observable/combineLatest";
+import {of} from "rxjs/observable/of";
+import {_throw} from "rxjs/observable/throw";
 
 
 @Injectable()
@@ -58,6 +67,10 @@ export class PlatformRepositoryService {
         return this.projects;
     }
 
+    setProjects(projects: Project[]) {
+        return this.patch({projects: projects});
+    }
+
     getPublicApps(): Observable<App[] | null> {
         return this.publicApps;
     }
@@ -89,26 +102,6 @@ export class PlatformRepositoryService {
 
                 const mapped = all.reduce((acc, item) => ({...acc, [item.id]: item}), {});
                 return open.map(id => mapped[id] || undefined).filter(v => v);
-            })
-        );
-    }
-
-    getClosedProjects(): Observable<Project[]> {
-        return combineLatest(this.projects, this.openProjects).pipe(
-            map(data => {
-
-                // If either of them is null, then we don't know which projects are closed
-                if (~data.indexOf(null)) {
-                    return null;
-                }
-
-                const [all, open] = data;
-
-                if (open.length === 0) {
-                    return all;
-                }
-
-                return all.filter(p => open.indexOf(p.id) === -1);
             })
         );
     }
@@ -237,7 +230,16 @@ export class PlatformRepositoryService {
         name: string;
         revision: number;
     }[]> {
-        return this.ipc.request("getAppUpdates", {appIDs}).toPromise();
+        return this.ipc.request("getAppUpdates", {appIDs})
+            .pipe(
+                catchError(err => {
+                    if (err.error && err.error.status === 404) {
+                        return of([]);
+                    }
+                    return _throw(err);
+                })
+            )
+            .toPromise();
     }
 
     getApp(id: string, forceFetch = false): Promise<RawApp> {
@@ -252,6 +254,28 @@ export class PlatformRepositoryService {
 
     getProject(projectSlug: string): Promise<Project> {
         return this.ipc.request("getProject", projectSlug).toPromise();
+    }
+
+    searchProjects(name: string): Observable<Project[]> {
+        return this.ipc.request("searchUserProjects", name)
+            .pipe();
+    }
+
+    fetchAppsForProjects(projectIds: string[]): Observable<App[]> {
+        return this.ipc.request("getAppsForProjects", projectIds)
+            .pipe(
+                catchError<App[], App[]>(() => []),
+                withLatestFrom(this.apps),
+                map(([newApps, currentApps]) => {
+                    const filtered = currentApps.filter((value) => {
+                        return !newApps.find(app => value.id === app.id);
+                    });
+                    return newApps.concat(filtered);
+                }),
+                switchMap(allApps => {
+                    return this.patch({apps: allApps});
+                })
+            );
     }
 
     searchAppsFromOpenProjects(substring?: string): Observable<App[]> {
@@ -278,7 +302,7 @@ export class PlatformRepositoryService {
                             }
 
                             const appID   = app.id.toLowerCase();
-                            const appName = app.name.toLowerCase();
+                            const appName = app.label.toLowerCase();
 
                             return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
                         });
@@ -300,7 +324,7 @@ export class PlatformRepositoryService {
                     }
 
                     const appID   = app.id.toLowerCase();
-                    const appName = app.name.toLowerCase();
+                    const appName = app.label.toLowerCase();
 
                     return appID.indexOf(term) !== -1 || appName.indexOf(term) !== -1;
                 });
