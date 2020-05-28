@@ -31,12 +31,28 @@
     .status {
         width: 100%;
         overflow: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .status-top {
+        width: 100%;
+    }
+
+    .status-body {
+        overflow: auto;
     }
 
     .execution-failure {
         background: #4f2929;
         color: white;
         padding: .5em;
+    }
+
+    .execution-logs {
+        white-space: pre-line; /*This is how to preserve line breaks*/
+        font-size: 12px; /*Obtained from code editor styles*/
+        font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace; /*Obtained from code editor styles*/
     }
 
     .docker-pull-timeout {

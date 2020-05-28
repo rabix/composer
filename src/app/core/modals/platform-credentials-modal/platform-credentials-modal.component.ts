@@ -292,8 +292,10 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
         const apiURL: string = this.form.get("url").value;
 
-        const platform = AuthCredentials.platformLookupByAPIURL[apiURL];
-        const url = platform ? platform.devTokenURL : "https://igor.sbgenomics.com/developer#token";
+        const platformURL = AuthCredentials.platformLookupByAPIURL[apiURL].platformURL;
+        const devTokenPath = AuthCredentials.platformDevTokenPath;
+
+        const url = `${platformURL}/${devTokenPath}`;
 
         this.system.openLink(url);
 

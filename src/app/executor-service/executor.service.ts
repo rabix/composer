@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
 import {ReplaySubject} from "rxjs/ReplaySubject";
-import {AppExecutionContext, ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
+import {AppExecutionContext, CWLExecutorConfig} from "../../../electron/src/storage/types/cwl-executor-config";
 import {AppHelper} from "../core/helpers/AppHelper";
 import {LocalRepositoryService} from "../repository/local-repository.service";
 import {PlatformRepositoryService} from "../repository/platform-repository.service";
@@ -11,28 +11,28 @@ import {switchMap, take, takeWhile, map} from "rxjs/operators";
 @Injectable()
 export class ExecutorService {
 
-    private config = new ReplaySubject<ExecutorConfig>(1);
+    private config = new ReplaySubject<CWLExecutorConfig>(1);
 
     constructor(private ipc: IpcService,
                 private localRepository: LocalRepositoryService,
                 private platformRepository: PlatformRepositoryService) {
 
-        this.localRepository.getExecutorConfig().subscribe(this.config);
+        this.localRepository.getCWLExecutorConfig().subscribe(this.config);
     }
 
-    getConfig<T extends keyof ExecutorConfig>(key: T): Observable<ExecutorConfig[T]> {
+    getConfig<T extends keyof CWLExecutorConfig>(key: T): Observable<CWLExecutorConfig[T]> {
         return this.config.pipe(
             map(c => c[key])
         );
     }
 
     /**
-     * Probes the executor path for Bunny version.
+     * Probes the executor path for CWL executor version.
      * Returns a message in the format “Version: #” if successful, or a description why it failed
      */
     getVersion(): Observable<string> {
-        return this.getConfig("path").pipe(
-            switchMap(path => this.ipc.request("probeExecutorVersion"))
+        return this.getConfig("executorPath").pipe(
+            switchMap(executorPath => this.ipc.request("probeExecutorVersion"))
         );
     }
 

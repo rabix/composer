@@ -13,6 +13,7 @@ export class AppExecution {
     readonly startTime?: number;
     readonly endTime?: number;
     readonly dockerPullTimeout?: number;
+    readonly logs: string;
 
     constructor(appType: AppType,
                 outdir: string,
@@ -21,7 +22,8 @@ export class AppExecution {
                 state: ExecutionState = "pending",
                 startTime?: number,
                 endTime?: number,
-                dockerPullTimeout?: number) {
+                dockerPullTimeout?: number,
+                logs: string = "") {
 
         this.appType           = appType;
         this.error             = error;
@@ -31,6 +33,7 @@ export class AppExecution {
         this.startTime         = startTime;
         this.endTime           = endTime;
         this.dockerPullTimeout = dockerPullTimeout;
+        this.logs = logs;
 
     }
 
@@ -46,7 +49,8 @@ export class AppExecution {
             update.state,
             update.startTime,
             update.endTime,
-            update.dockerPullTimeout
+            update.dockerPullTimeout,
+            update.logs
         );
     }
 

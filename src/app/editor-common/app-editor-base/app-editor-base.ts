@@ -755,28 +755,35 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     private runOnExecutor(): Observable<string | Object> {
 
         const metaManager    = this.injector.get<AppMetaManager>(AppMetaManagerToken);
-        const executorConfig = this.localRepository.getExecutorConfig();
+        const cwlExecutorConfig = this.localRepository.getCWLExecutorConfig();
         const job            = metaManager.getAppMeta("job");
         const user           = this.auth.getActive().pipe(
             map(user => user ? user.id : "local")
         );
 
-        return combineLatest(job, executorConfig, user).pipe(
+        return combineLatest(job, cwlExecutorConfig, user).pipe(
             take(1),
             switchMap(data => {
 
-                const [job, executorConfig, user] = data;
+                const [job, cwlExecutorConfig, user] = data;
 
-                const appID        = this.tabData.id;
-                const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
-                const executor     = this.injector.get(ExecutorService2);
+                /** Store the running executor config for later use */
+                this.localRepository.setCWLExecutorConfigHistory(cwlExecutorConfig);
+
+                const appID = this.tabData.id;
+                const executorPath = cwlExecutorConfig.executorPath;
+                const executor = this.injector.get(ExecutorService2);
                 const appIsLocal   = AppHelper.isLocal(appID);
-                const outDir       = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
+                const outDir = {
+                    prefix: cwlExecutorConfig.outDir.prefix,
+                    value: executor.makeOutputDirectoryName(cwlExecutorConfig.outDir.value, appID, appIsLocal ? "local" : user)
+                }
+                const executorParams = cwlExecutorConfig.executorParams;
 
                 const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 
-                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).pipe(
-                    finalize(() => this.fileRepository.reloadPath(outDir))
+                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir, executorParams}).pipe(
+                    finalize(() => this.fileRepository.reloadPath(outDir.value))
                 );
             })
         );

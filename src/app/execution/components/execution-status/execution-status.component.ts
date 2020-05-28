@@ -1,4 +1,4 @@
-import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges} from "@angular/core";
+import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges, ViewChild, ElementRef, AfterViewChecked} from "@angular/core";
 import {DirectiveBase} from "../../../util/directive-base/directive-base";
 import {AppExecution, ExecutionState} from "../../models";
 import {DirectoryExplorerToken, DirectoryExplorer, FileOpenerToken, FileOpener} from "../../interfaces";
@@ -12,7 +12,7 @@ import {ExecutionStopAction} from "../../actions/execution.actions";
     styleUrls: ["./execution-status.component.scss"],
     templateUrl: "./execution-status.component.html"
 })
-export class ExecutionStatusComponent extends DirectiveBase implements OnChanges {
+export class ExecutionStatusComponent extends DirectiveBase implements OnChanges, AfterViewChecked  {
 
     @Input()
     appID: string;
@@ -34,6 +34,12 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
     dockerPullTimeoutCountdown: number;
     dockerPullTimeoutID;
 
+    @ViewChild("scrollFrame")
+    private scrollFrame: ElementRef;
+    private scrollContainer: any;
+    private isNearBottom = true;
+    executionLogs: string = "";
+
     constructor(private store: Store<AppState>,
                 @DIOptional() @Inject(DirectoryExplorerToken) directoryExplorer: DirectoryExplorer,
                 @DIOptional() @Inject(FileOpenerToken) fileOpener: FileOpener) {
@@ -52,7 +58,56 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
 
             this.setupDockerTimeout();
 
+            /**
+             * Clear the logs every execution not to fill up the memory
+             */
+            if (this.execution && !this.execution.startTime) {
+                this.executionLogs = "";
+            }
+
+            if (this.execution && this.execution.logs) {
+                this.executionLogs += this.execution.logs;
+            }
         }
+    }
+
+    ngAfterViewChecked() {
+        this.scrollContainer = this.scrollFrame.nativeElement;
+        if (this.isNearBottom) {
+            this.scrollToBottom();
+        }
+    }
+
+    /**
+     * Scroll the container storing execution logs to bottom to inspect
+     * the most current log printed.
+     */
+    private scrollToBottom(): void {
+        try {
+            this.scrollContainer.scrollTop = this.scrollContainer.scrollHeight;
+        } catch(err) { }
+    }
+
+    /**
+     * Determines if the user scrolled near to the bottom of the frame.
+     * If so, auto-scroll to bottom will run, otherwise, scrollbar will
+     * be kept in its current position to allow inspecting during a
+     * running execution.
+     */
+    private isUserNearBottom(): boolean {
+        const threshold = 10;
+        const position = this.scrollContainer.scrollTop + this.scrollContainer.offsetHeight;
+        const height = this.scrollContainer.scrollHeight;
+        return position > height - threshold;
+    }
+
+    /**
+     * Update boolean flag as the container is scrolled.
+     *
+     * @param event
+     */
+    scrolled(event: any): void {
+        this.isNearBottom = this.isUserNearBottom();
     }
 
     openFile(filePath: string, language: string): void {

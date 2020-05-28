@@ -14,7 +14,8 @@ import {
     ExecutionPreparedAction,
     EXECUTION_STARTED,
     EXECUTION_DOCKER_PULL_TIMEOUT,
-    ExecutionDockerPullTimeoutAction
+    ExecutionDockerPullTimeoutAction,
+    ExecutorOutputAction
 } from "../actions/execution.actions";
 import {ProgressState} from "./index";
 import {TabCloseAction} from "../../core/actions/core.actions";
@@ -102,6 +103,23 @@ export function reducer<T extends { type: string | any }>(state: ProgressState =
             let mergedError = new ExecutionError(errorCode, errorMessage, "execution");
 
             return {...state, [appID]: app.fail(mergedError)};
+        }
+
+        case ExecutorOutputAction.type: {
+
+            const {appID, message} = action as Partial<ExecutorOutputAction>;
+
+            const app = state[appID];
+
+            if (!app || !message) {
+                return state;
+            }
+
+            const update = app.update({
+                logs: message
+            });
+
+            return {...state, [appID]: update};
         }
 
         case EXECUTION_REQUIREMENT_ERROR: {

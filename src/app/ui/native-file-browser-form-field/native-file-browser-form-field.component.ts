@@ -33,7 +33,7 @@ type SelectionType = "file" | "directory";
         <span class="input-group-btn">
             <button class="btn btn-secondary" type="button" (click)="onBrowse()" [disabled]="isDisabled">
                 <i *ngIf="useIcon; else textTpl" class="browse-icon fa {{ browseIcon }}"></i>
-                
+
                 <ng-template #textTpl>
                     {{ browseLabel }}
                 </ng-template>
@@ -81,7 +81,7 @@ export class NativeFileBrowserFormFieldComponent extends DirectiveBase implement
 
     isDisabled = false;
 
-    onTouched: Function;
+    onTouched: () => Function;
 
     propagateChange: (value: any) => void;
 

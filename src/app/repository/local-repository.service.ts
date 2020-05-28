@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {ReplaySubject} from "rxjs/ReplaySubject";
+import { ReplaySubject } from "rxjs/ReplaySubject";
+import {CWLExecutorConfig} from "../../../electron/src/storage/types/cwl-executor-config";
 import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
@@ -17,7 +18,9 @@ export class LocalRepositoryService {
     private openTabs: ReplaySubject<TabData<any>[]>                   = new ReplaySubject(1);
     private expandedFolders: ReplaySubject<string[]>                  = new ReplaySubject(1);
     private recentApps: ReplaySubject<RecentAppTab[]>                 = new ReplaySubject(1);
-    private credentials: ReplaySubject<AuthCredentials[]>             = new ReplaySubject(1);
+    private credentials: ReplaySubject<AuthCredentials[]> = new ReplaySubject(1);
+    private cwlExecutorConfig: ReplaySubject<CWLExecutorConfig>       = new ReplaySubject(1);
+    private cwlExecutorConfigHistory: ReplaySubject<CWLExecutorConfig[]> = new ReplaySubject(1);
     private executorConfig: ReplaySubject<ExecutorConfig>             = new ReplaySubject(1);
     private activeCredentials: ReplaySubject<AuthCredentials>         = new ReplaySubject(1);
     private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
@@ -33,6 +36,8 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
+        this.listen("cwlExecutorConfig").subscribe(this.cwlExecutorConfig);
+        this.listen("cwlExecutorConfigHistory").subscribe(this.cwlExecutorConfigHistory);
         this.listen("executorConfig").subscribe(this.executorConfig);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
@@ -207,6 +212,37 @@ export class LocalRepositoryService {
 
     setOpenTabs(openTabs: TabData<any>[]): Promise<any> {
         return this.patch({openTabs}).toPromise();
+    }
+
+    getCWLExecutorConfig(): Observable<CWLExecutorConfig> {
+        return this.cwlExecutorConfig;
+    }
+
+    setCWLExecutorConfig(cwlExecutorConfig: CWLExecutorConfig): Promise<any> {
+        return this.patch({cwlExecutorConfig}).pipe(
+            take(1)
+        ).toPromise();
+    }
+
+    getCWLExecutorConfigHistory(): Observable<CWLExecutorConfig[]> {
+        return this.cwlExecutorConfigHistory;
+    }
+
+    setCWLExecutorConfigHistory(cwlExecutorConfig: CWLExecutorConfig, limit = 5): Promise<any> {
+        return this.getCWLExecutorConfigHistory().pipe(
+            take(1)
+        ).toPromise().then((entries) => {
+            const update = [cwlExecutorConfig].concat(entries).filter((val, idx, arr) => {
+                const duplicateIndex = arr.findIndex(el => {
+                    return el.executorPath === val.executorPath &&
+                           el.outDir.value === val.outDir.value &&
+                           el.executorParams === val.executorParams;
+                });
+                return duplicateIndex === idx;
+            }).slice(0, limit);
+
+            return this.patch({cwlExecutorConfigHistory: update}).toPromise();
+        });
     }
 
     getExecutorConfig(): Observable<ExecutorConfig> {
