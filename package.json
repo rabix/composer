@@ -91,7 +91,7 @@
         "archiver": "^2.1.1",
         "codelyzer": "^4.0.1",
         "concurrently": "^3.5.0",
-        "electron": "1.7.12",
+        "electron": "7.2.4",
         "electron-builder": "20.44.4",
         "electron-notarize": "^0.2.1",
         "fs-extra": "^4.0.1",
