@@ -92,7 +92,7 @@ builder.build({
             ext: "cwl",
             name: "CWL"
         }],
-        afterSign: projectRoot + "/build-scripts/notarize.js",
+        // afterSign: projectRoot + "/build-scripts/notarize.js",
         dmg: {
             sign: false
         }
@@ -113,7 +113,7 @@ function maybeZipWindowsInstaller() {
 
 
     console.log("Archiving Windows installer...");
-    const [installerFilepath] = glob.sync("*.exe", {cwd: "build"});
+    const [installerFilepath] = glob.sync("*.exe", { cwd: "build" });
 
     if (!installerFilepath) {
         throw new Error("Cannot find installer binary.");
@@ -136,9 +136,9 @@ function maybeZipWindowsInstaller() {
 
     archive.pipe(output);
 
-    archive.file(`build/${installerFilepath}`, {name: installerFilepath});
-    archive.file(`build/${buildInfoPath}`, {name: buildInfoPath});
-    archive.directory(`build/${unpackedDir}`, {name: unpackedDir});
+    archive.file(`build/${installerFilepath}`, { name: installerFilepath });
+    archive.file(`build/${buildInfoPath}`, { name: buildInfoPath });
+    archive.directory(`build/${unpackedDir}`, { name: unpackedDir });
     return archive.finalize();
 }
 
