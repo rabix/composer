@@ -4,12 +4,13 @@ import {ExecutionStatusComponent} from "./execution-status.component";
 import {ExecutionError, AppExecution, StepExecution} from "../../models";
 import {FileOpenerToken, DirectoryExplorerToken} from "../../interfaces";
 import {ExecutionDurationPipe} from "../../pipes/execution-duration.pipe";
+import {SanitizeHtmlPipe} from "../../pipes/sanitize-html.pipe";
 
-const statusPanelDefualts = {
+const statusPanelDefaults = {
     component: ExecutionStatusComponent,
     moduleMetadata: {
         imports: [MomentModule],
-        declarations: [ExecutionDurationPipe],
+        declarations: [ExecutionDurationPipe, SanitizeHtmlPipe],
         providers: [
             {
                 provide: DirectoryExplorerToken, useValue: {
@@ -28,13 +29,13 @@ const statusPanelDefualts = {
 storiesOf("Execution Status Panel", module)
 
     .add("with pristine description", () => ({
-        ...statusPanelDefualts,
+        ...statusPanelDefaults,
         props: {
             appID: "test-app-id",
         } as Partial<ExecutionStatusComponent>
     }))
     .add("step state overview", () => ({
-        ...statusPanelDefualts,
+        ...statusPanelDefaults,
         props: {
             execution: new AppExecution("Workflow", "out", [
                 new StepExecution("step_a", "Mike", "pending"),
@@ -53,7 +54,7 @@ storiesOf("Execution Status Panel", module)
     }))
 
     .add("execution error", () => ({
-        ...statusPanelDefualts,
+        ...statusPanelDefaults,
         props: {
             execution: new AppExecution("Workflow", "outdir", [
                 new StepExecution("step_a", "Step A", "completed"),
@@ -63,7 +64,7 @@ storiesOf("Execution Status Panel", module)
     }))
 
     .add("step execution failed", () => ({
-        ...statusPanelDefualts,
+        ...statusPanelDefaults,
         props: {
             execution: new AppExecution("Workflow", "outdir", [
                 new StepExecution("step_a", "Step A", "completed"),

@@ -1,6 +1,6 @@
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
-import { CWLExecutorParamsConfig } from "../../../../../electron/src/storage/types/cwl-executor-config";
+import { CWLExecutionParamsConfig } from "../../../../../electron/src/storage/types/cwl-executor-config";
 import { Injectable } from "@angular/core";
 import {Store} from "@ngrx/store";
 import {
@@ -83,11 +83,10 @@ export class ExecutorService2 {
 
     }
 
-    execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath?: string, executionParams: Partial<CWLExecutorParamsConfig> = {}): Observable<any> {
+    execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath: string = "", executionParams: Partial<CWLExecutionParamsConfig> = {}): Observable<any> {
 
-        const content = serializeModel(model, true, false, true);
-        const executor = new CWLExecutor(executorPath);
-
+        const appContent = serializeModel(model, true, false, true);
+        const executor = new CWLExecutor({ executorPath: executorPath });
         const stepList = this.getStepList(model);
 
         return Observable.create((obs: Observer<any>) => {
@@ -104,7 +103,7 @@ export class ExecutorService2 {
                 executionParams.outDir.value
             ));
 
-            const startRunner = executor.execute(content, jobValue, executionParams).catch(ex => {
+            const startRunner = executor.execute(appContent, jobValue, executionParams).catch(ex => {
                 processStillRunning = false;
                 throw ex;
             });

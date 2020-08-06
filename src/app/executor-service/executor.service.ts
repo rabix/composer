@@ -27,12 +27,22 @@ export class ExecutorService {
     }
 
     /**
+     * Probes the bundled Rabix Executor for its version.
+     * Returns a message in the format “Version: #” if successful, or a description why it failed
+     */
+    getRabixExecutorVersion(): Observable<string> {
+        return this.getConfig("executorPath").pipe(
+            switchMap(executorPath => this.ipc.request("probeRabixExecutorVersion"))
+        );
+    }
+
+    /**
      * Probes the executor path for CWL executor version.
      * Returns a message in the format “Version: #” if successful, or a description why it failed
      */
-    getVersion(): Observable<string> {
+    getCWLExecutorVersion(): Observable<string> {
         return this.getConfig("executorPath").pipe(
-            switchMap(executorPath => this.ipc.request("probeExecutorVersion"))
+            switchMap(executorPath => this.ipc.request("probeCWLExecutorVersion"))
         );
     }
 

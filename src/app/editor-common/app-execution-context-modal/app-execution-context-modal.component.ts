@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AppExecutionContext, ExecutorParamsConfig} from "../../../../electron/src/storage/types/executor-config";
+import {AppExecutionContext, RabixExecutorParamsConfig} from "../../../../electron/src/storage/types/rabix-executor-config";
 import {AppHelper} from "../../core/helpers/AppHelper";
 import {ModalService} from "../../ui/modal/modal.service";
 import {NativeSystemService} from "../../native/system/native-system.service";
@@ -11,7 +11,7 @@ import {NativeSystemService} from "../../native/system/native-system.service";
         <form [formGroup]="form" (submit)="onSubmit(form.getRawValue())">
 
             <div class="p-1">
-                
+
                 <div formGroupName="executionParams">
 
                     <!--Configuration Directory-->
@@ -112,7 +112,7 @@ export class AppExecutionContextModalComponent implements OnInit {
                 quiet: false,
                 verbose: false,
                 noContainer: false
-            } as ExecutorParamsConfig, executionParams))
+            } as RabixExecutorParamsConfig, executionParams))
         });
 
         const baseDir = this.form.get("executionParams.baseDir");

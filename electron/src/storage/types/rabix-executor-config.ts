@@ -1,4 +1,4 @@
-export interface ExecutorConfig {
+export interface RabixExecutorConfig {
     path: string;
     choice: string | "bundled" | "custom";
     outDir: string;
@@ -6,10 +6,10 @@ export interface ExecutorConfig {
 
 export interface AppExecutionContext {
     jobPath: string;
-    executionParams: ExecutorParamsConfig;
+    executionParams: RabixExecutorParamsConfig;
 }
 
-export interface ExecutorParamsConfig {
+export interface RabixExecutorParamsConfig {
     baseDir: string;
     configurationDir: string;
     cacheDir: string;

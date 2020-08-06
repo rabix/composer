@@ -1,20 +1,19 @@
 export interface CWLExecutorConfig {
     executorPath: string;
-    outDir: CWLExecutorParamsOutDir;
-    executorParams: string;
+    executionParams: CWLExecutionParamsConfig;
 }
 
 export interface AppExecutionContext {
     jobPath: string;
-    cwlExecutionParams: CWLExecutorParamsConfig;
+    cwlExecutionParams: CWLExecutionParamsConfig;
 }
 
-export interface CWLExecutorParamsConfig {
-    executorParams: string;
-    outDir: CWLExecutorParamsOutDir;
+export interface CWLExecutionParamsConfig {
+    outDir: CWLExecutionOutDirConfig;
+    extras: string;
 }
 
-export interface CWLExecutorParamsOutDir {
+export interface CWLExecutionOutDirConfig {
     prefix?: string;
     value: string;
 }

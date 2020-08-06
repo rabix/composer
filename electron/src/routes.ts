@@ -613,14 +613,40 @@ export const patchAppMeta: AppMetaPatcher = (data: {
     }, callback);
 };
 
-export function probeExecutorVersion(data: { executorPath: string }, callback) {
+export function probeRabixExecutorVersion(data: { executorPath: string }, callback) {
     repositoryLoad.then(() => {
-        const executor = new CWLExecutor(repository.local.cwlExecutorConfig.executorPath);
+        const executor = new CWLExecutor({
+            jarPath: repository.local.rabixExecutorConfig.path,
+            executorPath: repository.local.cwlExecutorConfig.executorPath
+        });
+
+        executor.getRabixExecutorVersion((err: any, version) => {
+            if (err) {
+                if (err.code === "ENOENT") {
+                    return callback(null, "");
+                } else if (err.code === "EACCESS") {
+                    return callback(null, "No execution permissions on the bundled Rabix Executor");
+                } else {
+                    return callback(null, err.message);
+                }
+            }
+
+            callback(null, `Rabix Executor version: ${version}`);
+        });
+    });
+};
+
+export function probeCWLExecutorVersion(data: { executorPath: string }, callback) {
+    repositoryLoad.then(() => {
+        const executor = new CWLExecutor({
+            jarPath: repository.local.rabixExecutorConfig.path,
+            executorPath: repository.local.cwlExecutorConfig.executorPath
+        });
 
         executor.getVersion((err: any, version) => {
             if (err) {
                 if (err.code === "ENOENT") {
-                    return callback(null, "");
+                    return callback(null, "Not available");
                 } else if (err.code === "EACCESS") {
                     return callback(null, `No execution permissions on ${data.executorPath}`);
                 } else {
@@ -628,7 +654,7 @@ export function probeExecutorVersion(data: { executorPath: string }, callback) {
                 }
             }
 
-            callback(null, `Version: ${version}`);
+            callback(null, `CWL executor version: ${version}`);
         });
     });
 };
