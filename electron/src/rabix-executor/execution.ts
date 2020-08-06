@@ -1,5 +1,5 @@
 import {spawn, ChildProcess} from "child_process";
-import {ExecutorParamsConfig} from "../storage/types/executor-config";
+import {RabixExecutorParamsConfig} from "../storage/types/rabix-executor-config";
 import {createWriteStream, WriteStream} from "fs-extra";
 
 
@@ -13,7 +13,7 @@ export class Execution {
 
     private process: ChildProcess;
 
-    private executionParams: Partial<ExecutorParamsConfig>;
+    private executionParams: Partial<RabixExecutorParamsConfig>;
 
     constructor(public readonly jrePath: string,
                 public readonly jarPath: string,
@@ -29,7 +29,7 @@ export class Execution {
         this.stderrPath = filepath;
     }
 
-    setExecutionParams(executionParams: Partial<ExecutorParamsConfig>) {
+    setExecutionParams(executionParams: Partial<RabixExecutorParamsConfig>) {
         this.executionParams = executionParams;
     }
 
@@ -86,7 +86,7 @@ export class Execution {
 
     }
 
-    private parseExecutorParamsToArgs(params: Partial<ExecutorParamsConfig> = {}): string[] {
+    private parseExecutorParamsToArgs(params: Partial<RabixExecutorParamsConfig> = {}): string[] {
 
         const output = [];
 

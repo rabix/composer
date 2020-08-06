@@ -1,7 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {ReplaySubject} from "rxjs/ReplaySubject";
-import {ExecutorConfig} from "../../../electron/src/storage/types/executor-config";
+import { ReplaySubject } from "rxjs/ReplaySubject";
+import {RabixExecutorConfig} from "../../../electron/src/storage/types/rabix-executor-config";
+import {CWLExecutorConfig} from "../../../electron/src/storage/types/cwl-executor-config";
 import {RecentAppTab} from "../../../electron/src/storage/types/recent-app-tab";
 import {AuthCredentials} from "../auth/model/auth-credentials";
 import {TabData} from "../../../electron/src/storage/types/tab-data-interface";
@@ -13,18 +14,20 @@ import {ProxySettings} from "../../../electron/src/storage/types/proxy-settings"
 @Injectable()
 export class LocalRepositoryService {
 
-    private localFolders: ReplaySubject<string[]>                     = new ReplaySubject(1);
-    private openTabs: ReplaySubject<TabData<any>[]>                   = new ReplaySubject(1);
-    private expandedFolders: ReplaySubject<string[]>                  = new ReplaySubject(1);
-    private recentApps: ReplaySubject<RecentAppTab[]>                 = new ReplaySubject(1);
-    private credentials: ReplaySubject<AuthCredentials[]>             = new ReplaySubject(1);
-    private executorConfig: ReplaySubject<ExecutorConfig>             = new ReplaySubject(1);
-    private activeCredentials: ReplaySubject<AuthCredentials>         = new ReplaySubject(1);
-    private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps"> = new ReplaySubject(1);
-    private publicAppsGrouping: ReplaySubject<"toolkit" | "category"> = new ReplaySubject(1);
-    private ignoredUpdateVersion: ReplaySubject<string>               = new ReplaySubject(1);
-    private appMeta: ReplaySubject<AppMeta[]>                         = new ReplaySubject(1);
-    private proxySettings: ReplaySubject<ProxySettings>               = new ReplaySubject(1);
+    private localFolders: ReplaySubject<string[]>                      = new ReplaySubject(1);
+    private openTabs: ReplaySubject<TabData<any>[]>                    = new ReplaySubject(1);
+    private expandedFolders: ReplaySubject<string[]>                   = new ReplaySubject(1);
+    private recentApps: ReplaySubject<RecentAppTab[]>                  = new ReplaySubject(1);
+    private credentials: ReplaySubject<AuthCredentials[]>              = new ReplaySubject(1);
+    private rabixExecutorConfig: ReplaySubject<RabixExecutorConfig>      = new ReplaySubject(1);
+    private cwlExecutorConfig: ReplaySubject<CWLExecutorConfig>          = new ReplaySubject(1);
+    private cwlExecutorConfigHistory: ReplaySubject<CWLExecutorConfig[]> = new ReplaySubject(1);
+    private activeCredentials: ReplaySubject<AuthCredentials>          = new ReplaySubject(1);
+    private selectedAppsPanel: ReplaySubject<"myApps" | "publicApps">  = new ReplaySubject(1);
+    private publicAppsGrouping: ReplaySubject<"toolkit" | "category">  = new ReplaySubject(1);
+    private ignoredUpdateVersion: ReplaySubject<string>                = new ReplaySubject(1);
+    private appMeta: ReplaySubject<AppMeta[]>                          = new ReplaySubject(1);
+    private proxySettings: ReplaySubject<ProxySettings>                = new ReplaySubject(1);
 
     constructor(private ipc: IpcService) {
 
@@ -33,7 +36,9 @@ export class LocalRepositoryService {
         this.listen("recentApps").subscribe(this.recentApps);
         this.listen("localFolders").subscribe(this.localFolders);
         this.listen("expandedNodes").subscribe(this.expandedFolders);
-        this.listen("executorConfig").subscribe(this.executorConfig);
+        this.listen("rabixExecutorConfig").subscribe(this.rabixExecutorConfig);
+        this.listen("cwlExecutorConfig").subscribe(this.cwlExecutorConfig);
+        this.listen("cwlExecutorConfigHistory").subscribe(this.cwlExecutorConfigHistory);
         this.listen("selectedAppsPanel").subscribe(this.selectedAppsPanel);
         this.listen("publicAppsGrouping").subscribe(this.publicAppsGrouping);
         this.listen("ignoredUpdateVersion").subscribe(this.ignoredUpdateVersion);
@@ -209,14 +214,45 @@ export class LocalRepositoryService {
         return this.patch({openTabs}).toPromise();
     }
 
-    getExecutorConfig(): Observable<ExecutorConfig> {
-        return this.executorConfig;
+    getRabixExecutorConfig(): Observable<RabixExecutorConfig> {
+        return this.rabixExecutorConfig;
     }
 
-    setExecutorConfig(executorConfig: ExecutorConfig): Promise<any> {
-        return this.patch({executorConfig}).pipe(
+    setRabixExecutorConfig(rabixExecutorConfig: RabixExecutorConfig): Promise<any> {
+        return this.patch({rabixExecutorConfig}).pipe(
             take(1)
         ).toPromise();
+    }
+
+    getCWLExecutorConfig(): Observable<CWLExecutorConfig> {
+        return this.cwlExecutorConfig;
+    }
+
+    setCWLExecutorConfig(cwlExecutorConfig: CWLExecutorConfig): Promise<any> {
+        return this.patch({cwlExecutorConfig}).pipe(
+            take(1)
+        ).toPromise();
+    }
+
+    getCWLExecutorConfigHistory(): Observable<CWLExecutorConfig[]> {
+        return this.cwlExecutorConfigHistory;
+    }
+
+    setCWLExecutorConfigHistory(cwlExecutorConfig: CWLExecutorConfig, limit = 5): Promise<any> {
+        return this.getCWLExecutorConfigHistory().pipe(
+            take(1)
+        ).toPromise().then((entries) => {
+            const update = [cwlExecutorConfig].concat(entries).filter((val, idx, arr) => {
+                const duplicateIndex = arr.findIndex(el => {
+                    return el.executorPath === val.executorPath &&
+                           el.executionParams.outDir.value === val.executionParams.outDir.value &&
+                           el.executionParams.extras === val.executionParams.extras;
+                });
+                return duplicateIndex === idx;
+            }).slice(0, limit);
+
+            return this.patch({cwlExecutorConfigHistory: update}).toPromise();
+        });
     }
 
     getProxySettings(): Observable<ProxySettings> {

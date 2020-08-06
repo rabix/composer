@@ -8,7 +8,8 @@ import {EditorControlsComponent} from "./editor-controls/editor-controls.compone
 import {FileEditorComponent} from "./file-editor/file-editor.component";
 import {SettingsComponent} from "./settings/settings.component";
 import {StatusBarComponent} from "./status-bar/status-bar.component";
-import {TabLoaderComponent} from "./tab-loader/tab-loader.component";
+import { TabLoaderComponent } from "./tab-loader/tab-loader.component";
+import {CWLExecutorConfigComponent} from "./settings/cwl-executor-config/cwl-executor-config.component";
 import {ExecutorConfigComponent} from "./settings/executor-config/executor-config.component";
 import {NotificationBarComponent} from "./notification-bar/notification-bar.component";
 import {NotificationBarService} from "./notification-bar/notification-bar.service";
@@ -32,6 +33,7 @@ import {ProxySettingsComponent} from "./settings/proxy-settings/proxy-settings.c
         StatusBarComponent,
         TabLoaderComponent,
         NotificationBarComponent,
+        CWLExecutorConfigComponent,
         ExecutorConfigComponent,
         NotificationComponent,
         GetStartedNotificationComponent,

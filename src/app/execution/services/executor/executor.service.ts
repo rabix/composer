@@ -1,7 +1,7 @@
 import {Observable} from "rxjs/Observable";
 import {Observer} from "rxjs/Observer";
-import {ExecutorParamsConfig} from "../../../../../electron/src/storage/types/executor-config";
-import {Injectable} from "@angular/core";
+import { CWLExecutionParamsConfig } from "../../../../../electron/src/storage/types/cwl-executor-config";
+import { Injectable } from "@angular/core";
 import {Store} from "@ngrx/store";
 import {
     ExecutorOutputAction,
@@ -21,7 +21,7 @@ import {AppType} from "../../types";
 import {ExecutionError} from "../../models";
 import {serializeModel} from "../../../editor-common/utilities/model-serializer/model-serializer";
 
-const {RabixExecutor} = window["require"]("electron").remote.require("./src/rabix-executor/rabix-executor");
+const {CWLExecutor} = window["require"]("electron").remote.require("./src/cwl-executor/cwl-executor");
 const path            = window["require"]("path");
 
 @Injectable()
@@ -83,11 +83,10 @@ export class ExecutorService2 {
 
     }
 
-    execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath?: string, executionParams: Partial<ExecutorParamsConfig> = {}): Observable<any> {
+    execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath: string = "", executionParams: Partial<CWLExecutionParamsConfig> = {}): Observable<any> {
 
-        const content = serializeModel(model, true, false, true);
-        const executor = new RabixExecutor(executorPath);
-
+        const appContent = serializeModel(model, true, false, true);
+        const executor = new CWLExecutor({ executorPath: executorPath });
         const stepList = this.getStepList(model);
 
         return Observable.create((obs: Observer<any>) => {
@@ -101,10 +100,10 @@ export class ExecutorService2 {
                 appID,
                 model.class as AppType,
                 stepList,
-                executionParams.outDir
+                executionParams.outDir.value
             ));
 
-            const startRunner = executor.execute(content, jobValue, executionParams).catch(ex => {
+            const startRunner = executor.execute(appContent, jobValue, executionParams).catch(ex => {
                 processStillRunning = false;
                 throw ex;
             });

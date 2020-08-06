@@ -4,7 +4,7 @@ import { UserPlatformIdentifier } from "./user-platform-identifier";
 interface PlatformEntry {
     name: string;
     shortName: string;
-    devTokenURL: string;
+    platformURL: string;
 }
 
 export class AuthCredentials implements UserPlatformIdentifier {
@@ -17,12 +17,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         "https://api.sbgenomics.com": {
             "name": "Seven Bridges",
             "shortName": "SBG",
-            "devTokenURL": "https://igor.sbgenomics.com/developer#token",
+            "platformURL": "https://igor.sbgenomics.com"
         },
         "https://eu-api.sbgenomics.com": {
             "name": "Seven Bridges (EU)",
             "shortName": "SBG-EU",
-            "devTokenURL": "https://eu.sbgenomics.com/developer#token",
+            "platformURL": "https://eu.sbgenomics.com"
         },
         "https://api.sb.biodatacatalyst.nhlbi.nih.gov": {
             "name": "BioData Catalyst",
@@ -32,12 +32,12 @@ export class AuthCredentials implements UserPlatformIdentifier {
         "https://cgc-api.sbgenomics.com": {
             "name": "Cancer Genomics Cloud",
             "shortName": "CGC",
-            "devTokenURL": "https://cgc.sbgenomics.com/developer#token",
+            "platformURL": "https://cgc.sbgenomics.com"
         },
         "https://cavatica-api.sbgenomics.com": {
             "name": "Cavatica",
             "shortName": "CAVATICA",
-            "devTokenURL": "https://cavatica.sbgenomics.com/developer#token",
+            "platformURL": "https://cavatica.sbgenomics.com"
         },
         "https://api.sevenbridges.cn": {
             "name": "Seven Bridges (China)",
@@ -45,6 +45,8 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
         },
     };
+
+    static readonly platformDevTokenPath = "/developer#token";
 
     id: string;
     user: User;

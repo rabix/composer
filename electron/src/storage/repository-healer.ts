@@ -1,6 +1,7 @@
 import * as fs from "fs-extra";
-import {LocalRepository} from "./types/local-repository";
-import {defaultExecutionOutputDirectory} from "../controllers/execution-results.controller";
+import { LocalRepository } from "./types/local-repository";
+import {defaultRabixExecutionOutDir} from "../controllers/rabix-execution-results.controller";
+import {defaultCWLExecutionParams} from "../controllers/cwl-execution-results.controller";
 
 export function heal(repository: LocalRepository, key?: keyof LocalRepository): Promise<boolean> {
 
@@ -42,12 +43,12 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
             fixes.push(Promise.all(checks));
         }
 
-        if (key === "executorConfig" || !key) {
+        if (key === "rabixExecutorConfig" || !key) {
 
-            if (!repository.executorConfig.outDir) {
+            if (!repository.rabixExecutorConfig.outDir) {
                 fixes.push(new Promise((res, rej) => {
 
-                    repository.executorConfig.outDir = defaultExecutionOutputDirectory;
+                    repository.rabixExecutorConfig.outDir = defaultRabixExecutionOutDir;
                     modified = true;
 
                     res();
@@ -55,6 +56,20 @@ export function heal(repository: LocalRepository, key?: keyof LocalRepository): 
             }
         }
 
+        if (key === "cwlExecutorConfig" || !key) {
+
+            if (!repository.cwlExecutorConfig.executionParams ||
+                !repository.cwlExecutorConfig.executionParams.outDir ||
+                !repository.cwlExecutorConfig.executionParams.extras) {
+                fixes.push(new Promise((res, rej) => {
+
+                    repository.cwlExecutorConfig.executionParams = defaultCWLExecutionParams;
+                    modified = true;
+
+                    res();
+                }));
+            }
+        }
 
         Promise.all(fixes).then(() => resolve(modified), reject);
 

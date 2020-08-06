@@ -3,6 +3,7 @@ import * as path from "path";
 import * as SearchController from "./controllers/search.controller";
 import {SwapController} from "./controllers/swap.controller";
 import * as GitHubClient from "./github-api-client/github-client";
+import {CWLExecutor} from "./cwl-executor/cwl-executor";
 import {RabixExecutor} from "./rabix-executor/rabix-executor";
 import {AppQueryParams} from "./sbg-api-client/interfaces/queries";
 import {SBGClient} from "./sbg-api-client/sbg-client";
@@ -612,23 +613,48 @@ export const patchAppMeta: AppMetaPatcher = (data: {
     }, callback);
 };
 
-export function probeExecutorVersion(data: { path: string }, callback) {
+export function probeRabixExecutorVersion(data: { executorPath: string }, callback) {
     repositoryLoad.then(() => {
-        const rabix = new RabixExecutor(repository.local.executorConfig.path);
+        const executor = new CWLExecutor({
+            jarPath: repository.local.rabixExecutorConfig.path,
+            executorPath: repository.local.cwlExecutorConfig.executorPath
+        });
 
-        rabix.getVersion((err: any, version) => {
+        executor.getRabixExecutorVersion((err: any, version) => {
             if (err) {
                 if (err.code === "ENOENT") {
                     return callback(null, "");
                 } else if (err.code === "EACCESS") {
-                    return callback(null, `No execution permissions on ${data.path}`);
+                    return callback(null, "No execution permissions on the bundled Rabix Executor");
                 } else {
                     return callback(null, err.message);
                 }
             }
 
-            callback(null, `Version: ${version}`);
+            callback(null, `Rabix Executor version: ${version}`);
         });
     });
+};
 
-}
+export function probeCWLExecutorVersion(data: { executorPath: string }, callback) {
+    repositoryLoad.then(() => {
+        const executor = new CWLExecutor({
+            jarPath: repository.local.rabixExecutorConfig.path,
+            executorPath: repository.local.cwlExecutorConfig.executorPath
+        });
+
+        executor.getVersion((err: any, version) => {
+            if (err) {
+                if (err.code === "ENOENT") {
+                    return callback(null, "Not available");
+                } else if (err.code === "EACCESS") {
+                    return callback(null, `No execution permissions on ${data.executorPath}`);
+                } else {
+                    return callback(null, err.message);
+                }
+            }
+
+            callback(null, `CWL executor version: ${version}`);
+        });
+    });
+};

@@ -755,28 +755,43 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
     private runOnExecutor(): Observable<string | Object> {
 
         const metaManager    = this.injector.get<AppMetaManager>(AppMetaManagerToken);
-        const executorConfig = this.localRepository.getExecutorConfig();
         const job            = metaManager.getAppMeta("job");
         const user           = this.auth.getActive().pipe(
             map(user => user ? user.id : "local")
         );
+        const executorConfig = this.localRepository.getCWLExecutorConfig();
 
-        return combineLatest(job, executorConfig, user).pipe(
+        return combineLatest(job, user, executorConfig).pipe(
             take(1),
             switchMap(data => {
 
-                const [job, executorConfig, user] = data;
+                const [job, user, executorConfig] = data;
+                const appID = this.tabData.id;
+                const appIsLocal = AppHelper.isLocal(appID);
+                const executor = this.injector.get(ExecutorService2);
 
-                const appID        = this.tabData.id;
-                const executorPath = executorConfig.choice === "bundled" ? undefined : executorConfig.path;
-                const executor     = this.injector.get(ExecutorService2);
-                const appIsLocal   = AppHelper.isLocal(appID);
-                const outDir       = executor.makeOutputDirectoryName(executorConfig.outDir, appID, appIsLocal ? "local" : user);
+                /** Check if the app is not sbg:draft-2 so
+                 * we store the running executor config for later use */
+                const appContent = serializeModel(this.dataModel, true, false, true);
+                const app = JSON.parse(appContent);
+                if (app.cwlVersion !== "sbg:draft-2") {
+                    this.localRepository.setCWLExecutorConfigHistory(executorConfig);
+                }
+
+                const { executorPath, executionParams: defaultExecutionParams } = executorConfig;
+                const { outDir: defaultOutDir, extras: defaultExtras  } = defaultExecutionParams;
+                const executionParams = {
+                    outDir: {
+                        prefix: defaultOutDir.prefix,
+                        value: executor.makeOutputDirectoryName(defaultOutDir.value, appID, appIsLocal ? "local" : user)
+                    },
+                    extras: defaultExtras
+                }
 
                 const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 
-                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, {outDir}).pipe(
-                    finalize(() => this.fileRepository.reloadPath(outDir))
+                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, executionParams).pipe(
+                    finalize(() => this.fileRepository.reloadPath(executionParams.outDir.value))
                 );
             })
         );

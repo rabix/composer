@@ -53,11 +53,11 @@ export class DataRepository {
             });
         });
 
-        this.on("update.local.executorConfig", () => {
+        this.on("update.local.rabixExecutorConfig", () => {
 
-            if (this.local.executorConfig.choice === "bundled") {
+            if (this.local.rabixExecutorConfig.choice === "bundled") {
                 const executorPath             = path.resolve(__dirname + "/../../../executor/lib/rabix-cli.jar");
-                this.local.executorConfig.path = executorPath;
+                this.local.rabixExecutorConfig.path = executorPath;
             }
 
         });
