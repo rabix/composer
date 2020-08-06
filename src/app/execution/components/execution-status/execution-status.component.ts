@@ -1,11 +1,12 @@
-import {Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges, ViewChild, ElementRef, AfterViewChecked} from "@angular/core";
-import {DirectiveBase} from "../../../util/directive-base/directive-base";
+import { Component, Input, SimpleChanges, Optional as DIOptional, Inject, OnChanges, ViewChild, ElementRef, AfterViewChecked } from "@angular/core";
+import { DirectiveBase } from "../../../util/directive-base/directive-base";
 import {AppExecution, ExecutionState} from "../../models";
 import {DirectoryExplorerToken, DirectoryExplorer, FileOpenerToken, FileOpener} from "../../interfaces";
 import {Optional} from "../../utilities/types";
 import {Store} from "@ngrx/store";
 import {AppState} from "../../reducers";
-import {ExecutionStopAction} from "../../actions/execution.actions";
+import { ExecutionStopAction } from "../../actions/execution.actions";
+import { default as AnsiUp } from "ansi_up";
 
 @Component({
     selector: "ct-execution-status",
@@ -61,12 +62,14 @@ export class ExecutionStatusComponent extends DirectiveBase implements OnChanges
             /**
              * Clear the logs every execution not to fill up the memory
              */
-            if (this.execution && !this.execution.startTime) {
+            if (this.execution && this.execution.state === "pending") {
                 this.executionLogs = "";
             }
 
             if (this.execution && this.execution.logs) {
-                this.executionLogs += this.execution.logs;
+                const ansi_up = new AnsiUp();
+                ansi_up.use_classes = true;
+                this.executionLogs += ansi_up.ansi_to_html(this.execution.logs);
             }
         }
     }

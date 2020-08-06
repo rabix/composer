@@ -1,10 +1,10 @@
 import { User } from "../../sbg-api-client/interfaces";
 import {CWLExecutorConfig} from "./cwl-executor-config";
-import {ExecutorConfig} from "./executor-config";
+import {RabixExecutorConfig} from "./rabix-executor-config";
 import {RepositoryType} from "./repository-type";
-import {TabData} from "./tab-data-interface";
-import {defaultCWLExecutionOutputDirectory} from "../../controllers/cwl-execution-results.controller";
-import {defaultExecutionOutputDirectory} from "../../controllers/execution-results.controller";
+import { TabData } from "./tab-data-interface";
+import {defaultRabixExecutionOutDir} from "../../controllers/rabix-execution-results.controller";
+import {defaultCWLExecutionParams} from "../../controllers/cwl-execution-results.controller";
 import {ProxySettings} from "./proxy-settings";
 
 export interface CredentialsCache {
@@ -28,19 +28,18 @@ export class LocalRepository extends RepositoryType {
 
     sidebarHidden = false;
 
+    rabixExecutorConfig: RabixExecutorConfig = {
+        path: "",
+        choice: "bundled",
+        outDir: defaultRabixExecutionOutDir
+    };
+
     cwlExecutorConfig: CWLExecutorConfig = {
         executorPath: "/usr/local/bin/cwl-runner",
-        outDir: defaultCWLExecutionOutputDirectory,
-        executorParams: "--timestamps"
+        executionParams: defaultCWLExecutionParams
     };
 
     cwlExecutorConfigHistory: CWLExecutorConfig[] = [];
-
-    executorConfig: ExecutorConfig = {
-        path: "",
-        choice: "bundled",
-        outDir: defaultExecutionOutputDirectory
-    };
 
     proxySettings: ProxySettings = {
         useProxy: false,

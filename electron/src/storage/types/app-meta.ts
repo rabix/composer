@@ -1,4 +1,4 @@
-import {AppExecutionContext} from "./executor-config";
+import {AppExecutionContext} from "./rabix-executor-config";
 
 export interface AppMeta {
     [path: string]: AppMetaEntry

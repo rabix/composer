@@ -1,5 +1,5 @@
 import {spawn, ChildProcess} from "child_process";
-import {CWLExecutorParamsConfig} from "../storage/types/cwl-executor-config";
+import {CWLExecutionParamsConfig} from "../storage/types/cwl-executor-config";
 import {createWriteStream, WriteStream} from "fs-extra";
 
 
@@ -13,11 +13,14 @@ export class Execution {
 
     private process: ChildProcess;
 
-    private executionParams: Partial<CWLExecutorParamsConfig>;
+    private executionParams: Partial<CWLExecutionParamsConfig>;
 
-    constructor(public readonly executorPath: string,
+    constructor(public readonly jrePath: string,
+                public readonly jarPath: string,
+                public readonly executorPath: string,
                 public readonly appPath: string,
-                public readonly jobPath: string) {
+                public readonly jobPath: string,
+                public readonly isLegacy: boolean) {
     }
 
     setStdout(filepath: string) {
@@ -28,17 +31,28 @@ export class Execution {
         this.stderrPath = filepath;
     }
 
-    setCWLExecutionParams(executionParams: Partial<CWLExecutorParamsConfig>) {
+    setCWLExecutionParams(executionParams: Partial<CWLExecutionParamsConfig>) {
         this.executionParams = executionParams;
     }
 
     run(): ChildProcess {
 
-        this.process = spawn(this.executorPath, [
-            ...this.parseExecutorParamsToArgs(this.executionParams),
-            this.appPath,
-            this.jobPath
-        ]);
+        if (this.isLegacy) {
+            this.process = spawn(this.jrePath, [
+                "-jar",
+                this.jarPath,
+                "--enable-composer-logs",
+                this.appPath,
+                this.jobPath,
+                ...this.parseExecutionParamsToArgs(this.executionParams),
+            ]);
+        } else {
+            this.process = spawn(this.executorPath, [
+                ...this.parseExecutionParamsToArgs(this.executionParams),
+                this.appPath,
+                this.jobPath
+            ]);
+        }
 
         if (this.stdoutPath) {
             this.stdout = createWriteStream(this.stdoutPath, {autoClose: true, encoding: "utf8"});
@@ -54,9 +68,20 @@ export class Execution {
     }
 
     getCommandLineString(): string {
+        if (this.isLegacy) {
+            return [
+                this.jrePath,
+                "-jar",
+                this.jarPath,
+                this.appPath,
+                this.jobPath,
+                ...this.parseExecutionParamsToArgs(this.executionParams)
+            ].join(" ");
+        }
+
         return [
             this.executorPath,
-            ...this.parseExecutorParamsToArgs(this.executionParams),
+            ...this.parseExecutionParamsToArgs(this.executionParams),
             this.appPath,
             this.jobPath
         ].join(" ");
@@ -80,7 +105,7 @@ export class Execution {
 
     }
 
-    private parseExecutorParamsToArgs(params: Partial<CWLExecutorParamsConfig> = {}): string[] {
+    private parseExecutionParamsToArgs(params: Partial<CWLExecutionParamsConfig> = {}): string[] {
 
         const output = [];
 
@@ -88,12 +113,18 @@ export class Execution {
             params = {};
         }
 
-        if (params.executorParams) {
-            output.push(...params.executorParams.split(/\s+/));
+        if (params.outDir.prefix && params.outDir.value) {
+            if (this.isLegacy) {
+                output.push("--outdir", params.outDir.value);
+            } else {
+                output.push(params.outDir.prefix, params.outDir.value);
+            }
         }
 
-        if (params.outDir.prefix && params.outDir.value) {
-            output.push(params.outDir.prefix, params.outDir.value);
+        if (!this.isLegacy) {
+            if (params.extras) {
+                output.push(...params.extras.split(/\s+/));
+            }
         }
 
         return output;

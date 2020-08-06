@@ -9,6 +9,7 @@ import {MomentModule} from "angular2-moment";
 import {EffectsModule} from "@ngrx/effects";
 import {ExecutorOutputParser} from "./services/executor-output-parser/executor-output-parser.service";
 import {ExecutionDurationPipe} from "./pipes/execution-duration.pipe";
+import {SanitizeHtmlPipe} from "./pipes/sanitize-html.pipe";
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     return function (state, action) {
@@ -35,7 +36,8 @@ export const metaReducers: MetaReducer<any>[] = [
     ],
     declarations: [
         ExecutionStatusComponent,
-        ExecutionDurationPipe
+        ExecutionDurationPipe,
+        SanitizeHtmlPipe
     ],
     exports: [
         ExecutionStatusComponent

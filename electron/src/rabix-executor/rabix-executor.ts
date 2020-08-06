@@ -1,7 +1,7 @@
 const spawn = require("child_process").spawn;
 import * as fs from "fs-extra";
 import * as path from "path";
-import {ExecutorParamsConfig} from "../storage/types/executor-config";
+import {RabixExecutorParamsConfig} from "../storage/types/rabix-executor-config";
 import {Execution} from "./execution";
 import EventEmitter = NodeJS.EventEmitter;
 
@@ -65,7 +65,7 @@ export class RabixExecutor {
         }
     }
 
-    execute(content: string, jobValue: Object = {}, executionParams: Partial<ExecutorParamsConfig> = {}): Promise<Execution> {
+    execute(content: string, jobValue: Object = {}, executionParams: Partial<RabixExecutorParamsConfig> = {}): Promise<Execution> {
 
         const outDir = executionParams.outDir;
 

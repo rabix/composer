@@ -2,7 +2,7 @@ import * as os from "os";
 
 const path = require("path");
 
-export const defaultExecutionOutputDirectory = [os.homedir(), "RabixComposer", "Executions"].join(path.sep);
+export const defaultRabixExecutionOutDir = [os.homedir(), "RabixComposer", "Executions"].join(path.sep);
 
 export function makeOutputDirectoryName(outputDir, appID, user = "local", time = new Date()) {
 
