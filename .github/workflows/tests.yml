@@ -1,0 +1,34 @@
+# Courtesy of https://gist.github.com/azu/673426500458f63f019c8f5e013f282a
+
+name: Tests
+
+on: [push]
+
+jobs:
+  test:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os:
+          - macOS-10.14
+          #- windows-2016  #until we can figure out cross-platform command line
+          - ubuntu-18.04
+
+    steps:
+      - name: Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Use Node.js 8.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 8.x
+      - name: Install and test
+        run: |
+          yarn install
+          yarn test

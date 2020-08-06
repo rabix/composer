@@ -1,6 +1,6 @@
 {
     "name": "rabix-composer",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "executorVersion": "1.0.5",
     "executorDownloadURL": "https://github.com/rabix/bunny/releases/download/v1.0.5-1/rabix-1.0.5.tar.gz",
     "license": "Apache-2.0",
@@ -29,7 +29,7 @@
         "install-executor": "node build-scripts/bundle-executor.js",
         "serve": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng serve -aot",
         "start:electron": "./node_modules/.bin/electron ./electron",
-        "test": "yarn run test:electron && yarn run test:angular",
+        "test": "yarn run test:electron",
         "test:angular": "./node_modules/@angular/cli/bin/ng test --watch false",
         "test:angular:watch": "./node_modules/@angular/cli/bin/ng test",
         "test:spectron": "node ./node_modules/mocha/bin/_mocha --timeout 30000 -r ts-node/register --bail --ui bdd ./spectron/**/*.func.ts",
