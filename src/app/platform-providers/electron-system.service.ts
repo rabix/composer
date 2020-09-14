@@ -7,7 +7,7 @@ const {shell, webFrame} = window["require"]("electron");
 export class ElectronSystemService extends SystemService {
 
     boot() {
-        webFrame.setZoomLevelLimits(1, 1);
+        webFrame.setVisualLevelLimits(1, 1);
     }
 
     openLink(url: string, event?: MouseEvent) {
