@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [macOS-10.14, windows-2016, ubuntu-18.04]
+        os: [macOS-latest, windows-2016, ubuntu-18.04]
 
     steps:
       - name: Context
@@ -37,7 +37,7 @@ jobs:
       #     npx rimraf "dist/!(*.exe|*.deb|*.AppImage|*.dmg)"
 
       - name: Upload macOS artifacts
-        if: matrix.os == 'macOS-10.14'
+        if: matrix.os == 'macOS-latest'
         uses: actions/upload-artifact@v1
         with:
           name: ${{ matrix.os }}
