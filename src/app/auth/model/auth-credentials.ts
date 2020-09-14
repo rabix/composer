@@ -27,7 +27,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
         "https://api.sb.biodatacatalyst.nhlbi.nih.gov": {
             "name": "BioData Catalyst",
             "shortName": "BDCatalyst",
-            "devTokenURL": "https://platform.sb.biodatacatalyst.nhlbi.nih.gov/developer/#token",
+            "platformURL": "https://platform.sb.biodatacatalyst.nhlbi.nih.gov/developer/#token",
         },
         "https://cgc-api.sbgenomics.com": {
             "name": "Cancer Genomics Cloud",
@@ -42,7 +42,7 @@ export class AuthCredentials implements UserPlatformIdentifier {
         "https://api.sevenbridges.cn": {
             "name": "Seven Bridges (China)",
             "shortName": "SBG-CN",
-            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
+            "platformURL": "https://platform.sevenbridges.cn/developer#token",
         },
     };
 
