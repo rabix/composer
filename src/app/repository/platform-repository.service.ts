@@ -187,6 +187,10 @@ export class PlatformRepositoryService {
 
 
     createApp(appID: string, content: string): Promise<string> {
+
+        const appContent = Yaml.safeLoad(content, { json: true } as LoadOptions);
+        content = JSON.stringify(appContent, null, 4);
+
         return this.ipc.request("createPlatformApp", {
             id: appID,
             content: content
