@@ -790,7 +790,7 @@ export abstract class AppEditorBase extends DirectiveBase implements StatusContr
 
                 const jobWithAbspaths = appIsLocal ? ensureAbsolutePaths(path.dirname(appID), job) : job;
 
-                return executor.execute(appID, this.dataModel, jobWithAbspaths, executorPath, executionParams).pipe(
+                return executor.execute(appID, appContent, this.dataModel, jobWithAbspaths, executorPath, executionParams).pipe(
                     finalize(() => this.fileRepository.reloadPath(executionParams.outDir.value))
                 );
             })
