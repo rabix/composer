@@ -83,9 +83,8 @@ export class ExecutorService2 {
 
     }
 
-    execute(appID: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath: string = "", executionParams: Partial<CWLExecutionParamsConfig> = {}): Observable<any> {
+    execute(appID: string, appContent: string, model: WorkflowModel | CommandLineToolModel, jobValue: Object = {}, executorPath: string = "", executionParams: Partial<CWLExecutionParamsConfig> = {}): Observable<any> {
 
-        const appContent = serializeModel(model, true, false, true);
         const executor = new CWLExecutor({ executorPath: executorPath });
         const stepList = this.getStepList(model);
 
