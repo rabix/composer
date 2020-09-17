@@ -92,7 +92,7 @@ builder.build({
             ext: "cwl",
             name: "CWL"
         }],
-        // afterSign: projectRoot + "/build-scripts/notarize.js",
+        afterSign: projectRoot + "/build-scripts/notarize.js",
         dmg: {
             sign: false
         }
