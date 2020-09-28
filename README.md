@@ -22,25 +22,13 @@ modes work seamlessly together.
 ## Dependencies
 
 - [Node.js](https://nodejs.org/en/)
-- [yarn](https://yarnpkg.com/en/)
 
 ## Installation
-
-**The current release requires Node 8 to build properly. In an upcoming release we
-will update the code and dependencies so that they will work on the latest
-node.** 
-
-The [npm package `n`][npm-n] can be helpful in managing node versions, especially on
-macOS Catalina, where Python2 has been removed.
-
-[npm-n]: https://www.npmjs.com/package/n
-
-**The following commands should all be done using node8**
 
 ```bash
 git clone https://github.com/rabix/composer
 cd composer
-yarn install
+npm install
 ```
 
 **If you are using Linux:**
@@ -51,20 +39,29 @@ Install yarn using Linux instructions provided on https://yarnpkg.com/lang/en/do
 
 ## Starting the dev environment
 ```bash
-yarn run serve // starts the dev server
-yarn run compile:electron // compiles electron backend
+npm run compile:electron // compiles electron backend
+npm run compile:angular
+```
+
+In one terminal start the server
+```bash
+npm run serve // starts the dev server
+```
+
+In another terminal start the application
+```bash
 yarn run start:electron // opens the app shell
 ```
 
 ## Packaging the build as a desktop app for the host system and architecture
 ```bash
-yarn run build
+npm run build
 ```
 
 
 ## Running the tests
 ```bash
-yarn test
+npm run test
 ```
 
 ## Documentation
