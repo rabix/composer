@@ -16,7 +16,7 @@
         "url": "git+https://github.com/rabix/composer.git"
     },
     "scripts": {
-        "build": "./node_modules/.bin/rimraf dist ng-dist && yarn run compile:electron && yarn run compile:angular && yarn run package",
+        "build": "./node_modules/.bin/rimraf dist ng-dist && npm run compile:electron && npm run compile:angular && npm run package",
         "changelog": "./node_modules/.bin/git-changelog",
         "whereiam": "dir",
         "compile:angular": "node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng build -prod -aot",

@@ -4,7 +4,7 @@
     "main": "dist/main.js",
     "scripts": {
         "test": "./node_modules/mocha/bin/_mocha -r ts-node/register ./src/**/*.spec.ts",
-        "postinstall": "./../node_modules/.bin/electron-builder install-app-deps"
+        "postinstall": ""
     },
     "dependencies": {
         "async": "^2.4.1",
