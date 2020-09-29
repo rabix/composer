@@ -1,6 +1,6 @@
 {
     "name": "rabix-composer",
-    "version": "1.5.0-rc2",
+    "version": "1.0.3",
     "executorVersion": "1.0.5",
     "executorDownloadURL": "https://github.com/rabix/bunny/releases/download/v1.0.5-1/rabix-1.0.5.tar.gz",
     "license": "Apache-2.0",
@@ -53,7 +53,7 @@
         "@ngrx/store": "^5.0.0",
         "ajv": "^5.2.2",
         "angular2-moment": "^1.8.0",
-        "ansi_up": "^4.0.0",
+        "ansi_up": "^4.0.4",
         "babel-core": "^6.26.0",
         "bootstrap": "4.0.0-alpha.5",
         "brace": "^0.11.0",
