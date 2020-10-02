@@ -13,7 +13,7 @@ jobs:
       matrix:
         os:
           - macOS-latest
-          # - windows-2016
+          - windows-latest
           - ubuntu-18.04
 
     steps:
@@ -28,6 +28,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14.x
+
+      - name: Set Windows shell
+        if: contains(matrix.os, 'windows')
+        run: |
+          npm config set script-shell "C:\\Program Files (x86)\\git\\bin\\bash.exe"
+
       - name: Install and build
         run: |
           npm ci          
