@@ -40,7 +40,6 @@ Install yarn using Linux instructions provided on https://yarnpkg.com/lang/en/do
 ## Starting the dev environment
 ```bash
 npm run compile:electron // compiles electron backend
-npm run compile:angular
 ```
 
 In one terminal start the server
