@@ -32,7 +32,7 @@ jobs:
       - name: Set Windows shell
         if: contains(matrix.os, 'windows')
         run: |
-          npm config set script-shell "C:\\Program Files (x86)\\git\\bin\\bash.exe"
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
 
       - name: Install and build
         run: |
@@ -44,21 +44,21 @@ jobs:
       #     npx rimraf "dist/!(*.exe|*.deb|*.AppImage|*.dmg)"
 
       - name: Upload macOS artifacts
-        if: matrix.os == 'macOS-latest'
+        if: contains(matrix.os, 'macOS')
         uses: actions/upload-artifact@v1
         with:
           name: ${{ matrix.os }}
           path: build/mac
 
       - name: Upload win artifacts
-        if: matrix.os == 'windows-2016'
+        if: contains(matrix.os, 'windows')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}
           path: build/*.exe
 
       - name: Upload linux artifacts
-        if: matrix.os == 'ubuntu-18.04'
+        if: contains(matrix.os, 'ubuntu')
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}

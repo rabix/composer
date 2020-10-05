@@ -32,7 +32,7 @@ jobs:
       - name: Set Windows shell
         if: contains(matrix.os, 'windows')
         run: |
-          npm config set script-shell "C:\\Program Files (x86)\\git\\bin\\bash.exe"
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
 
       - name: Install, compile and test 
         run: |
