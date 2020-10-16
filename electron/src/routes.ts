@@ -616,7 +616,7 @@ export const patchAppMeta: AppMetaPatcher = (data: {
 export function probeRabixExecutorVersion(data: { executorPath: string }, callback) {
     repositoryLoad.then(() => {
         const executor = new CWLExecutor({
-            jarPath: repository.local.rabixExecutorConfig.path,
+            jarPath: undefined,
             executorPath: repository.local.cwlExecutorConfig.executorPath
         });
 
@@ -639,7 +639,7 @@ export function probeRabixExecutorVersion(data: { executorPath: string }, callba
 export function probeCWLExecutorVersion(data: { executorPath: string }, callback) {
     repositoryLoad.then(() => {
         const executor = new CWLExecutor({
-            jarPath: repository.local.rabixExecutorConfig.path,
+            jarPath: undefined,
             executorPath: repository.local.cwlExecutorConfig.executorPath
         });
 
