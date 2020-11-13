@@ -180,8 +180,8 @@ function parseJSON(content, source, rootPath, root?, graph?, traversedExternalPa
 
         if (!graph) {
             graph = {};
-            if (data.$graph && Array.isArray(data.$graph)) {
-                graph = data.$graph.reduce((acc, entry) => {
+            if (data["$graph"] && Array.isArray(data["$graph"])) {
+                graph = data["$graph"].reduce((acc, entry) => {
                     return Object.assign(acc, {[entry.id]: entry});
                 }, {});
             }

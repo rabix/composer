@@ -64,11 +64,7 @@ export class DataGatewayService {
             if (parse) {
                 return fetch.pipe(
                     map(content => {
-                        try {
-                            return YAML.safeLoad(content, {json: true, onWarning: noop} as any);
-                        } catch (err) {
-                            return new Error(err);
-                        }
+                        return YAML.safeLoad(content, {json: true, onWarning: noop} as any) as string;
                     })
                 );
             }
