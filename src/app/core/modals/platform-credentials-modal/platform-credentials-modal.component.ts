@@ -55,9 +55,9 @@ import {withLatestFrom, take} from "rxjs/operators";
                     </button>
                 </div>
 
-                <div *ngIf="form.dirty && form.invalid">                    
+                <div *ngIf="form.dirty && form.invalid">
                     <span class="text-warning" *ngIf="form.get('token').hasError('required')">
-                        <i class="fa fa-warning fa-fw"></i>    
+                        <i class="fa fa-warning fa-fw"></i>
                         Token cannot be empty
                     </span>
 
@@ -161,42 +161,42 @@ export class PlatformCredentialsModalComponent implements OnInit {
             take(1)
         ).subscribe((results: [AuthCredentials | undefined, AuthCredentials[]]) => {
 
-                const [active, all] = results;
+            const [active, all] = results;
 
-                // Determine whether we are adding new creds or updating old ones
-                const isEditing = this.tokenOnly;
+            // Determine whether we are adding new creds or updating old ones
+            const isEditing = this.tokenOnly;
 
-                const editedCredentials = new AuthCredentials(url, token, user);
+            const editedCredentials = new AuthCredentials(url, token, user);
 
-                let maybeUserUpdate = Promise.resolve();
+            let maybeUserUpdate = Promise.resolve();
 
-                if (isEditing) {
-                    if (editedCredentials.equals(active) || this.forceActivateUser) {
-                        // If we are editing credentials that appear to be active, update it
-                        maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
-                    }
-
-                } else {
-                    // Activate added credentials
-                    maybeUserUpdate = this.auth.setActiveCredentials(credentials);
-                    const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
-                        type: "success"
-                    });
-
-                    component.environment = AuthCredentials.getPlatformLabel(url);
-                    component.username    = user.username;
-
-                    component.dismiss.pipe(
-                        take(1)
-                    ).subscribe(() => {
-                        this.notificationBarService.dismissDynamicNotification(component);
-                    });
+            if (isEditing) {
+                if (editedCredentials.equals(active) || this.forceActivateUser) {
+                    // If we are editing credentials that appear to be active, update it
+                    maybeUserUpdate = this.auth.setActiveCredentials(editedCredentials);
                 }
 
-                maybeUserUpdate.then(() => this.global.reloadPlatformData());
+            } else {
+                // Activate added credentials
+                maybeUserUpdate = this.auth.setActiveCredentials(credentials);
+                const component = this.notificationBarService.showDynamicNotification(GetStartedNotificationComponent, {
+                    type: "success"
+                });
 
-                this.submit.next(true);
-            });
+                component.environment = AuthCredentials.getPlatformLabel(url);
+                component.username    = user.username;
+
+                component.dismiss.pipe(
+                    take(1)
+                ).subscribe(() => {
+                    this.notificationBarService.dismissDynamicNotification(component);
+                });
+            }
+
+            maybeUserUpdate.then(() => this.global.reloadPlatformData());
+
+            this.submit.next(true);
+        });
 
     }
 
@@ -229,7 +229,7 @@ export class PlatformCredentialsModalComponent implements OnInit {
                         if (!(val in AuthCredentials.platformLookupByAPIURL)) {
                             try {
                                 const url = new URL(val);
-                                if(url.hostname.endsWith(".sbgenomics.com")){
+                                if (url.hostname.endsWith(".sbgenomics.com") || url.hostname.endsWith(".nhlbi.nih.gov")) {
                                     return null;
                                 } else {
                                     return {name: true};
@@ -292,10 +292,16 @@ export class PlatformCredentialsModalComponent implements OnInit {
 
         const apiURL: string = this.form.get("url").value;
 
-        const platform = AuthCredentials.platformLookupByAPIURL[apiURL];
-        const url = platform ? platform.devTokenURL : "https://igor.sbgenomics.com/developer#token";
+        // Remove port from url
+        const platformAPIURL = apiURL.replace(/(:[1-9]+)$/, "");
 
-        this.system.openLink(url);
+        const isPlatform =
+            AuthCredentials.platformLookupByAPIURL[platformAPIURL] || AuthCredentials.stagingLookupByAPIURL[platformAPIURL];
+
+        const url = isPlatform ? isPlatform.platformURL : platformAPIURL;
+        const devTokenPath = AuthCredentials.platformDevTokenPath;
+
+        this.system.openLink(`${url}${devTokenPath}`);
 
     }
 
@@ -318,4 +324,3 @@ export class PlatformCredentialsModalComponent implements OnInit {
         };
     }
 }
-

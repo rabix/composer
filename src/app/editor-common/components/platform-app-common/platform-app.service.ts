@@ -4,6 +4,7 @@ import {AuthService} from "../../../auth/auth.service";
 import {NotificationBarService} from "../../../layout/notification-bar/notification-bar.service";
 import {SystemService} from "../../../platform-providers/system.service";
 import {take} from "rxjs/operators";
+import {AuthCredentials} from "../../../auth/model/auth-credentials";
 
 @Injectable()
 export class PlatformAppService {
@@ -25,14 +26,21 @@ export class PlatformAppService {
             }
 
             // Remove port from url
-            let platformURL = credentials.url.replace(/.com:[1-9]+/, ".com");
+            const platformAPIURL = credentials.url.replace(/(:[1-9]+)$/, "")
 
-            // If its not a vayu
-            if (!~platformURL.indexOf("-vayu")) {
+            let platformURL = platformAPIURL;
 
-                platformURL = ~platformURL.indexOf("-api") ? platformURL.replace("-api", "") : "https://igor.sbgenomics.com";
+            const isPlatform =
+                AuthCredentials.platformLookupByAPIURL[platformAPIURL] || AuthCredentials.stagingLookupByAPIURL[platformAPIURL];
+
+            if (!~platformAPIURL.indexOf("-vayu")) {
+
+                platformURL = (isPlatform && isPlatform.platformURL)
+                    || platformURL.replace("-api", "")
+                    || "https://igor.sbgenomics.com";
 
             }
+
 
             // URL example: u/ivanbatic/test-project/apps/#ivanbatic/test-project/bamtools-index-2-4-0
             const [userSlug, projectSlug, appSlug, revisionID = ""] = appID.split("/");
