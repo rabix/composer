@@ -18,38 +18,35 @@ modes work seamlessly together.
 
 ## Dependencies
 
-- [Node.js](https://nodejs.org/en/)
-- [yarn](https://yarnpkg.com/en/)
+- [Node.js](https://nodejs.org/en/) (v12.x)
 
 ## Installation
 
 ```bash
 git clone https://github.com/rabix/composer
 cd composer
-yarn install
+npm ci
 ```
 
 **If you are using Linux:**
 
 Install node.js from https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 
-Install yarn using Linux instructions provided on https://yarnpkg.com/lang/en/docs/install/
-
 ## Starting the dev environment
 ```bash
-yarn run serve // starts the dev server
-yarn run compile:electron // compiles electron backend
-yarn run start:electron // opens the app shell
+npm run serve // starts the dev server
+npm run compile:electron // compiles electron backend
+npm run start:electron // opens the app shell
 ```
 
 ## Packaging the build as a desktop app for the host system and architecture
 ```bash
-yarn run build
+npm run build
 ```
 
 ## Running the tests
 ```bash
-yarn test
+npm test
 ```
 
 ## Documentation
