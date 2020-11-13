@@ -24,10 +24,10 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "shortName": "SBG-EU",
             "devTokenURL": "https://eu.sbgenomics.com/developer#token",
         },
-        "https://api.sevenbridges.cn": {
-            "name": "Seven Bridges (China)",
-            "shortName": "SBG-CN",
-            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
+        "https://api.sb.biodatacatalyst.nhlbi.nih.gov": {
+            "name": "BioData Catalyst",
+            "shortName": "BDCatalyst",
+            "devTokenURL": "https://platform.sb.biodatacatalyst.nhlbi.nih.gov/developer/#token",
         },
         "https://cgc-api.sbgenomics.com": {
             "name": "Cancer Genomics Cloud",
@@ -39,10 +39,10 @@ export class AuthCredentials implements UserPlatformIdentifier {
             "shortName": "CAVATICA",
             "devTokenURL": "https://cavatica.sbgenomics.com/developer#token",
         },
-        "https://f4c-api.sbgenomics.com": {
-            "name": "Fair4Cures",
-            "shortName": "F4C",
-            "devTokenURL": "https://f4c.sbgenomics.com/developer#token",
+        "https://api.sevenbridges.cn": {
+            "name": "Seven Bridges (China)",
+            "shortName": "SBG-CN",
+            "devTokenURL": "https://platform.sevenbridges.cn/developer#token",
         },
     };
 
