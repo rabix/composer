@@ -2,7 +2,7 @@
 
 Rabix Composer will remain available as a local sbg:draft2 and CWL 1.0 tool and workflow editor. However, please note that Seven Bridges is not actively maintaining or extending Rabix Composer at the moment (Q2 2021). The repository will remain open for new issues and pull requests, but please have in mind that those may not be processed in a timely manner.
 
-New CWL versions and features will still be added to the core open source libraries [cwl-ts](https://github.com/rabix/cwl-ts) and [cwl-svg](https://github.com/rabix/cwl-svg). For full editing experience we suggest signing up to one of the Seven Bridges platforms.
+New CWL versions and features will still be added to the core open source libraries [cwl-ts](https://github.com/rabix/cwl-ts) and [cwl-svg](https://github.com/rabix/cwl-svg). For the best CWL visual editing experience, we suggest signing up to one of the Seven Bridges platforms.
 
 # Rabix Composer
 [![Build Status](https://travis-ci.org/rabix/composer.svg?branch=master)](https://travis-ci.org/rabix/composer)
