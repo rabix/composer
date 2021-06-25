@@ -1,3 +1,7 @@
+# Support notice
+
+Rabix Composer will remain available as a local sbg:draft2 and CWL 1.0 tool and workflow editor. However, please note that Seven Bridges is not actively maintaining or extending Rabix Composer at the moment (Q2 2021). The repository will remain open for new issues and pull requests, but please have in mind that those may not be processed in a timely manner.
+
 # Notice to Contributors to Seven Bridges Open Source Projects
 
 We require contributors to our open-source projects to sign a Seven
