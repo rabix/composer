@@ -105,7 +105,7 @@
         "karma-coverage-istanbul-reporter": "^1.4.1",
         "karma-jasmine": "~1.1.1",
         "karma-jasmine-html-reporter": "^0.2.2",
-        "markdown-it": "^8.3.2",
+        "markdown-it": "^12.3.2",
         "request": "^2.83.0",
         "rimraf": "^2.7.1",
         "spectron": "^3.7.2",
