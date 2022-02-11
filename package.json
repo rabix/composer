@@ -99,7 +99,7 @@
         "glob": "^7.1.1",
         "jasmine-core": "^2.99.1",
         "jasmine-spec-reporter": "^4.2.1",
-        "karma": "~2.0.0",
+        "karma": "~6.3.14",
         "karma-chrome-launcher": "^2.2.0",
         "karma-cli": "~1.0.1",
         "karma-coverage-istanbul-reporter": "^1.4.1",
