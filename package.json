@@ -51,7 +51,7 @@
         "@angular/router": "^5.2.6",
         "@ngrx/effects": "^5.0.1",
         "@ngrx/store": "^5.0.0",
-        "ajv": "^5.2.2",
+        "ajv": "^6.12.3",
         "angular2-moment": "^1.8.0",
         "babel-core": "^6.26.0",
         "bootstrap": "4.0.0-alpha.5",
