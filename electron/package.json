@@ -7,7 +7,7 @@
         "postinstall": ""
     },
     "dependencies": {
-        "async": "^2.4.1",
+        "async": "^2.6.4",
         "fix-path": "^2.1.0",
         "fs-extra": "^4.0.1",
         "glob": "^7.1.2",
